@@ -1,19 +1,17 @@
 import { Body, Controller, Post, UseGuards } from "@nestjs/common";
-import { LoginDto } from "./dto/create-auth.dto";;
-import { UserLogin } from "./auth.service";
+import { LoginDto } from "./dto/create-auth.dto";
+import { AuthService } from "./auth.service";
 import { AuthGuard } from "@nestjs/passport";
-import { UUID } from "typeorm/driver/mongodb/bson.typings.js";
 
 @Controller("auth")
-export class AuthLogin {
-  constructor (private userlogin:UserLogin) {}
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
   @UseGuards(AuthGuard('local'))
   @Post('login')
-  async login(@Body() dto:LoginDto){
-    const user = await this.userlogin.Validator(dto)
-    return this.userlogin.Login(user)
+  async login(@Body() dto: LoginDto) {
+    // Local strategy will validate; as a fallback, validate here
+    const user = await this.authService.validateUser(dto.email, dto.password);
+    return this.authService.login(user);
   }
-
-  
-
 }
