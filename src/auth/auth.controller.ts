@@ -1,34 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { Body, Controller, Post, UseGuards } from "@nestjs/common";
+import { LoginDto } from "./dto/create-auth.dto";;
+import { UserLogin } from "./auth.service";
+import { AuthGuard } from "@nestjs/passport";
+import { UUID } from "typeorm/driver/mongodb/bson.typings.js";
 
-@Controller('auth')
-export class AuthController {
-  constructor(private readonly authService: AuthService) {}
-
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
+@Controller("auth")
+export class AuthLogin {
+  constructor (private userlogin:UserLogin) {}
+  @UseGuards(AuthGuard('local'))
+  @Post('login')
+  async login(@Body() dto:LoginDto){
+    const user = await this.userlogin.Validator(dto)
+    return this.userlogin.Login(user)
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
+  
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
-  }
 }
