@@ -6,6 +6,7 @@ import { getDatabaseConfig } from './config/database.config';
 import { AuthModule } from './auth/auth.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { StockModule } from './stock/stock.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AppService } from './app.service';
       inject: [ConfigService],
     }),
     AuthModule,
+    StockModule,
   ],
   controllers: [AppController],
   providers: [AppService],
