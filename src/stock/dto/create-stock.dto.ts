@@ -1,1 +1,3 @@
-export class CreateStockDto {}
+export class CreateStockDto {
+    
+}
