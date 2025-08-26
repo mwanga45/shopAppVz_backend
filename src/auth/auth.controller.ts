@@ -10,8 +10,8 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   @Post('login')
   async login(@Body() dto: LoginDto) {
-    // Local strategy will validate; as a fallback, validate here
     const user = await this.authService.validateUser(dto.email, dto.password);
-    return this.authService.login(user);
+    const { id, email, role } = user as any;
+    return this.authService.login({ id, email, role });
   }
 }

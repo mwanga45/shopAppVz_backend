@@ -14,7 +14,11 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.email = :email', { email })
+      .getOne();
     if (!user) {
       throw new UnauthorizedException("Invalid email or password");
     }
@@ -27,7 +31,7 @@ export class AuthService {
     return user;
   }
 
-  async login(user: User) {
+  async login(user: { id: number; email: string; role: 'user' | 'admin' }) {
     const payload = {
       sub: user.id,
       email: user.email,

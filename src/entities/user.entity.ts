@@ -1,10 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column } from 'typeorm';
+import { baseEntity } from 'src/common/base.entity';
 
 @Entity('users')
-export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
+export class User extends baseEntity {
   @Column({ unique: true })
   email: string;
 
@@ -18,15 +16,9 @@ export class User {
   password: string;
 
   @Column({default:"user"})
-  role:"user" |"admin"
-
+  role: "user" | "admin";
 
   @Column({ default: true })
   isActive: boolean;
 
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }
