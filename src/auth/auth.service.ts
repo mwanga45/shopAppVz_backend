@@ -42,4 +42,7 @@ export class AuthService {
       role: user.role,
     };
   }
+  async  register(user:{firstname:string; lastname:string; email:string; password:string; nida:string; phone_number:string}){
+    
+  }
 }
