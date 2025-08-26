@@ -1,26 +1,21 @@
-export function validateNidaNumber(nida: string): { Isvalid: boolean; reason?: string }{
-//   if (/^(\d{8})-(\d{5})-(\d{5})-(\d{2})$/.test(nida)){
-//     return {Isvalid:false , reason:"Nida number is not valid"}
-//   }
-//   const dob =  nida.substring(0,9);
-//   const  year = dob.substring((0,5),10)   
-
-const nidaregx = /^(\d{8})-(\d{5})-(\d{5})-(\d{2})$/
-const match = nida.match(nidaregx)
-if(!Math){
-    return {Isvalid:false , reason:'invalid format'}
+export class NidaValidate{
+static  validateNidaNumber(nida: string): { Isvalid: boolean; reason?: string } {
+    const nidaregx = /^(\d{8})-(\d{5})-(\d{5})-(\d{2})$/;
+    const match = nida.match(nidaregx);
+    if (!match) {
+        return { Isvalid: false, reason: 'invalid format' };
+    }
+    const year = parseInt(match[1].substring(0, 4), 10);
+    const month = parseInt(match[1].substring(4, 6), 10);
+    const day = parseInt(match[1].substring(6, 8), 10);
+    const date = new Date(year, month - 1, day);
+    if (
+        date.getFullYear() !== year ||
+        date.getMonth() + 1 !== month ||
+        date.getDate() !== day
+    ) {
+        return { Isvalid: false, reason: 'invalid nida number' };
+    }
+    return { Isvalid: true };
 }
-const year = parseInt(nida.substring(0,5),10)
-const month = parseInt(nida.substring(5,7),10)
-const day = parseInt(nida.substring(7,9),10)
-
-const date = new Date(year,month-1,day)
-if(
-    date.getDay()!== day ||
-    date.getMonth() +1 !== month||
-    date.getDay() !== day
-){
-    return {Isvalid:false, reason:"invalid nida number"}
-}
-
 }
