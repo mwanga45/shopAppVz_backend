@@ -42,7 +42,22 @@ export class AuthService {
       role: user.role,
     };
   }
-  async  register(user:{firstname:string; lastname:string; email:string; password:string; nida:string; phone_number:string}){
-     
-  }
+         async  register(user:{firstname:string; lastname:string; email:string; password:string; nida:string; phone_number:string}){
+      const {email, phone_number, nida} = user;
+      const existing = await this.userRepository.findOne({
+        where:[
+          {email} as any,
+          {phone_number} as any,
+          {nida} as any,
+        ],
+      });
+      if(existing){
+        if((existing as any).email === email) return {exist: true, field: 'email'};
+        if((existing as any).phone_number === phone_number) return {exist: true, field: 'phone_number'};
+        if((existing as any).nida === nida) return {exist: true, field: 'nida'};
+      }
+      return {exist: false, proceed: true};
+    }
+    
+
 }
