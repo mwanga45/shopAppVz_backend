@@ -1,4 +1,5 @@
-import { IsEmail, isNotEmpty, IsNotEmpty, isString, IsString, Length } from "class-validator";
+import { match } from "assert";
+import { IsEmail, isNotEmpty, IsNotEmpty, isString, IsString, Length, Matches } from "class-validator";
 
 export class LoginDto {
     @IsEmail()
@@ -25,7 +26,11 @@ export class RegisterDTO{
     
     @IsString()
     @Length(6,20)
-    password
+    @Matches(/^[A-Z].*[@$!%*?&]/,{
+        message:"Password is too week"
+    })
+    password:string
+
     @IsString()
     @Length(20)
     nida:string
