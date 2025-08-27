@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Post, UseGuards, Req, HttpCode, HttpStatus, ConflictException } from "@nestjs/common";
 import { LoginDto } from "./dto/create-auth.dto";
 import { RegisterDTO } from "./dto/create-auth.dto";
 import { AuthService } from "./auth.service";
@@ -10,13 +10,17 @@ export class AuthController {
 
   @UseGuards(AuthGuard('local'))
   @Post('login')
-  async login(@Body() dto: LoginDto) {
-    const user = await this.authService.validateUser(dto.email, dto.password);
-    const { id, email, role } = user as any;
+  async login(@Req() req) {
+    const { id, email, role } = req.user;
     return this.authService.login({ id, email, role });
   }
   @Post('register')
-  async register(@Body() dto:RegisterDTO){
-    
+  @HttpCode(HttpStatus.CREATED)
+  async register(@Body() dto: RegisterDTO) {
+    const result = await this.authService.register(dto);
+    if (result && result.exist === true) {
+      throw new ConflictException({ field: result.field, message: `${result.field} already exists` });
+    }
+    return result;
   }
 }
