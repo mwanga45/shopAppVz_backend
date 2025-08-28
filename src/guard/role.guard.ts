@@ -5,7 +5,7 @@ import { Request } from "express";
 @Injectable()
 export class RoleGuard implements CanActivate{
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-        const request = context.switchToHttp().getRequest<Request>()
+      const request = context.switchToHttp().getRequest<Request>()
       return true
     }
 
