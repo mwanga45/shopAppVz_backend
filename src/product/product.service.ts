@@ -19,6 +19,25 @@ export class ProductService {
     if(product){
        throw new UnauthorizedException("Product name is already been exist")
     }
+    if (createProductDto.purchase_price >= createProductDto.Ws_price){
+      throw new UnauthorizedException("Please check the purchase prise and the whole sales  of this product the  pruschase sales must be small than  whole")
+    }
+    const allowedCategories = ["both", "wholesales", "retailsales", "none"]
+    const allowedTypes = ["liquid", "solid"]
+    const categoryValid = allowedCategories.includes(createProductDto.product_category)
+    const typeValid = allowedTypes.includes(createProductDto.product_type)
+    if (!categoryValid || !typeValid){
+      throw new UnauthorizedException("Please check either produc_category or product_type make sure u send appropiate  info")
+    }
+    const createproduct = this.Productrepository.create({
+      product_name:createProductDto.product_name,
+      product_category:createProductDto.product_category,
+      product_type:createProductDto.product_type,
+      wholesales_price:createProductDto.Ws_price,
+      retailsales_price:createProductDto.Rs_price,
+      purchase_price:createProductDto.purchase_price
+    })
+    await this.Productrepository.save(createproduct)
     return "Successfuly create  new product"
   }
 
