@@ -7,14 +7,14 @@ import { Repository } from 'typeorm';
 
 
 type Productpayload = {
-  sub:number,
-  product_name:string,
-  product_category:string,
-  product_type:string,
-  purchase_price:string,
-  retailsales_price:string,
-  wholesales_price:string
-
+  id: number,
+  product_name: string,
+  product_category: string,
+  product_type: string,
+  purchase_price: string,
+  retailsales_price: string,
+  wholesales_price: string,
+  UpdateAt: Date,
 }
 @Injectable()
 
@@ -51,7 +51,7 @@ export class ProductService {
     return "Successfuly create  new product"
   }
 
-  async findAll():Promise<Productpayload> {
+  async findAll():Promise<Productpayload[]> {
     const product_list = await this.Productrepository.find({
       select:["id", "product_name","product_category","product_type", "purchase_price","retailsales_price","wholesales_price","UpdateAt" ]
     })
