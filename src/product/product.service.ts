@@ -6,8 +6,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 
+type Productpayload = {
+  sub:number,
+  product_name:string,
+  product_category:string,
+  product_type:string,
+  purchase_price:string,
+  retailsales_price:string,
+  wholesales_price:string
 
+}
 @Injectable()
+
 export class ProductService {
   constructor(
    @InjectRepository(Product) private readonly  Productrepository:Repository<Product>
@@ -41,8 +51,12 @@ export class ProductService {
     return "Successfuly create  new product"
   }
 
-  findAll() {
-    return `This action returns all product`;
+  async findAll():Promise<Productpayload> {
+    const product_list = await this.Productrepository.find({
+      select:["id", "product_name","product_category","product_type", "purchase_price","retailsales_price","wholesales_price","UpdateAt" ]
+    })
+    return product_list
+    
   }
 
   findOne(id: number) {
