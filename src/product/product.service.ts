@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 
+
 type Productpayload = {
   id: number,
   product_name: string,
@@ -16,6 +17,7 @@ type Productpayload = {
   wholesales_price: string,
   UpdateAt: Date,
 }
+
 @Injectable()
 
 export class ProductService {
@@ -51,12 +53,33 @@ export class ProductService {
     return "Successfuly create  new product"
   }
 
-  async findAll():Promise<Productpayload[]> {
-    const product_list = await this.Productrepository.find({
-      select:["id", "product_name","product_category","product_type", "purchase_price","retailsales_price","wholesales_price","UpdateAt" ]
-    })
-    return product_list
-    
+  async findAll(filter?:{category?:string,type?:string}):Promise<Productpayload[]> {
+    const query = this.Productrepository.createQueryBuilder("product")
+      .select([
+        "product.id",
+        "product.product_name",
+        "product.product_category",
+        "product.product_type",
+        "product.purchase_price",
+        "product.retailsales_price",
+        "product.wholesales_price",
+        "product.UpdateAt",
+      ]);
+
+    if (filter?.type) {
+      query.andWhere("product.product_type = :type", { type: filter.type });
+    }
+    if (filter?.category) {
+      query.andWhere("product.product_category = :category", { category: filter.category });
+    }
+    return await query.orderBy("product.product_name", "ASC").getMany();
+  }
+  async findby_category():Promise<Productpayload[]>{
+    const products = await this.Productrepository.find({
+      select:["id", "product_name","product_category","product_type", "purchase_price","retailsales_price","wholesales_price","UpdateAt" ],
+      order:{ product_category: "ASC", product_name: "ASC" }
+    });
+    return products;
   }
 
   async findOne(product_id: number):Promise<any> {
