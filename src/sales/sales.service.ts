@@ -8,6 +8,7 @@ import { Product } from 'src/product/entities/product.entity';
 import { RetailSales } from './entities/sale.entity';
 import { NotFoundException } from '@nestjs/common';
 import { ProductInfo } from './type/type';
+import { isEmpty } from 'class-validator';
 
 @Injectable()
 export class SalesService {
@@ -35,6 +36,9 @@ export class SalesService {
      ])
      .where("product.product_category = :category",{category:"wholesales"})
      .getMany();
+     if(WholeSales.length){
+      return "No product avalaible yet"
+     }
      
      return wholesalesquery
   }
@@ -50,8 +54,12 @@ export class SalesService {
     ])
     .where("product.product_category =:category",{category:"retailsales"})
     .getMany();
+    if (RetailSales.length === 0){
+      return "No Product Available yet"
+    }
     return RetailSales
   }
+
   
 
   findOne(id: number) {
