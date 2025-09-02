@@ -8,7 +8,7 @@ import { Product } from 'src/product/entities/product.entity';
 import { RetailSales } from './entities/sale.entity';
 import { NotFoundException } from '@nestjs/common';
 import { ProductInfo } from './type/type';
-import { isEmpty } from 'class-validator';
+import { isDate, isEmpty } from 'class-validator';
 
 @Injectable()
 export class SalesService {
@@ -58,6 +58,24 @@ export class SalesService {
       return "No Product Available yet"
     }
     return RetailSales
+  }
+
+  async Sales_Record(sales:{product_id:string;product_type:string;product_category:string;totals_pc_kg_ltre:string}):Promise<any>{
+   const {product_id,product_type,product_category,totals_pc_kg_ltre} =  sales;
+
+  //  check product category
+  if(product_category === "wholesales"){
+    // update the  wholesales table base on date of today
+    // also check  the  type of product  make sure the row  created with specific measure in column of the type
+    // ckeck if the  today it have already have an record  by check product id id if is already exist in table
+    // if not  create
+    // if exist update the table
+    // make sure ur update also the  stock
+
+  }
+  // do the same to retail_category product
+
+
   }
 
   

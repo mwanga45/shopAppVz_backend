@@ -15,7 +15,7 @@ export class StockService {
     @InjectRepository(Stock_record) private readonly recstockRepo:Repository<Stock_record>,
     @InjectRepository(Product) private readonly productRepo:Repository<Product>
   ){}
-   async check_productname(product_Id:any):Promise<any>{
+ async check_productname(product_Id:any):Promise<any>{
         const findProductname = await  this.productRepo.findOne({
       where:{
         id:product_Id
