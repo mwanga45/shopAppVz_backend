@@ -2,9 +2,14 @@ import { IsString } from "class-validator";
 
 export class CreateStockDto {
     @IsString()
-    product_id:string
+    product_id: string
 
     @IsString()
-    Addition_strock:string
+    total_stock: string;
 
+    @IsString()
+    category: string;
+
+    @IsString()
+    product_type: string
 }

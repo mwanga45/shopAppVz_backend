@@ -9,7 +9,7 @@ export class StockController {
 
   @Post()
   create(@Body() createStockDto: CreateStockDto) {
-    return this.stockService.create(createStockDto);
+    return this.stockService.createStockRec(createStockDto);
   }
 
   @Get()
