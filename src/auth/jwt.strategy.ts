@@ -20,9 +20,9 @@ export class JwtStrategy extends PassportStrategy(Strategy){
   ) {
     super(
       {
-        jwtRequest:ExtractJwt.fromAuthHeaderAsBearerToken(),
+        jwtFromRequest:ExtractJwt.fromAuthHeaderAsBearerToken(),
         IgnoreTokeExpire:false,
-        secret0rkey:config.get<string>('jwt-token')
+        secretOrKey:config.get<string>('jwt.secret')
 
       }
     )

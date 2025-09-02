@@ -6,15 +6,18 @@ import { UpdateSaleDto } from './dto/update-sale.dto';
 @Controller('sales')
 export class SalesController {
   constructor(private readonly salesService: SalesService) {}
-
+  @Get('wholesales')
+  WholesalesInfo(){
+    return this.salesService.Wholesale()
+  }
   @Post()
   create(@Body() createSaleDto: CreateSaleDto) {
     return this.salesService.create(createSaleDto);
   }
 
-  @Get()
-  findAll() {
-    return this.salesService.findAll();
+  @Get('retailsale')
+  RetailsalesInfo() {
+    return this.salesService.RetailsSales();
   }
 
   @Get(':id')
@@ -22,13 +25,4 @@ export class SalesController {
     return this.salesService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSaleDto: UpdateSaleDto) {
-    return this.salesService.update(+id, updateSaleDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.salesService.remove(+id);
-  }
 }
