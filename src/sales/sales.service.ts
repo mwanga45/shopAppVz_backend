@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
-import { WholeSales } from './entities/sale.entity';
+import { WholeSales } from './entities/wholesale.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/product/entities/product.entity';
-import { RetailSales } from './entities/sale.entity';
+import { RetailSales } from './entities/retailsale.entity';
 import { NotFoundException } from '@nestjs/common';
 import { ProductInfo } from './type/type';
 import { isDate, isEmpty } from 'class-validator';
