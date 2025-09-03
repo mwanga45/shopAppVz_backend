@@ -118,8 +118,6 @@ export class SalesService {
   }
   async ProfitCalc(Total_litre_kg:string,product_id:string):Promise<any>{
     const AmountperEach = await this.ProductRepository.createQueryBuilder('p')
-    
-    
   }
   timetest():any{
     const date = new Date()
