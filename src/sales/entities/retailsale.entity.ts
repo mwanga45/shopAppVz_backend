@@ -21,7 +21,6 @@ export class RetailSales extends baseEntity{
     
     @Column({nullable:true})
     userId:string;
-    
 
     @ManyToOne(() => Product, { eager: true })
     @JoinColumn({ name: 'productId' })
