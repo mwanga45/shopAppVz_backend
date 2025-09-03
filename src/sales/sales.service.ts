@@ -9,6 +9,7 @@ import { RetailSales } from './entities/retailsale.entity';
 import { NotFoundException } from '@nestjs/common';
 import { ProductInfo } from './type/type';
 import { isDate, isEmpty } from 'class-validator';
+import { concat } from 'rxjs';
 
 @Injectable()
 export class SalesService {
@@ -60,12 +61,36 @@ export class SalesService {
     return RetailSales
   }
 
-  async Sales_Record(sales:{product_id:string;product_type:string;product_category:string;totals_pc_kg_ltre:string}):Promise<any>{
-   const {product_id,product_type,product_category,totals_pc_kg_ltre} =  sales;
+  async Sales_Record(sales:{product_id:string;product_type:string;product_category:string;totals_pc_kg_ltre:string; userId:string}):Promise<any>{
+   const {product_id,product_type,product_category,totals_pc_kg_ltre,userId} =  sales;
 
   //  check product category
   if(product_category === "wholesales"){
     // update the  wholesales table base on date of today
+    const checkproductexistance = await this.WholesalesRepository.exists({
+      where:{
+        productId:product_id
+      }
+    })
+    if(!checkproductexistance){
+      if(product_type== "solid"){
+        const total_pc = totals_pc_kg_ltre.concat(".","Pc")
+        const createSales =  this.WholesalesRepository.create({
+        productId:product_id,
+        Total_pc_pkg_litre:total_pc,
+      })
+      return await this.WholesalesRepository.save(createSales) 
+      }
+      const total_litre = totals_pc_kg_ltre.concat(".","m3")
+      const create = this.WholesalesRepository.create({
+        productId:product_id,
+        Total_pc_pkg_litre:total_litre
+      })
+      return this.WholesalesRepository.save(create)
+    }
+    const todayDate = this.timetest()
+
+
     // also check  the  type of product  make sure the row  created with specific measure in column of the type
     // ckeck if the  today it have already have an record  by check product id id if is already exist in table
     // if not  create
@@ -79,7 +104,7 @@ export class SalesService {
   }
 
   
-
+  
   findOne(id: number) {
     return `This action returns a #${id} sale`;
   }
@@ -90,5 +115,18 @@ export class SalesService {
 
   remove(id: number) {
     return `This action removes a #${id} sale`;
+  }
+  async ProfitCalc(Total_litre_kg:string,product_id:string):Promise<any>{
+    const AmountperEach = await this.ProductRepository.createQueryBuilder('p')
+    
+    
+  }
+  timetest():any{
+    const date = new Date()
+    const yy = String(date.getFullYear())
+    const dd = String(date.getDay()).padStart(2 ,'0')
+    const mm = String(date.getMonth()+1).padStart(2,'0')
+    const fulldate = yy.concat(".",mm,".",dd)
+    return fulldate
   }
 }

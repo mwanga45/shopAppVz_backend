@@ -26,8 +26,8 @@ export class RetailSales extends baseEntity{
     @JoinColumn({ name: 'productId' })
     product: Product;
 
-    @ManyToOne(()=> User,{eager:true})
-    @JoinColumn({name:'user_id'})
-    user:User;
+    // @ManyToOne(()=> User,{eager:true})
+    // @JoinColumn({name:'user_id'})
+    // user:User;
 
 }
