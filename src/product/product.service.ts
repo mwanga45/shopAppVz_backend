@@ -88,10 +88,10 @@ export class ProductService {
   }
   async updateproduct(id:number,updateProductDto:UpdateProductDto):Promise<any>{
     return await this.Productrepository.update({id},{...updateProductDto})
-    
+
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async Removeproduct(id: number):Promise<any> {
+    await this.Productrepository.delete({id})
   }
 }
