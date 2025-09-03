@@ -74,7 +74,7 @@ export class ProductService {
     }
     const response =  await query.orderBy("product.product_name", "ASC").getMany();
     if(response.length === 0){
-      return "No such product"
+      return "No such product category"
     }
     return response
 

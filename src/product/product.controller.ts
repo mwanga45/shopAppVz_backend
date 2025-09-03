@@ -16,8 +16,8 @@ export class ProductController {
   create(@Body() createProductDto: CreateProductDto) {
     return this.productService.create(createProductDto);
   }
-  @UseGuards(AuthGuard('jwt'))
-  @Get('wholes')
+  // @UseGuards(AuthGuard('jwt'))
+  @Get('getproduct')
   findAll(@Query('category') category?: string, @Query('type') type?: string) {
     return this.productService.findAll({ category, type });
   }
