@@ -11,13 +11,13 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @UseGuards(AuthGuard('jwt'), RoleGuard)
-  @Post("product_create")
+  @Post("create")
   @HttpCode(201)
   create(@Body() createProductDto: CreateProductDto) {
     return this.productService.create(createProductDto);
   }
   @UseGuards(AuthGuard('jwt'))
-  @Get()
+  @Get('wholes')
   findAll(@Query('category') category?: string, @Query('type') type?: string) {
     return this.productService.findAll({ category, type });
   }

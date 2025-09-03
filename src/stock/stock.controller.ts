@@ -7,12 +7,12 @@ import { UpdateStockDto } from './dto/update-stock.dto';
 export class StockController {
   constructor(private readonly stockService: StockService) {}
 
-  @Post()
+  @Post("create")
   create(@Body() createStockDto: CreateStockDto) {
     return this.stockService.createStockRec(createStockDto);
   }
 
-  @Get()
+  @Get("remain")
   findAll() {
     return this.stockService.findAll();
   }

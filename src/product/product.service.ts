@@ -53,7 +53,7 @@ export class ProductService {
     return "Successfuly create  new product"
   }
 
-  async findAll(filter?:{category?:string,type?:string}):Promise<Productpayload[]> {
+  async findAll(filter?:{category?:string,type?:string}):Promise<Productpayload[] | string> {
     const query = this.Productrepository.createQueryBuilder("product")
       .select([
         "product.id",
@@ -72,7 +72,12 @@ export class ProductService {
     if (filter?.category) {
       query.andWhere("product.product_category = :category", { category: filter.category });
     }
-    return await query.orderBy("product.product_name", "ASC").getMany();
+    const response =  await query.orderBy("product.product_name", "ASC").getMany();
+    if(response.length === 0){
+      return "No such product"
+    }
+    return response
+
   }
   async findby_category():Promise<Productpayload[]>{
     const products = await this.Productrepository.find({
