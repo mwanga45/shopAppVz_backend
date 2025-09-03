@@ -27,10 +27,16 @@ export class ProductController {
     return this.productService.findOne(+id);
   }
 
-  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  // @UseGuards(AuthGuard('jwt'), RoleGuard)
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+  //   return this.productService.update(+id, updateProductDto);
+  // }
+  @UseGuards(AuthGuard('jwt'),RoleGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productService.update(+id, updateProductDto);
+  updateProduct(@Param('id')id:number,
+  @Body()updateDto:UpdateProductDto){
+    this.productService.updateproduct(id,updateDto)
   }
   @UseGuards(AuthGuard('jwt'), RoleGuard)
   @Delete(':id')
