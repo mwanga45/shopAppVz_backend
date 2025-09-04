@@ -30,4 +30,11 @@ export class  SalesHelper {
      const Expected_profit = litre * ExpectProfitPerEach
      return Expected_profit
   }
+  calculeDevition (Expected_profit:number, Actual_Profit:number):any{
+    const  deviation_profit  = Expected_profit - Actual_Profit
+    const deviation_percentage = (Actual_Profit/Expected_profit)*100
+    
+    return {deviation_percentage,deviation_profit}
+    
+  }
 }
