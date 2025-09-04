@@ -14,7 +14,7 @@ export class OrderController {
   }
   @Get('active')
   GetActive() {
-    return this.orderService.GetActiveOrder();
+    return this.orderService.ProductSummary();
   }
 
   @Get(':id')
