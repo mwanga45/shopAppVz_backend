@@ -3,7 +3,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
-import { LessThanOrEqual, Repository } from 'typeorm';
+import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { Ordertype } from './utils/order.type';
 import { dialValidate } from 'src/common/helper/phone.helper';
 import { MoreThan } from 'typeorm/browser';
@@ -28,38 +28,61 @@ export class OrderService {
     })
     return this.orderRepo.save(create)
   }
-  async GetActiveOrder():Promise<any>{
-    // get Active 
-    const now = new Date()
-    const yyyy = String(now.getFullYear())
-    const mm = String(now.getMonth()+1).padStart(2,"0")
-    const dd = String(now.getDate()).padStart(2,'0')
-    const dateofToday = dd.concat("/",mm,"/",yyyy)
-    const Active = await this.orderRepo.find({
-      where:{OrderDate:LessThanOrEqual(dateofToday)}
-    })
-    if(Active.length === 0){
-      console.log(dateofToday)
-      return "No Any Order places"
+
+  async ProductSummary():Promise<{
+    ActiveOrder:{
+      data:any[];
+      count:number;
+      message?:any;
+    },
+    NearlyOrder:{
+      data:any[];
+      count:number;
+      message?:string;
+    },
+    OrdersHistory:{
+      data:any[];
+      count:number;
+      message?: string;
     }
-    return Active
+  }>{
+    const now = new Date();
+    const dateOfToday = [
+      String(now.getDate()).padStart(2,'0'),
+      String(now.getMonth()+1).padStart(2,'0'),
+      String(now.getFullYear()),
+    ].join('/')
+
+    const FeatureDay = [
+      String(now.getDate()+2).padStart(2,'0'),
+      String(now.getMonth()+1).padStart(2,'0'),
+      String(now.getFullYear())
+    ].join("/")
+   console.log("feature ",FeatureDay)
+   console.log("dateof to day",dateOfToday)
+   const [OrderHistory,ActiveOrders,NearlyOrders]=  await Promise.all([
+    this.orderRepo.find(),
+    this.orderRepo.find({where:{OrderDate:LessThanOrEqual(dateOfToday)}}),
+    this.orderRepo.find({where:{OrderDate:MoreThanOrEqual(FeatureDay)}})
+   ])
+   return {
+     ActiveOrder:{
+      data:ActiveOrders,
+      count:ActiveOrders.length,
+      ...(ActiveOrders.length === 0 &&{message:"No Active Order Available"})
+      
+    },
+    OrdersHistory:{
+      data:OrderHistory,
+      count:OrderHistory.length,
+       ...(OrderHistory.length === 0 && {message:"No Order History found at all"})  
+    },
+    NearlyOrder:{
+      data:NearlyOrders,
+      count:NearlyOrders.length,
+      ...(NearlyOrders.length === 0 && {message:"No Order in near feature"})
+    }
   }
-  async ChecknearlyOrder():Promise<any>{
-    const now  = new Date()
-    const yyyy = String(now.getFullYear)
-    const dd = String(now.getDate()+2).padStart(2,'0')
-    const mm = String(now.getMonth()+1).padStart(2,'0')
-    const dateofToday = dd.concat('/',mm,'/',dd)
-    console.log(dateofToday)
-    const GetNearOrder = await this.orderRepo.find({
-      where:{
-        OrderDate:MoreThan(dateofToday)
-      }
-    })
-    if (GetNearOrder.length===0){
-      return "There is No Nearly Order"
-    }
-    return GetNearOrder
   }
   findAll() {
     return `This action returns all order`;
