@@ -15,7 +15,7 @@ export class Order extends baseEntity {
     @Column()
     client_phone:string
 
-    @Column()
+    @Column({type:"date"})
     OrderDate:string
 
 }

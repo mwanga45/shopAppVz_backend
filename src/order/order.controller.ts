@@ -12,14 +12,9 @@ export class OrderController {
   createOrder(@Body() createOrderDto:CreateOrderDto) {
     return this.orderService.createOrder(createOrderDto);
   }
-  @Post("dial")
-  Testdial(@Body("phonenumber")phonenumber:string){
-    return this.orderService.checkPhone(phonenumber)
-  }
-
-  @Get()
-  findAll() {
-    return this.orderService.findAll();
+  @Get('active')
+  GetActive() {
+    return this.orderService.GetActiveOrder();
   }
 
   @Get(':id')
