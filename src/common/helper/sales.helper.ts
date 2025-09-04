@@ -16,5 +16,18 @@ export class  SalesHelper {
     const Actual_Profit  = profitPerEachlitre * litre
     return Actual_Profit
   }
-  calculateExpectedProfit_Wholesales(wholesales_price:string,)
+  calculateExpectedProfit_Wholesales(wholesales_price:string,purchase_price:string,total_litre?:string,total_pc?:string):any{
+    const litre = Number(total_litre ?? 0)
+    const Pc  = Number(total_pc ?? 0)
+    const Wholesale = Number(wholesales_price)
+    const PucPrice = Number(purchase_price)
+     if (litre === 0){
+        const ExpectProfitPerEach = Wholesale-PucPrice
+        const Expected_profit = Pc * ExpectProfitPerEach
+        return Expected_profit
+     }
+     const ExpectProfitPerEach = Wholesale-PucPrice
+     const Expected_profit = litre * ExpectProfitPerEach
+     return Expected_profit
+  }
 }
