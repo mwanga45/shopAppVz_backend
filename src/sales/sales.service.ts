@@ -63,7 +63,6 @@ export class SalesService {
 
   async Sales_Record(sales:{product_id:string;product_type:string;product_category:string;totals_pc_kg_ltre:string; userId:string}):Promise<any>{
    const {product_id,product_type,product_category,totals_pc_kg_ltre,userId} =  sales;
-
   //  check product category
   if(product_category === "wholesales"){
     // update the  wholesales table base on date of today

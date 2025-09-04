@@ -6,7 +6,7 @@ import { Order } from './entities/order.entity';
 import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { Ordertype } from './utils/order.type';
 import { dialValidate } from 'src/common/helper/phone.helper';
-import { MoreThan } from 'typeorm/browser';
+
 
 
 @Injectable()
@@ -82,7 +82,11 @@ export class OrderService {
       count:NearlyOrders.length,
       ...(NearlyOrders.length === 0 && {message:"No Order in near feature"})
     }
+
   }
+  // create an  function  that  will Automatic make sure is cancelled after ten days 
+  // after status stays pending for that time and then send are message  as record of 
+  // automatic  cancellation of order(Automatic invoke functu=ion) 
   }
   findAll() {
     return `This action returns all order`;
