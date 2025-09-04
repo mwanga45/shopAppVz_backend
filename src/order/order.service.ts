@@ -5,12 +5,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
 import { Ordertype } from './utils/type';
+import { dialValidate } from 'src/common/helper/phone.helper';
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectRepository(Order) 
-    private readonly orderRepo:Repository<Order>
+    private readonly orderRepo:Repository<Order>,
+    private readonly validator:dialValidate
   ){}
   async createOrder(order:Ordertype) :Promise<any>{
     const {user_id, productname, client_name,client_phone,OrderDate} = order
@@ -22,6 +24,11 @@ export class OrderService {
       OrderDate:OrderDate
     })
     return 
+  }
+  checkPhone(phone_number:string):string{
+   const dial = this.validator.CheckDialformat(phone_number)
+   console.log(dial)
+   return dial
   }
 
   findAll() {
