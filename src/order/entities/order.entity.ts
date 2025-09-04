@@ -18,4 +18,8 @@ export class Order extends baseEntity {
     @Column({type:"date"})
     OrderDate:string
 
+    @Column({default:"pending"})
+    OrderStatus:string
+
+
 }

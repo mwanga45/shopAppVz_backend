@@ -6,6 +6,7 @@ import { Order } from './entities/order.entity';
 import { LessThanOrEqual, Repository } from 'typeorm';
 import { Ordertype } from './utils/order.type';
 import { dialValidate } from 'src/common/helper/phone.helper';
+import { MoreThan } from 'typeorm/browser';
 
 
 @Injectable()
@@ -45,8 +46,20 @@ export class OrderService {
   }
   async ChecknearlyOrder():Promise<any>{
     const now  = new Date()
-    const yyyy = String(now.)
-
+    const yyyy = String(now.getFullYear)
+    const dd = String(now.getDate()+2).padStart(2,'0')
+    const mm = String(now.getMonth()+1).padStart(2,'0')
+    const dateofToday = dd.concat('/',mm,'/',dd)
+    console.log(dateofToday)
+    const GetNearOrder = await this.orderRepo.find({
+      where:{
+        OrderDate:MoreThan(dateofToday)
+      }
+    })
+    if (GetNearOrder.length===0){
+      return "There is No Nearly Order"
+    }
+    return GetNearOrder
   }
   findAll() {
     return `This action returns all order`;
