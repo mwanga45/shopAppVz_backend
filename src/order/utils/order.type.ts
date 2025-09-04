@@ -1,6 +1,6 @@
 export type Ordertype ={
-    user_id:string
-    productname:string
+    userId:string
+    product_name:string
     client_phone:string
     client_name:string
     OrderDate:string

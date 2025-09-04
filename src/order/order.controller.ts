@@ -8,10 +8,10 @@ import { Ordertype } from './utils/order.type';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  // @Post()
-  // createOrder(@Body() ordertype:Ordertype) {
-  //   return this.orderService.createOrder(Ordertype);
-  // }
+  @Post()
+  createOrder(@Body() createOrderDto:CreateOrderDto) {
+    return this.orderService.createOrder(createOrderDto);
+  }
   @Post("dial")
   Testdial(@Body("phonenumber")phonenumber:string){
     return this.orderService.checkPhone(phonenumber)
