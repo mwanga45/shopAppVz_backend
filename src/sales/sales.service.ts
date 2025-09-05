@@ -61,7 +61,7 @@ export class SalesService {
     return RetailSales
   }
 
-  async Sales_Record(sales:{product_id:string;product_type:string;product_category:string;totals_pc_kg_ltre:string; userId:string}):Promise<any>{
+  async Whole_Sales_Record(sales:{product_id:string;product_type:string;product_category:string;totals_pc_kg_ltre:string; userId:string}):Promise<any>{
    const {product_id,product_type,product_category,totals_pc_kg_ltre,userId} =  sales;
   //  check product category
   if(product_category === "wholesales"){

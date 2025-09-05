@@ -6,12 +6,10 @@ export class CreateSaleDto {
   Total_pc_pkg_litre: string;
 
   @IsString()
-  @IsNotEmpty()
-  TotalGenerated: string;
+  product_type:string
 
   @IsString()
-  @IsNotEmpty()
-  TotalProfit: string;
+  product_category:string
 
   @IsString()
   @IsNotEmpty()

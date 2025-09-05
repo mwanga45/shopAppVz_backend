@@ -9,7 +9,6 @@ export class User extends baseEntity {
   @Column({ unique: true })
   email: string;
 
-
   @Column({ select: false })
   password: string;
 

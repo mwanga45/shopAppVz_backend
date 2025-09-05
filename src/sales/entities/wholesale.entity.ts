@@ -21,10 +21,16 @@ export class WholeSales extends baseEntity{
 
   @Column({ nullable: true })
   productId: string;
+  
+  @Column()
+  profit_deviation:string
 
-  //  @ManyToOne(()=> User,{eager:true})
-  // @JoinColumn({name:'user_id'})
-  // user:User;
+  @Column()
+  percentage_deviation:string
+
+  @ManyToOne(()=> User,{eager:true})
+  @JoinColumn({name:'user_id'})
+  user:User;
 
   @ManyToOne(() => Product, { eager: true })
   @JoinColumn({ name: 'productId' })
