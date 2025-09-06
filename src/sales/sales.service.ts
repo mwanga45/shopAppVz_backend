@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
 import { WholeSales } from './entities/wholesale.entity';
@@ -9,14 +9,16 @@ import { RetailSales } from './entities/retailsale.entity';
 import { NotFoundException } from '@nestjs/common';
 import { ProductWholesales } from './utils/whole.type';
 import { isDate, isEmpty } from 'class-validator';
-import { concat } from 'rxjs';
+
+import { SalesHelper } from 'src/common/helper/sales.helper';
 
 @Injectable()
 export class SalesService {
   constructor(
     @InjectRepository(Product) private readonly ProductRepository:Repository<Product>,
     @InjectRepository(WholeSales) private readonly WholesalesRepository:Repository<WholeSales>,
-    @InjectRepository(RetailSales) private readonly RetailsalesRepository:Repository<RetailSales>
+    @InjectRepository(RetailSales) private readonly RetailsalesRepository:Repository<RetailSales>,
+    private readonly SalesHelper:SalesHelper
   ){}
   create(createSaleDto: CreateSaleDto) {
     return 'This action adds a new sale';
@@ -61,11 +63,44 @@ export class SalesService {
     return RetailSales
   }
 
-  async Whole_Sales_Record(createSaleDto:CreateSaleDto,userId:string):Promise<any>{
-   
+  async Whole_Sales_Record(Dto:CreateSaleDto,userId:string):Promise<any>{
+   const check_product = await this.ProductRepository.exists({
+    where:{id:Dto.productId}
+   })
+   if(!check_product){
+    throw new  BadRequestException('There is no such product')
+   }
+   if(Dto.product_type === "solid"){
+    const productType =  Dto.Total_pc_pkg_litre.concat('','L')
+    const productDB_info= await this.ProductRepository.findOne({
+      where:{id:Dto.productId},
+      select:['purchase_price', 'wholesales_price']
+    })
+
+    if(!productDB_info){
+     throw new NotFoundException('Product not found for profit calculation')
+    }
+    const ProfitGenerated = this.SalesHelper.CalculateProfit_Wholesales(productDB_info.purchase_price, productDB_info.wholesales_price,undefined, Dto.Total_pc_pkg_litre)
+    const ExpectedProfit = this.SalesHelper.calculateExpectedProfit_Wholesales(productDB_info.wholesales_price,productDB_info.purchase_price,undefined,Dto.Total_pc_pkg_litre)
+    const {deviation_profit,deviation_percentage} = this.SalesHelper.calculeDevition(ExpectedProfit,ProfitGenerated)
+    
+   }
+   else if(Dto.product_type === "liquid"){
+     const productType = Dto.Total_pc_pkg_litre.concat('','L')
+     const productDB_info= await this.ProductRepository.findOne({
+       where:{id:Dto.productId},
+       select:['purchase_price', 'wholesales_price']
+     })
+ 
+     if(!productDB_info){
+      throw new NotFoundException('Product not found for profit calculation')
+     }
+     const ProfitGenerated = this.SalesHelper.CalculateProfit_Wholesales(productDB_info.purchase_price, productDB_info.wholesales_price,Dto.Total_pc_pkg_litre, undefined)
+
+   }
   //  const {product_id,product_type,product_category,totals_pc_kg_ltre,userId} =  sales;
   // //  check product category
-  // if(product_category === "wholesales"){
+  // if(product_category == "wholesales"){
   //   // update the  wholesales table base on date of today
   //   const checkproductexistance = await this.WholesalesRepository.exists({
   //     where:{
