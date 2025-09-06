@@ -1,7 +1,10 @@
 import { baseEntity } from "src/common/base.entity";
 import { Product } from "src/product/entities/product.entity";
 import { Column } from "typeorm";
-
+export enum StockType {
+    IN = "IN",
+    OUT = "OUT"
+}
 export class Stock extends baseEntity {
     @Column({nullable:true})
     product_Id:String
@@ -10,7 +13,7 @@ export class Stock extends baseEntity {
     product_category:String
 
     @Column()
-    Total_stock:string
+    Total_stock:number
 
   
  
@@ -23,12 +26,11 @@ export class Stock_transaction extends baseEntity{
     product_category:String
 
     @Column()
-    type_Enum:"IN" |"OUT"
+    type:"enum"
+    type_Enum:StockType
 
     @Column()
     Quantity:string
-
-
 
     @Column()
     Reasons:string

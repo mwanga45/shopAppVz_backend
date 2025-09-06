@@ -9,8 +9,8 @@ import { RetailSales } from './entities/retailsale.entity';
 import { NotFoundException } from '@nestjs/common';
 import { ProductWholesales } from './utils/whole.type';
 import { isDate, isEmpty } from 'class-validator';
-
 import { SalesHelper } from 'src/common/helper/sales.helper';
+import { StockUpdateHelper } from 'src/common/helper/stockUpdate,helper';
 
 @Injectable()
 export class SalesService {
@@ -18,7 +18,8 @@ export class SalesService {
     @InjectRepository(Product) private readonly ProductRepository:Repository<Product>,
     @InjectRepository(WholeSales) private readonly WholesalesRepository:Repository<WholeSales>,
     @InjectRepository(RetailSales) private readonly RetailsalesRepository:Repository<RetailSales>,
-    private readonly SalesHelper:SalesHelper
+    private readonly SalesHelper:SalesHelper,
+    private readonly stockupdate:StockUpdateHelper ,
   ){}
   create(createSaleDto: CreateSaleDto) {
     return 'This action adds a new sale';
