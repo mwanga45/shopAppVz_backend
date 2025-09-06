@@ -1,5 +1,5 @@
 import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
-
+import { StockType } from 'src/stock/entities/stock.entity';
 export class CreateSaleDto {
   @IsString()
   @IsNotEmpty()
@@ -14,5 +14,9 @@ export class CreateSaleDto {
   @IsNumber()
   @IsNotEmpty()
   productId: number;
+
+  @IsString()
+  type:'enum'
+  product_status:StockType
 }
 

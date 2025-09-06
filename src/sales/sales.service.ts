@@ -93,8 +93,9 @@ export class SalesService {
       TotalProfit: ProfitGenerated, 
       Epected_Profit:ExpectedProfit,
       userId:{id:userId}
-      
     })
+    const sellingReason = "Sold" 
+    const UpdateAndTrackestock = await this.stockupdate.UpdateStock_Info(Number(Dto.productId),Dto.Total_pc_pkg_litre,sellingReason,Dto.product_status,Dto.product_category) 
    }
    else if(Dto.product_type === "liquid"){
      const productType = Dto.Total_pc_pkg_litre.concat('','L')
@@ -109,44 +110,6 @@ export class SalesService {
      const ProfitGenerated = this.SalesHelper.CalculateProfit_Wholesales(productDB_info.purchase_price, productDB_info.wholesales_price,Dto.Total_pc_pkg_litre, undefined)
 
    }
-  //  const {product_id,product_type,product_category,totals_pc_kg_ltre,userId} =  sales;
-  // //  check product category
-  // if(product_category == "wholesales"){
-  //   // update the  wholesales table base on date of today
-  //   const checkproductexistance = await this.WholesalesRepository.exists({
-  //     where:{
-  //       productId:product_id
-  //     }
-  //   })
-  //   if(!checkproductexistance){
-  //     if(product_type== "solid"){
-  //       const total_pc = totals_pc_kg_ltre.concat(".","Pc")
-  //       const createSales =  this.WholesalesRepository.create({
-  //       productId:product_id,
-  //       Total_pc_pkg_litre:total_pc,
-  //     })
-  //     return await this.WholesalesRepository.save(createSales) 
-  //     }
-  //     const total_litre = totals_pc_kg_ltre.concat(".","m3")
-  //     const create = this.WholesalesRepository.create({
-  //       productId:product_id,
-  //       Total_pc_pkg_litre:total_litre
-  //     })
-  //     return this.WholesalesRepository.save(create)
-  //   }
-  //   const todayDate = this.timetest()
-
-
-    // also check  the  type of product  make sure the row  created with specific measure in column of the type
-    // ckeck if the  today it have already have an record  by check product id id if is already exist in table
-    // if not  create
-    // if exist update the table
-    // make sure ur update also the  stock
-
-  // }
-  // do the same to retail_category product
-
-
   }
 
   

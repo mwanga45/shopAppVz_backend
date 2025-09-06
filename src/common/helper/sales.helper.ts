@@ -36,4 +36,5 @@ export class  SalesHelper {
     return {deviation_percentage,deviation_profit}
     
   }
+  // ValidateCutoff ()
 }

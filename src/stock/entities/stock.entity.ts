@@ -7,7 +7,7 @@ export enum StockType {
 }
 export class Stock extends baseEntity {
     @Column({nullable:true})
-    product_Id:String
+    product_Id:number
     
     @Column()
     product_category:String
@@ -20,7 +20,7 @@ export class Stock extends baseEntity {
 }
 export class Stock_transaction extends baseEntity{
     @Column({nullable:true})
-    Product_Id:string
+    Product_Id:number
 
     @Column()
     product_category:String

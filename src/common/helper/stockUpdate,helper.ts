@@ -11,7 +11,7 @@ constructor(
     @InjectRepository(Stock_transaction) private readonly stock_TransRepo:Repository<Stock_transaction>
 ){}
 
-async UpdateStock_Info (productId:string, Total_pc_pkg_litre:string,reasons:string, type_Enum:StockType,product_category:string){
+async UpdateStock_Info (productId:number, Total_pc_pkg_litre:string,reasons:string, type_Enum:StockType,product_category:string){
     //update the  stock table
     const checkproductId = await this.stockrepo.exists({
         where:{product_Id:productId}
