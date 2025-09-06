@@ -64,7 +64,7 @@ export class SalesService {
     return RetailSales
   }
 
-  async Whole_Sales_Record(Dto:CreateSaleDto,userId:string):Promise<any>{
+  async Whole_Sales_Record(Dto:CreateSaleDto,userId:number):Promise<any>{
    const check_product = await this.ProductRepository.exists({
     where:{id:Dto.productId}
    })
@@ -86,11 +86,11 @@ export class SalesService {
     const {deviation_profit,deviation_percentage} = this.SalesHelper.calculeDevition(ExpectedProfit,ProfitGenerated)
 
     const Addsales =  this.WholesalesRepository.create({
-      product: { id: Dto.productId },
-      profit_deviation: String(deviation_profit),
-      percentage_deviation: String(deviation_percentage),
-      TotalGenerated: String(ProfitGenerated),
-      TotalProfit: String(ProfitGenerated), // Placeholder for TotalProfit
+      productId:Dto.productId,
+      profit_deviation: deviation_profit,
+      percentage_deviation: deviation_percentage,
+      TotalGenerated: ProfitGenerated,
+      TotalProfit: ProfitGenerated, 
       Epected_Profit:ExpectedProfit,
       userId:{id:userId}
       
