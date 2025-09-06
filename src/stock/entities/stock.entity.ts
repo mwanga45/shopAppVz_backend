@@ -10,10 +10,16 @@ export class Stock extends baseEntity {
     Total_stock:string
  
 }
-export class Stock_record extends baseEntity{
+export class Stock_transaction extends baseEntity{
     @Column({nullable:true})
     Product_Id:string
 
     @Column()
-    Addition_kg_litre_Pc:string
+    type_Enum:"IN" |"OUT"
+
+    @Column()
+    Quantity:string
+
+    @Column()
+    Reasons:string
 }
