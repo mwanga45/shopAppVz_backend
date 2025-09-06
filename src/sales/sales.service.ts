@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/product/entities/product.entity';
 import { RetailSales } from './entities/retailsale.entity';
 import { NotFoundException } from '@nestjs/common';
-import { ProductInfo } from './type/type';
+import { ProductInfo } from './type/whole.type';
 import { isDate, isEmpty } from 'class-validator';
 import { concat } from 'rxjs';
 
@@ -61,33 +61,34 @@ export class SalesService {
     return RetailSales
   }
 
-  async Whole_Sales_Record(sales:{product_id:string;product_type:string;product_category:string;totals_pc_kg_ltre:string; userId:string}):Promise<any>{
-   const {product_id,product_type,product_category,totals_pc_kg_ltre,userId} =  sales;
-  //  check product category
-  if(product_category === "wholesales"){
-    // update the  wholesales table base on date of today
-    const checkproductexistance = await this.WholesalesRepository.exists({
-      where:{
-        productId:product_id
-      }
-    })
-    if(!checkproductexistance){
-      if(product_type== "solid"){
-        const total_pc = totals_pc_kg_ltre.concat(".","Pc")
-        const createSales =  this.WholesalesRepository.create({
-        productId:product_id,
-        Total_pc_pkg_litre:total_pc,
-      })
-      return await this.WholesalesRepository.save(createSales) 
-      }
-      const total_litre = totals_pc_kg_ltre.concat(".","m3")
-      const create = this.WholesalesRepository.create({
-        productId:product_id,
-        Total_pc_pkg_litre:total_litre
-      })
-      return this.WholesalesRepository.save(create)
-    }
-    const todayDate = this.timetest()
+  async Whole_Sales_Record(createSaleDto:CreateSaleDto,userId:string):Promise<any>{
+   
+  //  const {product_id,product_type,product_category,totals_pc_kg_ltre,userId} =  sales;
+  // //  check product category
+  // if(product_category === "wholesales"){
+  //   // update the  wholesales table base on date of today
+  //   const checkproductexistance = await this.WholesalesRepository.exists({
+  //     where:{
+  //       productId:product_id
+  //     }
+  //   })
+  //   if(!checkproductexistance){
+  //     if(product_type== "solid"){
+  //       const total_pc = totals_pc_kg_ltre.concat(".","Pc")
+  //       const createSales =  this.WholesalesRepository.create({
+  //       productId:product_id,
+  //       Total_pc_pkg_litre:total_pc,
+  //     })
+  //     return await this.WholesalesRepository.save(createSales) 
+  //     }
+  //     const total_litre = totals_pc_kg_ltre.concat(".","m3")
+  //     const create = this.WholesalesRepository.create({
+  //       productId:product_id,
+  //       Total_pc_pkg_litre:total_litre
+  //     })
+  //     return this.WholesalesRepository.save(create)
+  //   }
+  //   const todayDate = this.timetest()
 
 
     // also check  the  type of product  make sure the row  created with specific measure in column of the type
@@ -96,7 +97,7 @@ export class SalesService {
     // if exist update the table
     // make sure ur update also the  stock
 
-  }
+  // }
   // do the same to retail_category product
 
 
