@@ -18,20 +18,19 @@ export class StockService {
     @InjectRepository(Product) private readonly productRepo:Repository<Product>
   ){}
  async check_productname(product_Id:any):Promise<any>{
-        const findProductname = await  this.productRepo.findOne({
+        const findProductname = await  this.productRepo.find({
       where:{
         id:product_Id
       }
     })
-    
     return findProductname
    }
-   async createStockRec (stock:{product_id:string; total_stock:string,category:string;product_type:string}):Promise<any>{
-    const checkProduct = await this.check_productname(stock.product_id)
+   async createStockRec (Dto:CreateStockDto):Promise<any>{
+    const checkProduct = await this.check_productname(Dto.product_id)
     const stockRec =  this.stockRepo.create({
-      product_Id: stock.product_id,
-      Total_stock: Number(stock.total_stock),
-      product_category:stock.category
+      product_Id: Dto.product_id,
+      Total_stock: Dto.total_stock,
+      product_category:Dto.category
     })
     return this.stockRepo.save(stockRec)
    } 

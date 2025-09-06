@@ -164,6 +164,7 @@ export class SalesService {
     const UpdateAndTrackestock = await this.stockupdate.UpdateStock_Info(Number(Dto.productId),Dto.Total_pc_pkg_litre,sellingReason,Dto.product_status,Dto.product_category) 
     return
    }
+   return
   }
 
   
