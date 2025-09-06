@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { WholeSales } from "src/sales/entities/wholesale.entity";
 import { Product_discount } from "src/product/entities/discount.entity";
 import { Repository } from "typeorm";
 
@@ -7,7 +8,9 @@ import { Repository } from "typeorm";
 export class  SalesHelper {
   constructor( 
     @InjectRepository(Product_discount)
-    private readonly dscountRepo:Repository<Product_discount>
+    private readonly dscountRepo:Repository<Product_discount>,
+    @InjectRepository(WholeSales)
+    private readonly wholeRepo:Repository<WholeSales>
   ){}
   CalculateProfit_Wholesales(purchase_price:string,wholesales_price:string,total_litre?:string,total_pc?:string):number{
     const PucPrice = Number(purchase_price?? 0)
@@ -47,16 +50,17 @@ export class  SalesHelper {
     // check product  number 
     const ProductId = Number(product_Id ?? 0)
     const Amount = Number(Total_litre_kg ?? 0)
-    const checkLimit = await this.dscountRepo.findOne({
+    const disc_Info = await this.dscountRepo.findOne({
       where:{product_id:ProductId},
     })
-    if (!checkLimit){
+    if (!disc_Info){
       throw new NotFoundException("The product is not available")
     }
-    if(Amount < checkLimit.Product_startfrom ){
+    if(Amount < disc_Info.Product_startfrom ){
       return
     }
-    
+    const wholesale_price =  Number(wholesales_price ?? 0)
+    const AfterCutoff =  wholesale_price *(disc_Info.percentageCutoff/100) 
   }
  
 }
