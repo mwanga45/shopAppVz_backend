@@ -7,7 +7,12 @@ export class Stock extends baseEntity {
     product_Id:String
     
     @Column()
+    product_category:String
+
+    @Column()
     Total_stock:string
+
+  
  
 }
 export class Stock_transaction extends baseEntity{
@@ -15,10 +20,15 @@ export class Stock_transaction extends baseEntity{
     Product_Id:string
 
     @Column()
+    product_category:String
+
+    @Column()
     type_Enum:"IN" |"OUT"
 
     @Column()
     Quantity:string
+
+
 
     @Column()
     Reasons:string
