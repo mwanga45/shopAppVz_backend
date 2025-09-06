@@ -3,7 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { Product } from "./product.entity";
 
 @Entity()
-export class product_discount extends baseEntity{
+export class Product_discount extends baseEntity{
    @Column()
    product_id:number
 
