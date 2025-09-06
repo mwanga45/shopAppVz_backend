@@ -47,7 +47,6 @@ export class  SalesHelper {
     
   }
   async ValidateCutoff (Total_litre_kg:string,wholesales_price:string,product_Id:number, purchase_price:string):Promise<number[]>{
-    // check product  number 
     const Amount = Number(Total_litre_kg ?? 0)
     const disc_Info = await this.dscountRepo.findOne({
       where:{product_id:product_Id},

@@ -72,7 +72,6 @@ export class SalesService {
     throw new  BadRequestException('There is no such product')
    }
    if(Dto.product_type === "solid"){
-    const productType =  Dto.Total_pc_pkg_litre.concat('','L')
     const productDB_info= await this.ProductRepository.findOne({
       where:{id:Dto.productId},
       select:['purchase_price', 'wholesales_price']
@@ -103,7 +102,7 @@ export class SalesService {
     })
     await this.WholesalesRepository.save(Addsales)
 
-    }
+    }else{
     const Addsales =  this.WholesalesRepository.create({
       productId:Dto.productId,
       profit_deviation: deviation_profit,
@@ -114,11 +113,12 @@ export class SalesService {
       userId:{id:userId}
     })
     await this.WholesalesRepository.save(Addsales)
+  }
     const sellingReason = "Sold" 
     const UpdateAndTrackestock = await this.stockupdate.UpdateStock_Info(Number(Dto.productId),Dto.Total_pc_pkg_litre,sellingReason,Dto.product_status,Dto.product_category) 
+    return
    }
    else if(Dto.product_type === "liquid"){
-     const productType = Dto.Total_pc_pkg_litre.concat('','L')
      const productDB_info= await this.ProductRepository.findOne({
        where:{id:Dto.productId},
        select:['purchase_price', 'wholesales_price']
@@ -128,7 +128,41 @@ export class SalesService {
       throw new NotFoundException('Product not found for profit calculation')
      }
      const ProfitGenerated = this.SalesHelper.CalculateProfit_Wholesales(productDB_info.purchase_price, productDB_info.wholesales_price,Dto.Total_pc_pkg_litre, undefined)
+     const ExpectedProfit = this.SalesHelper.calculateExpectedProfit_Wholesales(productDB_info.wholesales_price,productDB_info.purchase_price,Dto.Total_pc_pkg_litre,undefined)
+     const {deviation_profit,deviation_percentage} = this.SalesHelper.calculeDevition(ExpectedProfit,ProfitGenerated)
+        const cutoff = await this.SalesHelper.ValidateCutoff(Dto.Total_pc_pkg_litre,productDB_info.wholesales_price,Dto.productId,productDB_info.purchase_price)
+  const TotalGenerated = Math.floor(
+      Number(Dto.Total_pc_pkg_litre) * Number(productDB_info.wholesales_price)
+ );
+ if(cutoff[0]> 0){
+  const Addsales =  this.WholesalesRepository.create({
+      productId:Dto.productId,
+      profit_deviation: deviation_profit,
+      percentage_deviation: deviation_percentage,
+      TotalGenerated:TotalGenerated,
+      TotalProfit: ProfitGenerated, 
+      Epected_Profit:ExpectedProfit,
+      userId:{id:userId},
+      percentage_cutoff:cutoff[1]
 
+    })
+    await this.WholesalesRepository.save(Addsales)
+
+ }else{
+      const Addsales =  this.WholesalesRepository.create({
+      productId:Dto.productId,
+      profit_deviation: deviation_profit,
+      percentage_deviation: deviation_percentage,
+      TotalGenerated:TotalGenerated,
+      TotalProfit: ProfitGenerated, 
+      Epected_Profit:ExpectedProfit,
+      userId:{id:userId}
+    })
+    await this.WholesalesRepository.save(Addsales)
+ }
+    const sellingReason = "Liquid" 
+    const UpdateAndTrackestock = await this.stockupdate.UpdateStock_Info(Number(Dto.productId),Dto.Total_pc_pkg_litre,sellingReason,Dto.product_status,Dto.product_category) 
+    return
    }
   }
 
