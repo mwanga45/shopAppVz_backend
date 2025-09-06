@@ -43,6 +43,8 @@ async UpdateStock_Info (productId:string, Total_pc_pkg_litre:string,reasons:stri
         Quantity:Total_pc_pkg_litre,
         Reasons:reasons
     })
+    return this.stock_TransRepo.save(stock_transaction)
+
 
 }
 

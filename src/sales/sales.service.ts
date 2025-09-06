@@ -84,7 +84,17 @@ export class SalesService {
     const ProfitGenerated = this.SalesHelper.CalculateProfit_Wholesales(productDB_info.purchase_price, productDB_info.wholesales_price,undefined, Dto.Total_pc_pkg_litre)
     const ExpectedProfit = this.SalesHelper.calculateExpectedProfit_Wholesales(productDB_info.wholesales_price,productDB_info.purchase_price,undefined,Dto.Total_pc_pkg_litre)
     const {deviation_profit,deviation_percentage} = this.SalesHelper.calculeDevition(ExpectedProfit,ProfitGenerated)
-    
+
+    const Addsales =  this.WholesalesRepository.create({
+      product: { id: Dto.productId },
+      profit_deviation: String(deviation_profit),
+      percentage_deviation: String(deviation_percentage),
+      TotalGenerated: String(ProfitGenerated),
+      TotalProfit: String(ProfitGenerated), // Placeholder for TotalProfit
+      Epected_Profit:ExpectedProfit,
+      userId:{id:userId}
+      
+    })
    }
    else if(Dto.product_type === "liquid"){
      const productType = Dto.Total_pc_pkg_litre.concat('','L')

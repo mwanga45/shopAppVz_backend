@@ -19,9 +19,9 @@ export class WholeSales extends baseEntity{
   @IsString()
   TotalProfit:string
 
-  @Column({ nullable: true })
-  productId: string;
-  
+  @Column()
+  Epected_Profit:number
+
   @Column()
   profit_deviation:string
 
@@ -30,7 +30,7 @@ export class WholeSales extends baseEntity{
 
   @ManyToOne(()=> User,{eager:true})
   @JoinColumn({name:'user_id'})
-  user:User;
+  userId:User;
 
   @ManyToOne(() => Product, { eager: true })
   @JoinColumn({ name: 'productId' })
