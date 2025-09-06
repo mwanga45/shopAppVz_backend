@@ -46,21 +46,21 @@ export class  SalesHelper {
     return {deviation_percentage,deviation_profit}
     
   }
-  async ValidateCutoff (Total_litre_kg:string,wholesales_price:string,product_Id:string, purchase_price:string):Promise<any>{
+  async ValidateCutoff (Total_litre_kg:string,wholesales_price:string,product_Id:number, purchase_price:string):Promise<number[]>{
     // check product  number 
-    const ProductId = Number(product_Id ?? 0)
     const Amount = Number(Total_litre_kg ?? 0)
     const disc_Info = await this.dscountRepo.findOne({
-      where:{product_id:ProductId},
+      where:{product_id:product_Id},
     })
     if (!disc_Info){
       throw new NotFoundException("The product is not available")
     }
     if(Amount < disc_Info.Product_startfrom ){
-      return
+      return [0]
     }
     const wholesale_price =  Number(wholesales_price ?? 0)
     const AfterCutoff =  wholesale_price *(disc_Info.percentageCutoff/100) 
+    return[AfterCutoff, disc_Info.percentageCutoff]
   }
  
 }
