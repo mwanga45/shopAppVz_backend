@@ -1,5 +1,4 @@
-
-export type  ProductInfo ={
+export type  ProductWholesales ={
   Id:string,
   product_name: string,
   product_type:string,

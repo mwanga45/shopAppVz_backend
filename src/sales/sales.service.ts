@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/product/entities/product.entity';
 import { RetailSales } from './entities/retailsale.entity';
 import { NotFoundException } from '@nestjs/common';
-import { ProductInfo } from './type/whole.type';
+import { ProductWholesales } from './utils/whole.type';
 import { isDate, isEmpty } from 'class-validator';
 import { concat } from 'rxjs';
 
