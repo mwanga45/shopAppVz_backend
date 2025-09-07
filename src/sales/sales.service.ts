@@ -96,7 +96,7 @@ export class SalesService {
       TotalGenerated:TotalGenerated,
       TotalProfit: ProfitGenerated, 
       Epected_Profit:ExpectedProfit,
-      userId:{id:userId},
+      userId:userId,
       percentage_cutoff:cutoff[1]
 
     })
@@ -110,7 +110,7 @@ export class SalesService {
       TotalGenerated:TotalGenerated,
       TotalProfit: ProfitGenerated, 
       Epected_Profit:ExpectedProfit,
-      userId:{id:userId}
+      userId:userId
     })
     await this.WholesalesRepository.save(Addsales)
   }
@@ -142,7 +142,7 @@ export class SalesService {
       TotalGenerated:TotalGenerated,
       TotalProfit: ProfitGenerated, 
       Epected_Profit:ExpectedProfit,
-      userId:{id:userId},
+      userId:userId,
       percentage_cutoff:cutoff[1]
 
     })
@@ -156,7 +156,7 @@ export class SalesService {
       TotalGenerated:TotalGenerated,
       TotalProfit: ProfitGenerated, 
       Epected_Profit:ExpectedProfit,
-      userId:{id:userId}
+      userId:userId
     })
     await this.WholesalesRepository.save(Addsales)
  }

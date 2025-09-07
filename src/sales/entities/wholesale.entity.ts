@@ -8,6 +8,9 @@ import { User } from "src/entities/user.entity";
 @Entity()
 export class WholeSales extends baseEntity{
   @Column()
+  userId :number
+
+  @Column()
   @IsString()
   Total_pc_pkg_litre:string
 
@@ -37,7 +40,7 @@ export class WholeSales extends baseEntity{
   @Column()
   @ManyToOne(()=> User,{eager:true})
   @JoinColumn({name:'user_id'})
-  userId:User;
+  user:User;
 
   @ManyToOne(() => Product, { eager: true })
   @JoinColumn({ name: 'productId' })

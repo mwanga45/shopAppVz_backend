@@ -9,10 +9,11 @@ import { ProductModule } from 'src/product/product.module';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([Stock,Stock_transaction]),
-    ProductModule
+    TypeOrmModule.forFeature([Stock,Stock_transaction,StockUpdateHelper]),
+    ProductModule,
+    // StockUpdateHelper
   ],
   controllers: [StockController],
-  providers: [StockService],
+  providers: [StockService,StockUpdateHelper],
 })
 export class StockModule {}
