@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateSaleDto } from './dto/create-sale.dto';
+import { CreateRetailsalesDto, CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
 import { WholeSales } from './entities/wholesale.entity';
 import { Repository } from 'typeorm';
@@ -172,6 +172,9 @@ export class SalesService {
   }
 
   
+  async Retail_Sale_Record(Dto:CreateRetailsalesDto,userId:number):Promise<any>{
+
+  }
   
   findOne(id: number) {
     return `This action returns a #${id} sale`;

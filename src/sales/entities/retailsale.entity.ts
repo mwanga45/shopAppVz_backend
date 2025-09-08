@@ -13,21 +13,23 @@ export class RetailSales extends baseEntity{
 
     @Column()
     @IsString()
-    TotalGenereted:string
-    TotalProfit:string
-
-    @Column({ nullable: true })
-    productId: string;
+    TotalGenereted:number
     
-    @Column({nullable:true})
-    userId:string;
+    @Column()
+    TotalProfit:number;
+
+    @Column()
+    productId: number;
+    
+    @Column()
+    userId:number;
 
     @ManyToOne(() => Product, { eager: true })
     @JoinColumn({ name: 'productId' })
     product: Product;
 
-    // @ManyToOne(()=> User,{eager:true})
-    // @JoinColumn({name:'user_id'})
-    // user:User;
+    @ManyToOne(()=> User,{eager:true})
+    @JoinColumn({name:'userId'})
+    user:User;
 
 }
