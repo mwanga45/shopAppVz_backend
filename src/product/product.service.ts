@@ -26,7 +26,6 @@ export class ProductService {
   ){}
   
   async create(createProductDto: CreateProductDto):Promise<string> {
-    // const {product_name,product_category,product_type,wholesales_price,retailsales_price,purchase_price} = Product
     const product = await this.Productrepository.findOne({where:{product_name:createProductDto.product_name}})
     if(product){
        throw new UnauthorizedException("Product name is already been exist")

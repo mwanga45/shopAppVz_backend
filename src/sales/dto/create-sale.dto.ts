@@ -20,3 +20,24 @@ export class CreateSaleDto {
   product_status:StockType
 }
 
+export class CreateRetailsalesDto {
+  @IsString()
+  @IsNotEmpty()
+  Total_pc_pkg_litre: string;
+
+  @IsString()
+  product_type:string
+
+  @IsString()
+  product_category:string
+
+  @IsNumber()
+  @IsNotEmpty()
+  productId: number;
+
+  @IsString()
+  type:'enum'
+  product_status:StockType
+
+}
+
