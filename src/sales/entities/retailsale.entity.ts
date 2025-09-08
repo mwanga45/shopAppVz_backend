@@ -14,7 +14,7 @@ export class RetailSales extends baseEntity{
     @Column()
     @IsString()
     TotalGenereted:number
-    
+
     @Column()
     TotalProfit:number;
 
@@ -23,6 +23,15 @@ export class RetailSales extends baseEntity{
     
     @Column()
     userId:number;
+
+    @Column()
+    Epected_Profit:number
+
+    @Column()
+    profit_deviation:number
+
+    @Column()
+    percentage_deviation:number
 
     @ManyToOne(() => Product, { eager: true })
     @JoinColumn({ name: 'productId' })

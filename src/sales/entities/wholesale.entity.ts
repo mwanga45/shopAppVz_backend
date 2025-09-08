@@ -22,13 +22,13 @@ export class WholeSales extends baseEntity{
   @IsString()
   TotalProfit:number
 
-  @Column({ nullable: true })
+  @Column()
   productId: number;
   
   @Column()
   Epected_Profit:number
 
-  @Column({nullable:true})
+  @Column()
   profit_deviation:number
 
   @Column()
