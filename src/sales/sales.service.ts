@@ -11,6 +11,7 @@ import { ProductWholesales } from './utils/whole.type';
 import { isDate, isEmpty } from 'class-validator';
 import { SalesHelper } from 'src/common/helper/sales.helper';
 import { StockUpdateHelper } from 'src/common/helper/stockUpdate,helper';
+import { table } from 'console';
 
 @Injectable()
 export class SalesService {
@@ -203,9 +204,27 @@ export class SalesService {
         profit_deviation:deviation_profit,
         percentage_deviation:deviation_percentage,
       })
-      
-      
+      this.RetailsalesRepository.save(Createsales)
+
+    }else{
+      const  ExpectedProfit = this.SalesHelper.calculateExpectedProfit_Wholesales(productInfo.retailsales_price,productInfo.purchase_price,Dto.Total_pc_pkg_litre,undefined)
+      const ProfitGenerated = this.SalesHelper.CalculateProfit_Wholesales(productInfo.purchase_price,productInfo.retailsales_price,Dto.Total_pc_pkg_litre,undefined)
+      const {deviation_profit,deviation_percentage} = this.SalesHelper.calculeDevition(ExpectedProfit,ProfitGenerated)
+      const TotalGenerated = Math.floor(
+        Number(Dto.Total_pc_pkg_litre) * Number(productInfo.retailsales_price)
+      )
+        const Createsales =  this.RetailsalesRepository.create({
+        Total_litre_kg:Dto.Total_pc_pkg_litre,
+        TotalGenereted:TotalGenerated,
+        productId:Dto.productId,
+        userId:userId,
+        Epected_Profit:ExpectedProfit,
+        profit_deviation:deviation_profit,
+        percentage_deviation:deviation_percentage,
+      })
+      this.RetailsalesRepository.save(Createsales)
     }
+
   }
   
   findOne(id: number) {
