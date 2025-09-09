@@ -165,7 +165,7 @@ export class SalesService {
     })
     await this.WholesalesRepository.save(Addsales)
  }
-    const sellingReason = "Liquid" 
+    const sellingReason = "Sold" 
     const UpdateAndTrackestock = await this.stockupdate.UpdateStock_Info(Number(Dto.productId),Dto.Total_pc_pkg_litre,sellingReason,Dto.product_status,Dto.product_category) 
     return
    }
@@ -224,7 +224,9 @@ export class SalesService {
       })
       this.RetailsalesRepository.save(Createsales)
     }
-
+    const sellingReason = "Sold"
+    const UdateStock = await this.stockupdate.UpdateStock_Info(Dto.productId,Dto.Total_pc_pkg_litre,sellingReason,Dto.product_status,Dto.product_category)
+    return 
   }
   
   findOne(id: number) {
