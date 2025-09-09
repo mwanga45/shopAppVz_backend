@@ -70,7 +70,9 @@ export class AuthService {
        password:hashedPassword,
        fullname:fullname,
        phone_number:Dto.phone_number,
-       nida:Dto.nida
+       nida:Dto.nida,
+       role:Dto.role
+
       });
       await this.userRepository.save(CreateUser)
       return {exist: false, proceed: true};

@@ -1,5 +1,6 @@
 import { match } from "assert";
 import { IsEmail, isNotEmpty, IsNotEmpty, isString, IsString, Length, Matches } from "class-validator";
+import { UserType } from "src/entities/user.entity";
 
 export class LoginDto {
     @IsEmail()
@@ -39,4 +40,7 @@ export class RegisterDTO{
     @IsNotEmpty()
     @Length(10)
     phone_number:string
+
+    @IsString()
+    role:UserType
 }

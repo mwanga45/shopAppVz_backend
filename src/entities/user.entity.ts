@@ -1,6 +1,9 @@
 import { Entity, Column } from 'typeorm';
 import { baseEntity } from 'src/common/base.entity';
-
+export enum UserType {
+  Admin ="admin",
+  User="user" 
+}
 @Entity('users')
 export class User extends baseEntity {
   @Column()
@@ -18,8 +21,8 @@ export class User extends baseEntity {
   @Column()
   nida:string
 
-  @Column({default:"user"})
-  role: "user" | "admin";
+  @Column({ type: 'enum', enum: UserType, default: UserType.User })
+  role: UserType;
 
   @Column({ default: true })
   isActive: boolean;
