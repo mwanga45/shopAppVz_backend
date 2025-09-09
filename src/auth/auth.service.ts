@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { User } from "src/entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { NidaValidate } from "src/common/helper/nide.helper";
+import { RegisterDTO } from "./dto/create-auth.dto";
 
 @Injectable()
 export class AuthService {
@@ -43,34 +44,33 @@ export class AuthService {
       role: user.role,
     };
   }
-      async  register(user:{firstname:string; lastname:string; email:string; password:string; nida:string; phone_number:string}){
-      const {email, phone_number, nida, password, firstname,lastname} = user;
+      async  register(Dto:RegisterDTO){
+      
       const existing = await this.userRepository.findOne({
-        where:[
-          {email} as any,
-          {phone_number} as any,
-          {nida} as any,
-        ],
+        where:{
+          email:Dto.email,
+          phone_number:Dto.phone_number,
+          nida:Dto.nida
+        }
       });
       if(existing){
-        if((existing as any).email === email) return {exist: true, field: 'email'};
-        if((existing as any).phone_number === phone_number) return {exist: true, field: 'phone_number'};
-        if((existing as any).nida === nida) return {exist: true, field: 'nida'};
+        if((existing as any).email === Dto.email) return {exist: true, field: 'email'};
+        if((existing as any).phone_number === Dto.phone_number) return {exist: true, field: 'phone_number'};
+        if((existing as any).nida === Dto.nida) return {exist: true, field: 'nida'};
       }
 
-      const isValid = NidaValidate.validateNidaNumber(nida)
+      const isValid = NidaValidate.validateNidaNumber(Dto.nida)
       if(isValid.Isvalid === false){
         throw new UnauthorizedException(isValid.reason)
-        return
       }
-      const hashedPassowrd = await bcrypt.hash(password,10)
-      const fullname = firstname.concat(" ",lastname)
+      const hashedPassword = await bcrypt.hash(Dto.password,10)
+      const fullname = Dto.firstname.concat(" ",Dto.lastname)
       const CreateUser = this.userRepository.create({
-       email:user.email,
-       password:hashedPassowrd,
+       email:Dto.email,
+       password:hashedPassword,
        fullname:fullname,
-       phone_number:user.phone_number,
-       nida:user.nida
+       phone_number:Dto.phone_number,
+       nida:Dto.nida
       });
       await this.userRepository.save(CreateUser)
       return {exist: false, proceed: true};

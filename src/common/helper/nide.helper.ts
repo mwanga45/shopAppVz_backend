@@ -3,7 +3,7 @@ static  validateNidaNumber(nida: string): { Isvalid: boolean; reason?: string } 
     const nidaregx = /^(\d{8})-(\d{5})-(\d{5})-(\d{2})$/;
     const match = nida.match(nidaregx);
     if (!match) {
-        return { Isvalid: false, reason: 'invalid format' };
+        return { Isvalid: false, reason: 'invalid format Nida number' };
     }
     const year = parseInt(match[1].substring(0, 4), 10);
     const month = parseInt(match[1].substring(4, 6), 10);
