@@ -84,7 +84,7 @@ export class SalesService {
     const ExpectedProfit = this.SalesHelper.calculateExpectedProfit_Wholesales(productDB_info.wholesales_price,productDB_info.purchase_price,undefined,Dto.Total_pc_pkg_litre)
     const {deviation_profit,deviation_percentage} = this.SalesHelper.calculeDevition(ExpectedProfit,ProfitGenerated)
     const cutoff = await this.SalesHelper.ValidateCutoff(Dto.Total_pc_pkg_litre,productDB_info.wholesales_price,Dto.productId,productDB_info.purchase_price)
-  const TotalGenerated = Math.floor(
+    const TotalGenerated = Math.floor(
       Number(Dto.Total_pc_pkg_litre) * Number(productDB_info.wholesales_price)
  );
 
@@ -173,7 +173,39 @@ export class SalesService {
 
   
   async Retail_Sale_Record(Dto:CreateRetailsalesDto,userId:number):Promise<any>{
+    // check if ther product exists
+    const product_Exist =  await this.ProductRepository.exists({
+      where:{id:Dto.productId}
+    })
+    if(!product_Exist){
+      throw new NotFoundException("Product is Not found")
+    }
+    const productInfo = await this.ProductRepository.findOne({
+      where:{id:Dto.productId}
+    })
+    if(!productInfo){
+      throw new NotFoundException("product is not found")
+    }
+    if (Dto.product_type === "solid"){
+      const  ExpectedProfit = this.SalesHelper.calculateExpectedProfit_Wholesales(productInfo.retailsales_price,productInfo.purchase_price,undefined,Dto.Total_pc_pkg_litre)
+      const ProfitGenerated = this.SalesHelper.CalculateProfit_Wholesales(productInfo.purchase_price,productInfo.retailsales_price,undefined,Dto.Total_pc_pkg_litre)
+      const {deviation_profit,deviation_percentage} = this.SalesHelper.calculeDevition(ExpectedProfit,ProfitGenerated)
+      const TotalGenerated = Math.floor(
+        Number(Dto.Total_pc_pkg_litre) * Number(productInfo.retailsales_price)
+      )
 
+      const Createsales =  this.RetailsalesRepository.create({
+        Total_litre_kg:Dto.Total_pc_pkg_litre,
+        TotalGenereted:TotalGenerated,
+        productId:Dto.productId,
+        userId:userId,
+        Epected_Profit:ExpectedProfit,
+        profit_deviation:deviation_profit,
+        percentage_deviation:deviation_percentage,
+      })
+      
+      
+    }
   }
   
   findOne(id: number) {
