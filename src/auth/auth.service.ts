@@ -6,6 +6,7 @@ import { User } from "src/entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { NidaValidate } from "src/common/helper/nide.helper";
 import { RegisterDTO } from "./dto/create-auth.dto";
+import { UserType } from "src/entities/user.entity";
 
 @Injectable()
 export class AuthService {
@@ -33,19 +34,22 @@ export class AuthService {
     return user;
   }
 
-  async login(user: { id: number; email: string; role: 'user' | 'admin' }) {
+  async login(user: User) {
     const payload = {
       sub: user.id,
       email: user.email,
       role: user.role,
     };
+    
+    const accessToken = this.jwtService.sign(payload);
+    console.log('Generated Access Token:', accessToken);
+
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: accessToken,
       role: user.role,
     };
   }
       async  register(Dto:RegisterDTO){
-      
       const existing = await this.userRepository.findOne({
         where:{
           email:Dto.email,
@@ -72,7 +76,6 @@ export class AuthService {
        phone_number:Dto.phone_number,
        nida:Dto.nida,
        role:Dto.role
-
       });
       await this.userRepository.save(CreateUser)
       return {exist: false, proceed: true};

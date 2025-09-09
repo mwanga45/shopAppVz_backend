@@ -10,9 +10,9 @@ export class AuthController {
 
   @UseGuards(AuthGuard('local'))
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   async login(@Req() req) {
-    const { id, email, role } = req.user;
-    return this.authService.login({ id, email, role });
+    return this.authService.login(req.user);
   }
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
