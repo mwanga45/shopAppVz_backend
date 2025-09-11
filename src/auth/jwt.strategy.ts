@@ -27,13 +27,14 @@ export class JwtStrategy extends PassportStrategy(Strategy){
       }
     )
   }
-  async Validate(Reqpayload:payload){
+  async validate(Reqpayload:payload){
     const user = this.userRepo.findOne({where:{id:Reqpayload.sub},select:[
       "id","email","role"
     ]})
     if(!user){
       throw new UnauthorizedException("Token is Invalid")
     }
+    console.log(Reqpayload.sub, Reqpayload.email,Reqpayload.role)
     return {userId:Reqpayload.sub, user_email:Reqpayload.email, user_role:Reqpayload.role}
   }
 

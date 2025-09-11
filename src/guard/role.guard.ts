@@ -11,7 +11,7 @@ export class RoleGuard implements CanActivate{
       if(!user){
         throw new UnauthorizedException('Unauthorized')
       }
-      if(user.role !== 'admin'){
+      if(user.user_role !== 'admin'){
         throw new ForbiddenException('Forbidden')
       }
       return true

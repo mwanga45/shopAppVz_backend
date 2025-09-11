@@ -27,21 +27,21 @@ export class ProductService {
   
   async create(createProductDto: CreateProductDto):Promise<string> {
     // check incoming data
-    if(createProductDto.Rs_price .length === 0 && createProductDto.Ws_price.length === 0){
-       throw new BadRequestException("Please make sure you have an either wholesale price or retailsale price ")
+    if(createProductDto.product_category === "retailsales" && (!createProductDto.Rs_price || !createProductDto.rpurchase_price)){
+       throw new BadRequestException("For retail sales, Retail Price and Retail Purchase Price are required.")
     }
-    if(createProductDto.wpurchase_price.length === 0 && createProductDto.rpurchase_price.length === 0){
-      throw new BadRequestException("Please make sure you have an  either wholesales or retails  purchase price")
+    if(createProductDto.product_category === "wholesales" && (!createProductDto.Ws_price || !createProductDto.wpurchase_price)){
+      throw new BadRequestException("For wholesale sales, Wholesale Price and Wholesale Purchase Price are required.")
     }
     const product = await this.Productrepository.findOne({where:{product_name:createProductDto.product_name , product_category:createProductDto.product_category}})
     if(product){
        throw new BadRequestException("Product name is already been exist")
     }
-    if (createProductDto.wpurchase_price > createProductDto.Ws_price){
-      throw new BadRequestException("Please check the purchase prise and the whole sales  of this product the  pruschase sales of whole sales must be small than  whole")
+    if (createProductDto.Ws_price && createProductDto.wpurchase_price && Number(createProductDto.wpurchase_price) > Number(createProductDto.Ws_price)){
+      throw new BadRequestException("Wholesale purchase price must be less than wholesale price.")
     }
-      if (createProductDto.wpurchase_price > createProductDto.Ws_price){
-      throw new BadRequestException("Please check the purchase prise and the retail sales  of this product the  pruschase sales must be small than  whole")
+      if (createProductDto.Rs_price && createProductDto.rpurchase_price && Number(createProductDto.rpurchase_price) > Number(createProductDto.Rs_price)){
+      throw new BadRequestException("Retail purchase price must be less than retail price.")
     }
     const allowedCategories = [ "wholesales", "retailsales"]
     const allowedTypes = ["Liquid", "Solid"]
@@ -50,6 +50,12 @@ export class ProductService {
     if (!categoryValid || !typeValid){
       throw new BadRequestException("Please check either produc_category or product_type make sure u send appropiate  info")
     }
+
+    // Ensure product_name is not empty
+    if (!createProductDto.product_name || createProductDto.product_name.trim().length === 0) {
+      throw new BadRequestException("Product name cannot be empty.");
+    }
+
     const createproduct = this.Productrepository.create({
       product_name:createProductDto.product_name,
       product_category:createProductDto.product_category,
@@ -70,7 +76,8 @@ export class ProductService {
         "product.product_name",
         "product.product_category",
         "product.product_type",
-        "product.purchase_price",
+        "product.wpurchase_price",
+        "product.rpurchase_price",
         "product.retailsales_price",
         "product.wholesales_price",
         "product.UpdateAt",
