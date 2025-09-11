@@ -26,9 +26,14 @@ export class ProductService {
   ){}
   
   async create(createProductDto: CreateProductDto):Promise<string> {
+    // check incoming data
+    if(createProductDto.Rs_price .length === 0 && createProductDto.Ws_price.length === 0){
+       throw new BadRequestException("Please make sure you have an either wholesale price or retailsale price ")
+    }
+    if(createProductDto.wpurchase_price.length === 0 && createProductDto.rpurchase_price.length === 0){
+      throw new BadRequestException("Please make sure you have an  either wholesales or retails  purchase price")
+    }
     const product = await this.Productrepository.findOne({where:{product_name:createProductDto.product_name , product_category:createProductDto.product_category}})
-    
-
     if(product){
        throw new BadRequestException("Product name is already been exist")
     }
