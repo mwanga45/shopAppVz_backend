@@ -12,7 +12,7 @@ export class  SalesHelper {
     @InjectRepository(WholeSales)
     private readonly wholeRepo:Repository<WholeSales>
   ){}
-  CalculateProfit_Wholesales(purchase_price:string,wholesales_price:string,total_litre?:string,total_pc?:string):number{
+  CalculateProfit_Wholesales(purchase_price:string | null,wholesales_price:string | null,total_litre?:string,total_pc?:string):number{
     const PucPrice = Number(purchase_price?? 0)
     const Wholesales = Number(wholesales_price ?? 0)
     const litre = Number(total_litre ?? 0)
@@ -26,11 +26,11 @@ export class  SalesHelper {
     const Actual_Profit  = profitPerEachlitre * litre
     return Actual_Profit
   }
-  calculateExpectedProfit_Wholesales(wholesales_price:string,purchase_price:string,total_litre?:string,total_pc?:string):number{
+  calculateExpectedProfit_Wholesales(wholesales_price:string | null,purchase_price:string | null,total_litre?:string,total_pc?:string):number{
     const litre = Number(total_litre ?? 0)
     const Pc  = Number(total_pc ?? 0)
-    const Wholesale = Number(wholesales_price)
-    const PucPrice = Number(purchase_price)
+    const Wholesale = Number(wholesales_price ?? 0)
+    const PucPrice = Number(purchase_price ?? 0)
      if (litre === 0){
         const ExpectProfitPerEach = Wholesale-PucPrice
         const Expected_profit = Pc * ExpectProfitPerEach
@@ -46,7 +46,7 @@ export class  SalesHelper {
     return {deviation_percentage,deviation_profit}
     
   }
-  async ValidateCutoff (Total_litre_kg:string,wholesales_price:string,product_Id:number, purchase_price:string):Promise<number[]>{
+  async ValidateCutoff (Total_litre_kg:string,wholesales_price:string | null,product_Id:number, purchase_price:string | null):Promise<number[]>{
     const Amount = Number(Total_litre_kg ?? 0)
     const disc_Info = await this.dscountRepo.findOne({
       where:{product_id:product_Id},

@@ -36,7 +36,7 @@ export class SalesService {
       "product.product_name",
       "product.product_category",
       "product.product_type",
-      "product.purchase_price",
+      "product.wpurchase_price",
       "product.wholesales_price",
      ])
      .where("product.product_category = :category",{category:"wholesales"})
@@ -54,7 +54,7 @@ export class SalesService {
       "product.product_name",
       "product.product_category",
       "product.product_type",
-      "product.purchase_price",
+      "product.rpurchase_price",
       "product.retailsales_price"
     ])
     .where("product.product_category =:category",{category:"retailsales"})
@@ -75,16 +75,16 @@ export class SalesService {
    if(Dto.product_type === "solid"){
     const productDB_info= await this.ProductRepository.findOne({
       where:{id:Dto.productId},
-      select:['purchase_price', 'wholesales_price']
+      select:['wpurchase_price', 'wholesales_price']
     })
 
     if(!productDB_info){
      throw new NotFoundException('Product not found for profit calculation')
     }
-    const ProfitGenerated = this.SalesHelper.CalculateProfit_Wholesales(productDB_info.purchase_price, productDB_info.wholesales_price,undefined, Dto.Total_pc_pkg_litre)
-    const ExpectedProfit = this.SalesHelper.calculateExpectedProfit_Wholesales(productDB_info.wholesales_price,productDB_info.purchase_price,undefined,Dto.Total_pc_pkg_litre)
+    const ProfitGenerated = this.SalesHelper.CalculateProfit_Wholesales(productDB_info.wpurchase_price!, productDB_info.wholesales_price!,undefined, Dto.Total_pc_pkg_litre)
+    const ExpectedProfit = this.SalesHelper.calculateExpectedProfit_Wholesales(productDB_info.wholesales_price!,productDB_info.wpurchase_price!,undefined,Dto.Total_pc_pkg_litre)
     const {deviation_profit,deviation_percentage} = this.SalesHelper.calculeDevition(ExpectedProfit,ProfitGenerated)
-    const cutoff = await this.SalesHelper.ValidateCutoff(Dto.Total_pc_pkg_litre,productDB_info.wholesales_price,Dto.productId,productDB_info.purchase_price)
+    const cutoff = await this.SalesHelper.ValidateCutoff(Dto.Total_pc_pkg_litre,productDB_info.wholesales_price!,Dto.productId,productDB_info.wpurchase_price!)
     const TotalGenerated = Math.floor(
       Number(Dto.Total_pc_pkg_litre) * Number(productDB_info.wholesales_price)
  );
@@ -124,16 +124,16 @@ export class SalesService {
    else if(Dto.product_type === "liquid"){
      const productDB_info= await this.ProductRepository.findOne({
        where:{id:Dto.productId},
-       select:['purchase_price', 'wholesales_price']
+       select:['wpurchase_price', 'wholesales_price']
      })
  
      if(!productDB_info){
       throw new NotFoundException('Product not found for profit calculation')
      }
-     const ProfitGenerated = this.SalesHelper.CalculateProfit_Wholesales(productDB_info.purchase_price, productDB_info.wholesales_price,Dto.Total_pc_pkg_litre, undefined)
-     const ExpectedProfit = this.SalesHelper.calculateExpectedProfit_Wholesales(productDB_info.wholesales_price,productDB_info.purchase_price,Dto.Total_pc_pkg_litre,undefined)
+     const ProfitGenerated = this.SalesHelper.CalculateProfit_Wholesales(productDB_info.wpurchase_price!, productDB_info.wholesales_price!,Dto.Total_pc_pkg_litre, undefined)
+     const ExpectedProfit = this.SalesHelper.calculateExpectedProfit_Wholesales(productDB_info.wholesales_price!,productDB_info.wpurchase_price!,Dto.Total_pc_pkg_litre,undefined)
      const {deviation_profit,deviation_percentage} = this.SalesHelper.calculeDevition(ExpectedProfit,ProfitGenerated)
-        const cutoff = await this.SalesHelper.ValidateCutoff(Dto.Total_pc_pkg_litre,productDB_info.wholesales_price,Dto.productId,productDB_info.purchase_price)
+        const cutoff = await this.SalesHelper.ValidateCutoff(Dto.Total_pc_pkg_litre,productDB_info.wholesales_price!,Dto.productId,productDB_info.wpurchase_price!)
   const TotalGenerated = Math.floor(
       Number(Dto.Total_pc_pkg_litre) * Number(productDB_info.wholesales_price)
  );
@@ -188,8 +188,8 @@ export class SalesService {
       throw new NotFoundException("product is not found")
     }
     if (Dto.product_type === "solid"){
-      const  ExpectedProfit = this.SalesHelper.calculateExpectedProfit_Wholesales(productInfo.retailsales_price,productInfo.purchase_price,undefined,Dto.Total_pc_pkg_litre)
-      const ProfitGenerated = this.SalesHelper.CalculateProfit_Wholesales(productInfo.purchase_price,productInfo.retailsales_price,undefined,Dto.Total_pc_pkg_litre)
+      const  ExpectedProfit = this.SalesHelper.calculateExpectedProfit_Wholesales(productInfo.retailsales_price!,productInfo.rpurchase_price!,undefined,Dto.Total_pc_pkg_litre)
+      const ProfitGenerated = this.SalesHelper.CalculateProfit_Wholesales(productInfo.rpurchase_price!,productInfo.retailsales_price!,undefined,Dto.Total_pc_pkg_litre)
       const {deviation_profit,deviation_percentage} = this.SalesHelper.calculeDevition(ExpectedProfit,ProfitGenerated)
       const TotalGenerated = Math.floor(
         Number(Dto.Total_pc_pkg_litre) * Number(productInfo.retailsales_price)
@@ -207,8 +207,8 @@ export class SalesService {
       this.RetailsalesRepository.save(Createsales)
 
     }else{
-      const  ExpectedProfit = this.SalesHelper.calculateExpectedProfit_Wholesales(productInfo.retailsales_price,productInfo.purchase_price,Dto.Total_pc_pkg_litre,undefined)
-      const ProfitGenerated = this.SalesHelper.CalculateProfit_Wholesales(productInfo.purchase_price,productInfo.retailsales_price,Dto.Total_pc_pkg_litre,undefined)
+      const  ExpectedProfit = this.SalesHelper.calculateExpectedProfit_Wholesales(productInfo.retailsales_price!,productInfo.rpurchase_price!,Dto.Total_pc_pkg_litre,undefined)
+      const ProfitGenerated = this.SalesHelper.CalculateProfit_Wholesales(productInfo.rpurchase_price!,productInfo.retailsales_price!,Dto.Total_pc_pkg_litre,undefined)
       const {deviation_profit,deviation_percentage} = this.SalesHelper.calculeDevition(ExpectedProfit,ProfitGenerated)
       const TotalGenerated = Math.floor(
         Number(Dto.Total_pc_pkg_litre) * Number(productInfo.retailsales_price)

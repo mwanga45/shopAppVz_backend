@@ -27,8 +27,10 @@ export class ProductService {
   
   async create(createProductDto: CreateProductDto):Promise<string> {
     const product = await this.Productrepository.findOne({where:{product_name:createProductDto.product_name , product_category:createProductDto.product_category}})
+    
+
     if(product){
-       throw new UnauthorizedException("Product name is already been exist")
+       throw new BadRequestException("Product name is already been exist")
     }
     if (createProductDto.wpurchase_price > createProductDto.Ws_price){
       throw new BadRequestException("Please check the purchase prise and the whole sales  of this product the  pruschase sales of whole sales must be small than  whole")

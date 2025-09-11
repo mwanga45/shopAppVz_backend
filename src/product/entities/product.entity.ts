@@ -20,17 +20,17 @@ export class Product extends baseEntity{
      @Column({type:"enum", enum:product_type})
      product_type:product_type
 
-     @Column()
-     wpurchase_price:string
+     @Column({nullable:true, type: 'varchar'})
+     wpurchase_price:string |null
      
-     @Column()
-     rpurchase_price:string
+     @Column({nullable:true, type: 'varchar'})
+     rpurchase_price:string | null
 
-     @Column()
-     wholesales_price:string
+     @Column({nullable:true, type: 'varchar'})
+     wholesales_price:string|null
 
-     @Column()
-     retailsales_price:string
+     @Column({nullable:true, type: 'varchar'})
+     retailsales_price:string|null
     
 }
 
