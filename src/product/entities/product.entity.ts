@@ -1,18 +1,30 @@
 import { baseEntity } from "src/common/base.entity";
 import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+export enum product_type{
+    Liquid= "Liquid",
+    Solid = "Solid"
+}
+export enum  category {
+  wholesales ="wholesales",
+  retailsales= "retailsales"
+
+}
 @Entity()
 export class Product extends baseEntity{
      @Column()
      product_name:string
      
-     @Column()
-     product_category:"both" | "wholesales"|"retailsales"|"none"
+     @Column({type:'enum', enum:category})
+     product_category: category
+
+     @Column({type:"enum", enum:product_type})
+     product_type:product_type
 
      @Column()
-     product_type:"liquid"|"solid"
-
+     wpurchase_price:string
+     
      @Column()
-     purchase_price:string
+     rpurchase_price:string
 
      @Column()
      wholesales_price:string

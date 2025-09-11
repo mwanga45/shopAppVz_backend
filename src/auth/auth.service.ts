@@ -40,10 +40,8 @@ export class AuthService {
       email: user.email,
       role: user.role,
     };
-    
     const accessToken = this.jwtService.sign(payload);
     console.log('Generated Access Token:', accessToken);
-
     return {
       access_token: accessToken,
       role: user.role,

@@ -1,14 +1,16 @@
 import { IsString } from "class-validator";
+import { product_type } from "../entities/product.entity";
+import { category } from "../entities/product.entity";
 
 export class CreateProductDto {
     @IsString()
     product_name:string
 
     @IsString()
-    product_category:"both" | "wholesales"|"retailsales"|"none"
+    product_category:category
     
     @IsString()
-    product_type:"liquid"|"solid"
+    product_type:product_type
     
     @IsString()
     Rs_price:string
@@ -17,5 +19,8 @@ export class CreateProductDto {
     Ws_price:string
 
     @IsString()
-    purchase_price:string
+    wpurchase_price:string
+
+    @IsString()
+    rpurchase_price:string
 }

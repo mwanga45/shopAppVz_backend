@@ -1,9 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { And, Repository } from 'typeorm';
 
 
 
@@ -26,19 +26,22 @@ export class ProductService {
   ){}
   
   async create(createProductDto: CreateProductDto):Promise<string> {
-    const product = await this.Productrepository.findOne({where:{product_name:createProductDto.product_name}})
+    const product = await this.Productrepository.findOne({where:{product_name:createProductDto.product_name , product_category:createProductDto.product_category}})
     if(product){
        throw new UnauthorizedException("Product name is already been exist")
     }
-    if (createProductDto.purchase_price >= createProductDto.Ws_price){
-      throw new UnauthorizedException("Please check the purchase prise and the whole sales  of this product the  pruschase sales must be small than  whole")
+    if (createProductDto.wpurchase_price > createProductDto.Ws_price){
+      throw new BadRequestException("Please check the purchase prise and the whole sales  of this product the  pruschase sales of whole sales must be small than  whole")
     }
-    const allowedCategories = ["both", "wholesales", "retailsales", "none"]
-    const allowedTypes = ["liquid", "solid"]
+      if (createProductDto.wpurchase_price > createProductDto.Ws_price){
+      throw new BadRequestException("Please check the purchase prise and the retail sales  of this product the  pruschase sales must be small than  whole")
+    }
+    const allowedCategories = [ "wholesales", "retailsales"]
+    const allowedTypes = ["Liquid", "Solid"]
     const categoryValid = allowedCategories.includes(createProductDto.product_category)
     const typeValid = allowedTypes.includes(createProductDto.product_type)
     if (!categoryValid || !typeValid){
-      throw new UnauthorizedException("Please check either produc_category or product_type make sure u send appropiate  info")
+      throw new BadRequestException("Please check either produc_category or product_type make sure u send appropiate  info")
     }
     const createproduct = this.Productrepository.create({
       product_name:createProductDto.product_name,
@@ -46,13 +49,14 @@ export class ProductService {
       product_type:createProductDto.product_type,
       wholesales_price:createProductDto.Ws_price,
       retailsales_price:createProductDto.Rs_price,
-      purchase_price:createProductDto.purchase_price
+      wpurchase_price:createProductDto.wpurchase_price,
+      rpurchase_price:createProductDto.rpurchase_price
     })
     await this.Productrepository.save(createproduct)
     return "Successfuly create  new product"
   }
 
-  async findAll(filter?:{category?:string,type?:string}):Promise<Productpayload[] | string> {
+  async findAll(filter?:{category?:string,type?:string}):Promise<any> {
     const query = this.Productrepository.createQueryBuilder("product")
       .select([
         "product.id",
@@ -78,16 +82,16 @@ export class ProductService {
     return response
 
   }
-  async findby_category():Promise<Productpayload[]>{
+  async findby_category():Promise<any>{
     const products = await this.Productrepository.find({
-      select:["id", "product_name","product_category","product_type", "purchase_price","retailsales_price","wholesales_price","UpdateAt" ],
+      select:["id", "product_name","product_category","product_type", "wpurchase_price","rpurchase_price","retailsales_price","wholesales_price","UpdateAt" ],
       order:{ product_category: "ASC", product_name: "ASC" }
     });
     return products;
   }
 
   async findOne(product_id: number):Promise<any> {
-    const ProductbyId = await this.Productrepository.findOne({where:{id:product_id}, select:["id","product_name","product_type","product_category",'product_type',"purchase_price","wholesales_price","retailsales_price"]})
+    const ProductbyId = await this.Productrepository.findOne({where:{id:product_id}, select:["id","product_name","product_type","product_category",'product_type',"wpurchase_price","rpurchase_price" ,"wholesales_price","retailsales_price"]})
     return ProductbyId;
   }
   async updateproduct(id:number,updateProductDto:UpdateProductDto):Promise<any>{
