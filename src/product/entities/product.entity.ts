@@ -36,9 +36,9 @@ export class Product extends baseEntity{
      @Column({nullable:true, type: 'varchar'})
      retailsales_price:string|null
       
-     @ManyToOne(()=> User,{eager:true})
+     @ManyToOne(()=> User,user =>user.product)
      @JoinColumn({name:"userId"})
-     User:User
+     user:User
     
 }
 

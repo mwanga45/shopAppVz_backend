@@ -17,6 +17,7 @@ export class ProductController {
     const userId = req.user.userId
     return this.productService.create(createProductDto,userId);
   }
+  @UseGuards(AuthGuard('jwt'))
   @Get('getproduct')
   findAll(@Query('category') category?: string, @Query('type') type?: string) {
     return this.productService.findAll({ category, type });

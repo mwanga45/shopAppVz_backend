@@ -1,5 +1,6 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, OneToMany } from 'typeorm';
 import { baseEntity } from 'src/common/base.entity';
+import { Product } from 'src/product/entities/product.entity';
 export enum UserType {
   Admin ="admin",
   User="user" 
@@ -26,5 +27,8 @@ export class User extends baseEntity {
 
   @Column({ default: true })
   isActive: boolean;
+
+  @OneToMany(() => Product,(product)=>product.user)
+  product:Product[]
 
 }
