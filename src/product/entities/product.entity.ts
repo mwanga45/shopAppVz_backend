@@ -1,6 +1,7 @@
 import { baseEntity } from "src/common/base.entity";
 import { User } from "src/entities/user.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Stock, Stock_transaction } from "src/stock/entities/stock.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 export enum product_type{
     Liquid= "Liquid",
     Solid = "Solid"
@@ -39,6 +40,11 @@ export class Product extends baseEntity{
      @ManyToOne(()=> User,user =>user.product)
      @JoinColumn({name:"userId"})
      user:User
+
+     @OneToMany (()=> Stock_transaction, (stocktrans)=> stocktrans.product)
+     stocktrans:Stock_transaction[]
     
+     @OneToMany(()=> Stock, (stock)=>stock.product)
+     stock:Stock[]
 }
 

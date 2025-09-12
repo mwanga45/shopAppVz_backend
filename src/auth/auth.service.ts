@@ -6,7 +6,7 @@ import { User } from "src/entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { NidaValidate } from "src/common/helper/nide.helper";
 import { RegisterDTO } from "./dto/create-auth.dto";
-import { UserType } from "src/entities/user.entity";
+
 
 @Injectable()
 export class AuthService {

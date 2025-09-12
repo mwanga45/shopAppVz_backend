@@ -73,6 +73,7 @@ export class ProductService {
 
   async findAll(filter?:{category?:string,type?:string}):Promise<any> {
     const query = this.Productrepository.createQueryBuilder("product")
+      .leftJoinAndSelect("product.user", "user")
       .select([
         "product.id",
         "product.product_name",
@@ -84,6 +85,7 @@ export class ProductService {
         "product.wholesales_price",
         "product.userId",
         "product.UpdateAt",
+        "user.fullname"
       ]);
 
     if (filter?.type) {
