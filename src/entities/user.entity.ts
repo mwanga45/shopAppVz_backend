@@ -1,6 +1,7 @@
 import { Entity, Column, OneToMany } from 'typeorm';
 import { baseEntity } from 'src/common/base.entity';
 import { Product } from 'src/product/entities/product.entity';
+import { Stock, Stock_transaction } from 'src/stock/entities/stock.entity';
 export enum UserType {
   Admin ="admin",
   User="user" 
@@ -30,5 +31,11 @@ export class User extends baseEntity {
 
   @OneToMany(() => Product,(product)=>product.user)
   product:Product[]
+
+  @OneToMany(()=> Stock, (stock)=> stock.user)
+  stock:Stock[]
+
+  @OneToMany(()=> Stock_transaction,(stocktrans)=> stocktrans.user)
+  stocktrans:Stock_transaction[]
 
 }

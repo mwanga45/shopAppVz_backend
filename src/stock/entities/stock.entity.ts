@@ -1,4 +1,5 @@
 import { baseEntity } from "src/common/base.entity";
+import { User } from "src/entities/user.entity";
 import { Product } from "src/product/entities/product.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 export enum StockType {
@@ -16,14 +17,13 @@ export class Stock extends baseEntity {
     @Column()
     Total_stock:number
 
-  @ManyToOne(() => Product, {eager:true})
-  @JoinColumn({name:"productId"})
-  Product:Product
-  
   @ManyToOne(()=> Product , (product)=>product.stock)
   @JoinColumn({name:"product_id"})
   product:Product
- 
+
+  @ManyToOne(()=> User,(user) => user.stock)
+  @JoinColumn({name:"user_id"})
+  user:User
 }
 @Entity()
 export class Stock_transaction extends baseEntity{
@@ -44,6 +44,9 @@ export class Stock_transaction extends baseEntity{
     Reasons:string
     
     @ManyToOne(()=> Product, (product)=>product.stocktrans)
-    @JoinColumn({name:"ProductId"})
+    @JoinColumn({name:"product_id"})
     product:Product
+    @ManyToOne(()=> User, (user)=>user.stocktrans)
+    @JoinColumn({name:"user_id"})
+    user:User
 }
