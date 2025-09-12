@@ -25,7 +25,7 @@ export class ProductService {
    @InjectRepository(Product) private readonly  Productrepository:Repository<Product>
   ){}
   
-  async create(createProductDto: CreateProductDto):Promise<string> {
+  async create(createProductDto: CreateProductDto, userId:any):Promise<string> {
     // check incoming data
     if(createProductDto.product_category === "retailsales" && (!createProductDto.Rs_price || !createProductDto.rpurchase_price)){
        throw new BadRequestException("For retail sales, Retail Price and Retail Purchase Price are required.")
@@ -63,7 +63,9 @@ export class ProductService {
       wholesales_price:createProductDto.Ws_price,
       retailsales_price:createProductDto.Rs_price,
       wpurchase_price:createProductDto.wpurchase_price,
-      rpurchase_price:createProductDto.rpurchase_price
+      rpurchase_price:createProductDto.rpurchase_price,
+      userId:userId
+
     })
     await this.Productrepository.save(createproduct)
     return "Successfuly create  new product"
@@ -80,6 +82,7 @@ export class ProductService {
         "product.rpurchase_price",
         "product.retailsales_price",
         "product.wholesales_price",
+        "product.userId",
         "product.UpdateAt",
       ]);
 

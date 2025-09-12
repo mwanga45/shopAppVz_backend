@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpCode, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpCode, Query,Request } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -13,10 +13,10 @@ export class ProductController {
   @UseGuards(AuthGuard('jwt'), RoleGuard)
   @Post("create")
   @HttpCode(201)
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productService.create(createProductDto);
+  create(@Request() req,@Body() createProductDto: CreateProductDto) {
+    const userId = req.user.userId
+    return this.productService.create(createProductDto,userId);
   }
-  // @UseGuards(AuthGuard('jwt'))
   @Get('getproduct')
   findAll(@Query('category') category?: string, @Query('type') type?: string) {
     return this.productService.findAll({ category, type });

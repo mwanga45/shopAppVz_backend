@@ -1,5 +1,6 @@
 import { baseEntity } from "src/common/base.entity";
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/entities/user.entity";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 export enum product_type{
     Liquid= "Liquid",
     Solid = "Solid"
@@ -13,6 +14,9 @@ export enum  category {
 export class Product extends baseEntity{
      @Column()
      product_name:string
+
+     @Column()
+     userId:number
      
      @Column({type:'enum', enum:category})
      product_category: category
@@ -31,6 +35,10 @@ export class Product extends baseEntity{
 
      @Column({nullable:true, type: 'varchar'})
      retailsales_price:string|null
+      
+     @ManyToOne(()=> User,{eager:true})
+     @JoinColumn({name:"userId"})
+     User:User
     
 }
 
