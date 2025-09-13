@@ -18,6 +18,11 @@ export class StockController {
   findAll() {
     return this.stockService.findAll();
   }
+  @Get('prInfo')
+  getProductInfo(){
+    return this.stockService.findProductInfo()
+  }
+
 
   @Get(':id')
   findOne(@Param('id') id: string) {

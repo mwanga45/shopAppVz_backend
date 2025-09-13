@@ -38,18 +38,23 @@ export class StockService {
     .select([
       "p.id",
       "p.product_name",
-      "p.category"
+      "p.product_category"
     ])
-    .where('p.category = :category',{category:category.wholesales})
+    .where('p.product_category = :category',{category:category.wholesales})
+    const ForWholesales = await getWholesalesquery.orderBy('p.product_name', 'ASC').getMany()
+
     const getRetailsalesquery = this.productRepo.createQueryBuilder('p')
     .select([
       'p.id',
       'p.product_name',
-      'p.category',
+      'p.product_category',
     ])
-    .where('p.category = :category',{category:category.retailsales})
-    
-    const ForWholesales = await getWholesalesquery.orderBy('p.product_name', 'ASC').getMany()
+    .where('p.product_category = :category',{category:category.retailsales})
+    const ForRetailsales = await getRetailsalesquery.orderBy('p.product_name',"ASC").getMany()
+
+    return {
+      ForRetailsales,ForWholesales
+    }
 
   } 
 
