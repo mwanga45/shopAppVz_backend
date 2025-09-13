@@ -42,7 +42,6 @@ export class StockService {
      })
      this.recstockRepo.save(QueryStockTrans)
      return {message:"Successfuly  add and make follow up of stock"}
-
    } 
   async findProductInfo ():Promise<any>{
     const getWholesalesquery = this.productRepo.createQueryBuilder('p')
