@@ -7,6 +7,7 @@ import { Stock_transaction } from './entities/stock.entity';
 import { category, Product } from 'src/product/entities/product.entity';
 import { Repository } from 'typeorm';
 import { ResponseType } from 'src/type/type.interface';
+import { StockType } from './entities/stock.entity';
 // import { StockUpdateHelper } from 'src/common/helper/stockUpdate,helper';
 import { WebSocketSubjectConfig } from 'rxjs/webSocket';
 @Injectable()
@@ -115,8 +116,14 @@ export class StockService {
       }
     }
     const findQuantity = stock_prev.Quantity + updateStockDto.total_stock
-      
-
+    const updatestocktrans =   this.recstockRepo.create({
+      product:{id:updateStockDto.product_id},
+      product_category:updateStockDto.product_category,
+      type_Enum:StockType.IN,
+      Change_type:updateStockDto.Method,
+      user:{id:userId},
+      Reasons:updateStockDto.Reasons
+    })
       return{
       message:"Succefuly Update Stock",
       success:true

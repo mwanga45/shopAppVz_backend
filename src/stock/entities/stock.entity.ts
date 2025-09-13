@@ -49,7 +49,7 @@ export class Stock_transaction extends baseEntity{
     Quantity:number
 
     @Column()
-    Reasons:string
+    Reasons:String
     
     @ManyToOne(()=> Product, (product)=>product.stocktrans)
     @JoinColumn({name:"product_id"})
