@@ -6,6 +6,11 @@ export enum StockType {
     IN = "IN",
     OUT = "OUT"
 }
+export enum ChangeType {
+    ADD = "add",
+    REMOVE = "Removed",
+    DELETE = "Delete"
+}
 @Entity()
 export class Stock extends baseEntity {
     @Column({nullable:true})
@@ -33,9 +38,18 @@ export class Stock_transaction extends baseEntity{
     @Column()
     product_category:String
 
+    @Column({type:"enum", enum:ChangeType , default:ChangeType.ADD})
+    Change_type:ChangeType
+    
     @Column()
     type:"enum"
     type_Enum:StockType
+
+    @Column()
+    prev_stock:String
+
+    @Column()
+    new_stock:String
 
     @Column()
     Quantity:string
