@@ -101,12 +101,27 @@ export class StockService {
     const Updatestk = await this.stockRepo.update(id, {
       Total_stock:FindSum,
       user:{id:userId},
-    })
+    });
+    const stock_prev  = await this.recstockRepo.createQueryBuilder('S')
+    .select(['S.prev_stock','S.Quantity' ])
+    .where('S.product_id = :product_id',{product_id:updateStockDto.product_id})
+    .orderBy('S.CreatedAt', 'ASC')
+    .getOne()
+
+    if(!stock_prev){
+      return{
+        message:"Failed  to get prev total",
+        success:false
+      }
+    }
+    const findQuantity = stock_prev.Quantity + updateStockDto.total_stock
+      
+
       return{
       message:"Succefuly Update Stock",
       success:true
     }
-    
+
     }else if(updateStockDto.Method === ChangeType.REMOVE){
 
     }
