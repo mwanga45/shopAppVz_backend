@@ -8,7 +8,7 @@ export class CreateStockDto {
     total_stock: number;
 
     @IsString()
-    category: string;
+    product_category: string;
 
     @IsString()
     product_type: string

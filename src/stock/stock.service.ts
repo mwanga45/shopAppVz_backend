@@ -7,6 +7,7 @@ import { Stock_transaction } from './entities/stock.entity';
 import { category, Product } from 'src/product/entities/product.entity';
 import { Repository } from 'typeorm';
 import { StockUpdateHelper } from 'src/common/helper/stockUpdate,helper';
+import { WebSocketSubjectConfig } from 'rxjs/webSocket';
 @Injectable()
 
 export class StockService {
@@ -16,22 +17,32 @@ export class StockService {
     private readonly stockhelper:StockUpdateHelper,
     @InjectRepository(Product) private readonly productRepo:Repository<Product>
   ){}
- async check_productname(product_Id:any):Promise<any>{
-        const findProductname = await  this.productRepo.find({
-      where:{
-        id:product_Id
-      }
-    })
-    return findProductname
-   }
+
    async createStockRec (Dto:CreateStockDto):Promise<any>{
-    const checkProduct = await this.check_productname(Dto.product_id)
+    // check if the product is Already registered
+    const checkExistence = await this.stockRepo.exists({
+      where:{product_Id:Dto.product_id, product_category:Dto.product_category}
+    })
+    if(checkExistence){
+      return "Please the product is already been registered go  to Stock then make you update there"
+    }
     const stockRec =  this.stockRepo.create({
       product_Id: Dto.product_id,
       Total_stock: Dto.total_stock,
-      product_category:Dto.category
+      product_category:Dto.product_category
     })
-    return this.stockRepo.save(stockRec)
+    const reason = "Reister New product"
+    this.stockRepo.save(stockRec)
+     const QueryStockTrans =    this.recstockRepo.create({
+      product_Id:Dto.product_id,
+      product_category:Dto.product_category,
+      new_stock:Dto.total_stock,
+      Quantity:Dto.total_stock,
+      Reasons:reason
+     })
+     this.recstockRepo.save(QueryStockTrans)
+     return {message:"Successfuly  add and make follow up of stock"}
+
    } 
   async findProductInfo ():Promise<any>{
     const getWholesalesquery = this.productRepo.createQueryBuilder('p')
