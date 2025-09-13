@@ -85,8 +85,12 @@ export class StockService {
     return `This action returns a #${id} stock`;
   }
 
-  update(id: number, updateStockDto: UpdateStockDto) {
-    return `This action updates a #${id} stock`;
+   async updateStock(id: number, updateStockDto: UpdateStockDto,userId):Promise<ResponseType<any>> {
+    // const update_stk = await this.stockRepo.update(id,updateStockDto)   
+    return{
+      message:"Succefuly Update Stock",
+      success:true
+    }
   }
 
   remove(id: number) {

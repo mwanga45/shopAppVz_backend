@@ -15,6 +15,7 @@ export class StockController {
     return this.stockService.createStockRec(createStockDto, userId);
   }
 
+
   @Get("remain")
   findAll() {
     return this.stockService.findAll();
@@ -30,10 +31,11 @@ export class StockController {
   findOne(@Param('id') id: string) {
     return this.stockService.findOne(+id);
   }
-
+  @UseGuards(AuthGuard('jwt'),RoleGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStockDto: UpdateStockDto) {
-    return this.stockService.update(+id, updateStockDto);
+  update(@Request() req ,@Param('id') id: string, @Body() updateStockDto: UpdateStockDto) {
+    const  userId  = req.user.UserId
+    return this.stockService.updateStock(+id, updateStockDto,userId);
   }
 
   @Delete(':id')
