@@ -4,10 +4,9 @@ import { UpdateStockDto } from './dto/update-stock.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Stock } from './entities/stock.entity';
 import { Stock_transaction } from './entities/stock.entity';
-import { Product } from 'src/product/entities/product.entity';
+import { category, Product } from 'src/product/entities/product.entity';
 import { Repository } from 'typeorm';
 import { StockUpdateHelper } from 'src/common/helper/stockUpdate,helper';
-
 @Injectable()
 
 export class StockService {
@@ -34,6 +33,25 @@ export class StockService {
     })
     return this.stockRepo.save(stockRec)
    } 
+  async findProductInfo ():Promise<any>{
+    const getWholesalesquery = this.productRepo.createQueryBuilder('p')
+    .select([
+      "p.id",
+      "p.product_name",
+      "p.category"
+    ])
+    .where('p.category = :category',{category:category.wholesales})
+    const getRetailsalesquery = this.productRepo.createQueryBuilder('p')
+    .select([
+      'p.id',
+      'p.product_name',
+      'p.category',
+    ])
+    .where('p.category = :category',{category:category.retailsales})
+    
+    const ForWholesales = await getWholesalesquery.orderBy('p.product_name', 'ASC').getMany()
+
+  } 
 
   findAll() {
     return `This action returns all stock`;

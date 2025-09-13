@@ -37,15 +37,13 @@ async UpdateStock_Info (productId:number, Total_pc_pkg_litre:string,reasons:stri
 
     // Add the record to  the stock transaction 
     const  stock_transaction =   this.stock_TransRepo.create({
-        Product_Id:productId,
+        product_Id:productId,
         product_category:product_category,
         type_Enum:type_Enum,
-        Quantity:Total_pc_pkg_litre,
+        Quantity:Number(Total_pc_pkg_litre?? 0),
         Reasons:reasons
     })
     return this.stock_TransRepo.save(stock_transaction)
-
-
 }
 
 }

@@ -1,7 +1,7 @@
 import { baseEntity } from "src/common/base.entity";
 import { User } from "src/entities/user.entity";
 import { Product } from "src/product/entities/product.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from "typeorm";
 export enum StockType {
     IN = "IN",
     OUT = "OUT"
@@ -13,7 +13,7 @@ export enum ChangeType {
 }
 @Entity()
 export class Stock extends baseEntity {
-    @Column({nullable:true})
+    @Column()
     product_Id:number
     
     @Column()
@@ -22,7 +22,7 @@ export class Stock extends baseEntity {
     @Column()
     Total_stock:number
 
-  @ManyToOne(()=> Product , (product)=>product.stock)
+  @OneToOne(()=> Product , (product)=>product.stock)
   @JoinColumn({name:"product_id"})
   product:Product
 
@@ -33,7 +33,7 @@ export class Stock extends baseEntity {
 @Entity()
 export class Stock_transaction extends baseEntity{
     @Column({nullable:true})
-    Product_Id:number
+    product_Id:number
 
     @Column()
     product_category:String
@@ -41,18 +41,18 @@ export class Stock_transaction extends baseEntity{
     @Column({type:"enum", enum:ChangeType , default:ChangeType.ADD})
     Change_type:ChangeType
     
-    @Column()
+    @Column({type:"enum" ,enum:StockType, default:StockType.IN})
     type:"enum"
     type_Enum:StockType
 
-    @Column()
-    prev_stock:String
+    @Column({default:0})
+    prev_stock:number
 
     @Column()
-    new_stock:String
+    new_stock:number
 
     @Column()
-    Quantity:string
+    Quantity:number
 
     @Column()
     Reasons:string
