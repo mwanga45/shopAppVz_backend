@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateStockDto } from './dto/create-stock.dto';
 import { UpdateStockDto } from './dto/update-stock.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Stock } from './entities/stock.entity';
+import { ChangeType, Stock } from './entities/stock.entity';
 import { Stock_transaction } from './entities/stock.entity';
 import { category, Product } from 'src/product/entities/product.entity';
 import { Repository } from 'typeorm';
@@ -86,7 +86,7 @@ export class StockService {
   }
 
    async updateStock(id: number, updateStockDto: UpdateStockDto,userId:any):Promise<ResponseType<any>> {
-    if(updateStockDto.Method === 'add'){
+    if(updateStockDto.Method === ChangeType.ADD){
     const findTotal = await this.stockRepo.createQueryBuilder('s')
     .select('s.Total_stock', 'total') 
     .where('s.product_id = :product_id',{product_id:updateStockDto.product_id})
@@ -98,6 +98,17 @@ export class StockService {
       }
     }
     const FindSum = findTotal.total + updateStockDto.total_stock
+    const Updatestk = await this.stockRepo.update(id, {
+      Total_stock:FindSum,
+      user:{id:userId},
+    })
+      return{
+      message:"Succefuly Update Stock",
+      success:true
+    }
+    
+    }else if(updateStockDto.Method === ChangeType.REMOVE){
+
     }
     return{
       message:"Succefuly Update Stock",
