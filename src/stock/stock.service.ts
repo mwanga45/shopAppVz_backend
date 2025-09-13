@@ -85,8 +85,20 @@ export class StockService {
     return `This action returns a #${id} stock`;
   }
 
-   async updateStock(id: number, updateStockDto: UpdateStockDto,userId):Promise<ResponseType<any>> {
-    // const update_stk = await this.stockRepo.update(id,updateStockDto)   
+   async updateStock(id: number, updateStockDto: UpdateStockDto,userId:any):Promise<ResponseType<any>> {
+    if(updateStockDto.Method === 'add'){
+    const findTotal = await this.stockRepo.createQueryBuilder('s')
+    .select('s.Total_stock', 'total') 
+    .where('s.product_id = :product_id',{product_id:updateStockDto.product_id})
+    .getRawOne<{total:number}>()
+    if(!findTotal){
+      return{
+        success:false,
+        message:'Failed  to find  the targeted product '
+      }
+    }
+    const FindSum = findTotal.total + updateStockDto.total_stock
+    }
     return{
       message:"Succefuly Update Stock",
       success:true
