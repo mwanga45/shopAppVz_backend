@@ -10,7 +10,7 @@ import { NotFoundException } from '@nestjs/common';
 import { ProductWholesales } from './utils/whole.type';
 import { isDate, isEmpty } from 'class-validator';
 import { SalesHelper } from 'src/common/helper/sales.helper';
-import { StockUpdateHelper } from 'src/common/helper/stockUpdate,helper';
+// import { StockUpdateHelper } from 'src/common/helper/stockUpdate,helper';
 import { table } from 'console';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class SalesService {
     @InjectRepository(WholeSales) private readonly WholesalesRepository:Repository<WholeSales>,
     @InjectRepository(RetailSales) private readonly RetailsalesRepository:Repository<RetailSales>,
     private readonly SalesHelper:SalesHelper,
-    private readonly stockupdate:StockUpdateHelper ,
+    // private readonly stockupdate:StockUpdateHelper ,
   ){}
   create(createSaleDto: CreateSaleDto) {
     return 'This action adds a new sale';
@@ -118,7 +118,7 @@ export class SalesService {
     await this.WholesalesRepository.save(Addsales)
   }
     const sellingReason = "Sold" 
-    const UpdateAndTrackestock = await this.stockupdate.UpdateStock_Info(Number(Dto.productId),Dto.Total_pc_pkg_litre,sellingReason,Dto.product_status,Dto.product_category) 
+    // const UpdateAndTrackestock = await this.stockupdate.UpdateStock_Info(Number(Dto.productId),Dto.Total_pc_pkg_litre,sellingReason,Dto.product_status,Dto.product_category) 
     return
    }
    else if(Dto.product_type === "liquid"){
@@ -166,7 +166,7 @@ export class SalesService {
     await this.WholesalesRepository.save(Addsales)
  }
     const sellingReason = "Sold" 
-    const UpdateAndTrackestock = await this.stockupdate.UpdateStock_Info(Number(Dto.productId),Dto.Total_pc_pkg_litre,sellingReason,Dto.product_status,Dto.product_category) 
+    // const UpdateAndTrackestock = await this.stockupdate.UpdateStock_Info(Number(Dto.productId),Dto.Total_pc_pkg_litre,sellingReason,Dto.product_status,Dto.product_category) 
     return
    }
    return
@@ -225,7 +225,7 @@ export class SalesService {
       this.RetailsalesRepository.save(Createsales)
     }
     const sellingReason = "Sold"
-    const UdateStock = await this.stockupdate.UpdateStock_Info(Dto.productId,Dto.Total_pc_pkg_litre,sellingReason,Dto.product_status,Dto.product_category)
+    // const UdateStock = await this.stockupdate.UpdateStock_Info(Dto.productId,Dto.Total_pc_pkg_litre,sellingReason,Dto.product_status,Dto.product_category)
     return 
   }
   

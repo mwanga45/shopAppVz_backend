@@ -6,7 +6,7 @@ import { Stock } from './entities/stock.entity';
 import { Stock_transaction } from './entities/stock.entity';
 import { category, Product } from 'src/product/entities/product.entity';
 import { Repository } from 'typeorm';
-import { StockUpdateHelper } from 'src/common/helper/stockUpdate,helper';
+// import { StockUpdateHelper } from 'src/common/helper/stockUpdate,helper';
 import { WebSocketSubjectConfig } from 'rxjs/webSocket';
 @Injectable()
 
@@ -14,30 +14,30 @@ export class StockService {
   constructor(
     @InjectRepository(Stock) private readonly stockRepo:Repository<Stock>,
     @InjectRepository(Stock_transaction) private readonly recstockRepo:Repository<Stock_transaction>,
-    private readonly stockhelper:StockUpdateHelper,
+    // private readonly stockhelper:StockUpdateHelper,
     @InjectRepository(Product) private readonly productRepo:Repository<Product>
   ){}
 
    async createStockRec (Dto:CreateStockDto):Promise<any>{
     // check if the product is Already registered
     const checkExistence = await this.stockRepo.exists({
-      where:{product_Id:Dto.product_id, product_category:Dto.product_category}
+      where:{product:{id:Number(Dto.product_id)}, product_category:Dto.product_category}
     })
     if(checkExistence){
       return "Please the product is already been registered go  to Stock then make you update there"
     }
     const stockRec =  this.stockRepo.create({
-      product_Id: Dto.product_id,
-      Total_stock: Dto.total_stock,
+      product:{id: Number(Dto.product_id)},
+      Total_stock: Number(Dto.total_stock),
       product_category:Dto.product_category
     })
-    const reason = "Reister New product"
+    const reason = "Register New product"
     this.stockRepo.save(stockRec)
      const QueryStockTrans =    this.recstockRepo.create({
-      product_Id:Dto.product_id,
+      product:{id:Number(Dto.product_id)},
       product_category:Dto.product_category,
-      new_stock:Dto.total_stock,
-      Quantity:Dto.total_stock,
+      new_stock:Number(Dto.total_stock),
+      Quantity:Number(Dto.total_stock),
       Reasons:reason
      })
      this.recstockRepo.save(QueryStockTrans)

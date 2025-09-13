@@ -14,9 +14,6 @@ export enum ChangeType {
 @Entity()
 export class Stock extends baseEntity {
     @Column()
-    product_Id:number
-    
-    @Column()
     product_category:String
 
     @Column()
@@ -32,9 +29,6 @@ export class Stock extends baseEntity {
 }
 @Entity()
 export class Stock_transaction extends baseEntity{
-    @Column({nullable:true})
-    product_Id:number
-
     @Column()
     product_category:String
 

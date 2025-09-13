@@ -7,16 +7,16 @@ import { RetailSales} from './entities/retailsale.entity'
 import { ProductModule } from 'src/product/product.module';
 import { StockModule } from 'src/stock/stock.module';
 import { SalesHelper } from 'src/common/helper/sales.helper';
-import { StockUpdateHelper } from 'src/common/helper/stockUpdate,helper';
+// import { StockUpdateHelper } from 'src/common/helper/stockUpdate,helper';
 import { Stock,Stock_transaction } from 'src/stock/entities/stock.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([WholeSales, RetailSales,StockUpdateHelper,Stock,Stock_transaction]),
+    TypeOrmModule.forFeature([WholeSales, RetailSales,Stock,Stock_transaction]),
     ProductModule,
     StockModule,
   ],
   controllers: [SalesController],
-  providers: [SalesService,SalesHelper,StockUpdateHelper],
+  providers: [SalesService,SalesHelper],
 })
 export class SalesModule {}
