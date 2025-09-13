@@ -6,6 +6,7 @@ import { Stock } from './entities/stock.entity';
 import { Stock_transaction } from './entities/stock.entity';
 import { category, Product } from 'src/product/entities/product.entity';
 import { Repository } from 'typeorm';
+import { ResponseType } from 'src/type/type.interface';
 // import { StockUpdateHelper } from 'src/common/helper/stockUpdate,helper';
 import { WebSocketSubjectConfig } from 'rxjs/webSocket';
 @Injectable()
@@ -18,18 +19,22 @@ export class StockService {
     @InjectRepository(Product) private readonly productRepo:Repository<Product>
   ){}
 
-   async createStockRec (Dto:CreateStockDto):Promise<any>{
+   async createStockRec (Dto:CreateStockDto, userId:any):Promise<ResponseType<any>>{
     // check if the product is Already registered
     const checkExistence = await this.stockRepo.exists({
       where:{product:{id:Number(Dto.product_id)}, product_category:Dto.product_category}
     })
     if(checkExistence){
-      return "Please the product is already been registered go  to Stock then make you update there"
+      return {
+        message:"Please you have already register the  product go to stock to update it",
+        success:false 
+      }
     }
     const stockRec =  this.stockRepo.create({
       product:{id: Number(Dto.product_id)},
       Total_stock: Number(Dto.total_stock),
-      product_category:Dto.product_category
+      product_category:Dto.product_category,
+      user:{id:userId}
     })
     const reason = "Register New product"
     this.stockRepo.save(stockRec)
@@ -38,10 +43,14 @@ export class StockService {
       product_category:Dto.product_category,
       new_stock:Number(Dto.total_stock),
       Quantity:Number(Dto.total_stock),
+      user:{id:userId},
       Reasons:reason
      })
      this.recstockRepo.save(QueryStockTrans)
-     return {message:"Successfuly  add and make follow up of stock"}
+     return {
+      success:true,
+      message:"Successfuly register the product and make follow up"
+     }
    } 
   async findProductInfo ():Promise<any>{
     const getWholesalesquery = this.productRepo.createQueryBuilder('p')

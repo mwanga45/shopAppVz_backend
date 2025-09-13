@@ -1,5 +1,5 @@
-export interface Response{
+export interface ResponseType<T = any>{
     success:boolean
     message:String
-    data?:any
+    data?:T
 }
