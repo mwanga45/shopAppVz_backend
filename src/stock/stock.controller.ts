@@ -18,6 +18,7 @@ export class StockController {
   findAll() {
     return this.stockService.findAll();
   }
+  @UseGuards(AuthGuard('jwt'),RoleGuard)
   @Get('prInfo')
   getProductInfo(){
     return this.stockService.findProductInfo()
