@@ -137,11 +137,22 @@ export class StockService {
       const findTotal = await this.stockRepo.createQueryBuilder('s')
       .select('s.Total_stock', 'total')
       .where('s.product_id = :product_id',{product_id:updateStockDto.product_id})
-      .getRawOne<{totat:number}>()
+      .getRawOne<{total:number}>()
+
+      if(!findTotal){
+        return{
+          message:"Failed to return total stock",
+          success:false
+        }
+      }
+      const updateTotalstock = findTotal.total - updateStockDto.total_stock;
+      const updatestock  = await this.stockRepo.update(id,{
+      Total_stock:updateTotalstock,
+      user:{id:userId}
+      })
       
-
-
     }
+
     return{
       message:"Succefuly Update Stock",
       success:true
