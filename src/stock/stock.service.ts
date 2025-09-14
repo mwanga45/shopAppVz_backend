@@ -178,14 +178,38 @@ export class StockService {
         success:false
       }
     }
-
     return{
       message:"Fail to update Stock please try again",
       success:false
     }
   }
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} stock`;
-  // }
+  async returnStockInfo ():Promise<ResponseType<any>> {
+    // select  the  productname , productname , new_stock  of last Add COLUMN  and new_stock of the    coloumn  for each product in stock trans
+    const  getStockInfo = await this.recstockRepo.createQueryBuilder('s')
+    .leftJoin('s.product', 'p')
+    .leftJoin('A', 'user_id')
+    .select('p.id','product_id' )
+    .addSelect('p.product_name', 'product_name')
+    .addSelect(
+      `(SELECT st new_stock From Stock_transaction  st
+      where product_id = product_id  AND st Change_type = 'Add'
+      ORDER BY CreatedAt DESC
+      LIMIT 1), last_add_stock`
+    )
+    .addSelect(
+      `(SELECT  st new_stock   FROM Stock_transaction  st
+        where  product_id = product_id 
+        ORDER BY CreateAt  DESC
+        LIMIT 1 ), last_stock`
+    )
+    
+    
+    return{
+      message:"Succefuly Obtain data",
+      success:true
+    }
+
+    
+  }
 }
