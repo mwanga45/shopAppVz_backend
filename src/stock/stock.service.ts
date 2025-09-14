@@ -103,23 +103,26 @@ export class StockService {
       Total_stock:FindSum,
       user:{id:userId},
     });
-    const stock_prev  = await this.recstockRepo.createQueryBuilder('S')
-    .select(['S.prev_stock','S.Quantity' ])
+    const stock_details = await this.recstockRepo.createQueryBuilder('S')
+    .select(['S.prev_stock','S.Quantity','S.new_stock' ])
     .where('S.product_id = :product_id',{product_id:updateStockDto.product_id})
     .orderBy('S.CreatedAt', 'ASC')
     .getOne()
 
-    if(!stock_prev){
+    if(!stock_details){
       return{
         message:"Failed  to get prev total",
         success:false
       }
     }
-    const findQuantity = stock_prev.Quantity + updateStockDto.total_stock
+    const findNewstock = stock_details.new_stock + updateStockDto.total_stock
     const updatestocktrans =   this.recstockRepo.create({
       product:{id:updateStockDto.product_id},
       product_category:updateStockDto.product_category,
       type_Enum:StockType.IN,
+      new_stock:findNewstock,
+      prev_stock:stock_details.new_stock,
+      Quantity:updateStockDto.total_stock,
       Change_type:updateStockDto.Method,
       user:{id:userId},
       Reasons:updateStockDto.Reasons
@@ -130,6 +133,7 @@ export class StockService {
     }
 
     }else if(updateStockDto.Method === ChangeType.REMOVE){
+      
 
     }
     return{
