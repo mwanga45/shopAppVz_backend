@@ -54,7 +54,7 @@ export class Stock_transaction extends baseEntity{
     @ManyToOne(()=> Product, (product)=>product.stocktrans)
     @JoinColumn({name:"product_id"})
     product:Product
-    @ManyToMany(()=> User, (user)=>user.stocktrans)
+    @ManyToOne(()=> User, (user)=>user.stocktrans)
     @JoinColumn({name:"user_id"})
     user:User
 }

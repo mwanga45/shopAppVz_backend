@@ -26,6 +26,11 @@ export class StockController {
     return this.stockService.findProductInfo()
   }
 
+  @Get('stock_result')
+  getStockResult(){
+    return this.stockService.returnStockInfo()
+  }
+
 
   @Get(':id')
   findOne(@Param('id') id: string) {

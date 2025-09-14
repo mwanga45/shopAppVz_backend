@@ -1,4 +1,4 @@
-import { Entity, Column, OneToMany, ManyToMany } from 'typeorm';
+import { Entity, Column, OneToMany, ManyToMany, ManyToOne } from 'typeorm';
 import { baseEntity } from 'src/common/base.entity';
 import { Product } from 'src/product/entities/product.entity';
 import { Stock, Stock_transaction } from 'src/stock/entities/stock.entity';
@@ -35,7 +35,7 @@ export class User extends baseEntity {
   @OneToMany(()=> Stock, (stock)=> stock.user)
   stock:Stock[]
 
-  @ManyToMany(()=> Stock_transaction,(stocktrans)=> stocktrans.user)
+  @ManyToOne(()=> Stock_transaction,(stocktrans)=> stocktrans.user)
   stocktrans:Stock_transaction[]
 
 }

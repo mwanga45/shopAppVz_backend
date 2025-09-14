@@ -186,31 +186,50 @@ export class StockService {
 
   async returnStockInfo ():Promise<ResponseType<any>> {
     // select  the  productname , productname , new_stock  of last Add COLUMN  and new_stock of the    coloumn  for each product in stock trans
-    const  getStockInfo = await this.recstockRepo.createQueryBuilder('s')
+    const getStockInfo = await this.recstockRepo
+    .createQueryBuilder('s')
     .leftJoin('s.product', 'p')
-    .leftJoin('u', 'user_id')
-    .select('u.id', 'fullname')
-    .select('p.id','product_id' )
+    .leftJoin('s.user', 'u')
+    .select('p.id', 'product_id')
     .addSelect('p.product_name', 'product_name')
-    .addSelect(
-      `(SELECT st new_stock From Stock_transaction  st
-      where product_id = product_id  AND st Change_type = 'Add'
-      ORDER BY CreatedAt DESC
-      LIMIT 1), last_add_stock`
-    )
-    .addSelect(
-      `(SELECT  st new_stock ,st CreateAt   FROM Stock_transaction  st
-        where  product_id = product_id 
-        ORDER BY CreateAt  DESC
-        LIMIT 1 ), last_stock`
-    )
-    
-    
-    return{
-      message:"Succefuly Obtain data",
-      success:true
-    }
+    .addSelect('u.id', 'user_id')
+    .addSelect('u.fullname', 'fullname')
+    .addSelect((subQuery) => {
+      return subQuery
+        .select('st.new_stock')
+        .from('Stock_transaction', 'st')
+        .where('st.product_id = p.id')
+        .andWhere('st.Change_type = :addtype', { addtype: ChangeType.ADD })
+        .orderBy('st.CreatedAt', 'DESC')
+        .limit(1);
+    }, 'last_add_stock')
+    .addSelect((subQuery) => {
+      return subQuery
+        .select('st.new_stock')
+        .from('Stock_transaction', 'st')
+        .where('st.product_id = p.id')
+        .orderBy('st.CreatedAt', 'DESC')
+        .limit(1);
+    }, 'last_stock')
+    .addSelect((subQuery) => {
+      return subQuery
+        .select('st.CreatedAt')
+        .from('Stock_transaction', 'st')
+        .where('st.product_id = p.id')
+        .orderBy('st.CreatedAt', 'DESC')
+        .limit(1);
+    }, 'CreatedAt')
+    .groupBy('p.id')
+    .addGroupBy('p.product_name')
+    .addGroupBy('u.id')
+    .addGroupBy('u.fullname')
+    .getRawMany();
 
-    
+  return {
+    message: 'Successfully obtained data',
+    success: true,
+    data: getStockInfo,
+  };
+
   }
 }
