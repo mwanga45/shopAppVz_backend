@@ -127,13 +127,19 @@ export class StockService {
       user:{id:userId},
       Reasons:updateStockDto.Reasons
     })
+    this.recstockRepo.save(updateStockDto)
       return{
       message:"Succefuly Update Stock",
       success:true
     }
 
     }else if(updateStockDto.Method === ChangeType.REMOVE){
+      const findTotal = await this.stockRepo.createQueryBuilder('s')
+      .select('s.Total_stock', 'total')
+      .where('s.product_id = :product_id',{product_id:updateStockDto.product_id})
+      .getRawOne<{totat:number}>()
       
+
 
     }
     return{
