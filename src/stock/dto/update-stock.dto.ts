@@ -7,6 +7,6 @@ export class UpdateStockDto{
     product_id:number;
     total_stock:number;
     Method:ChangeType;
-    Reasons:String;
+    Reasons:string;
     product_category:StockType
 }
