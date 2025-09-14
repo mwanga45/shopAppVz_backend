@@ -188,7 +188,8 @@ export class StockService {
     // select  the  productname , productname , new_stock  of last Add COLUMN  and new_stock of the    coloumn  for each product in stock trans
     const  getStockInfo = await this.recstockRepo.createQueryBuilder('s')
     .leftJoin('s.product', 'p')
-    .leftJoin('A', 'user_id')
+    .leftJoin('u', 'user_id')
+    .select('u.id', 'fullname')
     .select('p.id','product_id' )
     .addSelect('p.product_name', 'product_name')
     .addSelect(
@@ -198,7 +199,7 @@ export class StockService {
       LIMIT 1), last_add_stock`
     )
     .addSelect(
-      `(SELECT  st new_stock   FROM Stock_transaction  st
+      `(SELECT  st new_stock ,st CreateAt   FROM Stock_transaction  st
         where  product_id = product_id 
         ORDER BY CreateAt  DESC
         LIMIT 1 ), last_stock`
