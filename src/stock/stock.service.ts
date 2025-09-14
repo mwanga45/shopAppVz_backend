@@ -224,11 +224,21 @@ export class StockService {
     .addGroupBy('u.id')
     .addGroupBy('u.fullname')
     .getRawMany();
+    
+    const finalresult = getStockInfo.map((p)=>{
+      const lastadd = Number(p.last_add_stock)|| 0;
+      const laststock = Number(p.last_stock) || 0;
+
+    const percentageRemain = lastadd > 0 ?((laststock / lastadd) * 100):null
+    return{
+      ...p,percentageRemain
+    }
+    })
 
   return {
     message: 'Successfully obtained data',
     success: true,
-    data: getStockInfo,
+    data: finalresult,
   };
 
   }
