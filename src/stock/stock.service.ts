@@ -150,16 +150,42 @@ export class StockService {
       Total_stock:updateTotalstock,
       user:{id:userId}
       })
-      
+      const QueryStockTrans = await this.recstockRepo.createQueryBuilder('S')
+      .select(['S.new_stock', 'S.prev_stock'])
+      .where('S.product_id = :product_id', {product_id:updateStockDto.product_id})
+      .orderBy('S.CreateAt','DESC')
+      .getOne();
+      if(!QueryStockTrans){
+        return{
+          message:"No record  of the product in Stock_trans table",
+          success:false
+        }
+      }
+      const findNewstock =  QueryStockTrans.new_stock - updateStockDto.total_stock
+      const newstocktrancrec =  this.recstockRepo.create({
+        user:{id:userId},
+        Quantity:updateStockDto.total_stock,
+        prev_stock:QueryStockTrans.new_stock,
+        new_stock:findNewstock,
+        product:{id:updateStockDto.product_id},
+        type_Enum:StockType.OUT,
+        product_category:updateStockDto.product_category,
+        Change_type:ChangeType.REMOVE
+      })
+      this.recstockRepo.save(newstocktrancrec)
+      return{
+        message:"Succesfuly Updatw Stock (reduce number stock)",
+        success:false
+      }
     }
 
     return{
-      message:"Succefuly Update Stock",
-      success:true
+      message:"Fail to update Stock please try again",
+      success:false
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} stock`;
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} stock`;
+  // }
 }

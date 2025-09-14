@@ -30,7 +30,7 @@ export class Stock extends baseEntity {
 @Entity()
 export class Stock_transaction extends baseEntity{
     @Column()
-    product_category:String
+    product_category:string
 
     @Column({type:"enum", enum:ChangeType , default:ChangeType.ADD})
     Change_type:ChangeType
