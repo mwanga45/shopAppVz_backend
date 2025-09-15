@@ -25,22 +25,22 @@ export class StockController {
   getProductInfo(){
     return this.stockService.findProductInfo()
   }
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt'))
   @Get('stock_result')
   getStockResult(){
     return this.stockService.returnStockInfo()
   }
 
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.stockService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.stockService.findOne(+id);
+  // }
   @UseGuards(AuthGuard('jwt'),RoleGuard)
-  @Patch(':id')
-  update(@Request() req ,@Param('id') id: string, @Body() updateStockDto: UpdateStockDto) {
+  @Patch()
+  update(@Request() req ,@Body() updateStockDto: UpdateStockDto) {
     const  userId  = req.user.UserId
-    return this.stockService.updateStock(+id, updateStockDto,userId);
+    return this.stockService.updateStock(updateStockDto,userId); // Removed 'id' parameter
   }
 
 

@@ -86,7 +86,7 @@ export class StockService {
     return `This action returns a #${id} stock`;
   }
 
-   async updateStock(id: number, updateStockDto: UpdateStockDto,userId:any):Promise<ResponseType<any>> {
+   async updateStock(updateStockDto: UpdateStockDto,userId:any):Promise<ResponseType<any>> {
     if(updateStockDto.Method === ChangeType.ADD){
     const findTotal = await this.stockRepo.createQueryBuilder('s')
     .select('s.Total_stock', 'total') 
@@ -99,7 +99,7 @@ export class StockService {
       }
     }
     const FindSum = findTotal.total + updateStockDto.total_stock
-    const Updatestk = await this.stockRepo.update(id, {
+    const Updatestk = await this.stockRepo.update({ product: { id: updateStockDto.product_id } }, { 
       Total_stock:FindSum,
       user:{id:userId},
     });
@@ -127,7 +127,7 @@ export class StockService {
       user:{id:userId},
       Reasons:updateStockDto.Reasons
     })
-    this.recstockRepo.save(updateStockDto)
+    this.recstockRepo.save(updatestocktrans)
       return{
       message:"Succefuly Update Stock",
       success:true
@@ -146,14 +146,14 @@ export class StockService {
         }
       }
       const updateTotalstock = findTotal.total - updateStockDto.total_stock;
-      const updatestock  = await this.stockRepo.update(id,{
+      const updatestock  = await this.stockRepo.update({ product: { id: updateStockDto.product_id } },{ // Updated to use product_id
       Total_stock:updateTotalstock,
       user:{id:userId}
       })
       const QueryStockTrans = await this.recstockRepo.createQueryBuilder('S')
       .select(['S.new_stock', 'S.prev_stock'])
       .where('S.product_id = :product_id', {product_id:updateStockDto.product_id})
-      .orderBy('S.CreateAt','DESC')
+      .orderBy('S.CreatedAt','DESC')
       .getOne();
       if(!QueryStockTrans){
         return{
@@ -170,7 +170,8 @@ export class StockService {
         product:{id:updateStockDto.product_id},
         type_Enum:StockType.OUT,
         product_category:updateStockDto.product_category,
-        Change_type:ChangeType.REMOVE
+        Change_type:ChangeType.REMOVE,
+        Reasons:updateStockDto.Reasons
       })
       this.recstockRepo.save(newstocktrancrec)
       return{
@@ -191,6 +192,7 @@ export class StockService {
     .leftJoin('s.product', 'p')
     .leftJoin('s.user', 'u')
     .select('p.id', 'product_id')
+    .addSelect('p.product_category', 'product_category')
     .addSelect('p.product_name', 'product_name')
     .addSelect('u.id', 'user_id')
     .addSelect('u.fullname', 'fullname')
