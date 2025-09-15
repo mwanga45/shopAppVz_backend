@@ -25,7 +25,7 @@ export class StockController {
   getProductInfo(){
     return this.stockService.findProductInfo()
   }
-
+  @UseGuards(AuthGuard('jwt'))
   @Get('stock_result')
   getStockResult(){
     return this.stockService.returnStockInfo()
