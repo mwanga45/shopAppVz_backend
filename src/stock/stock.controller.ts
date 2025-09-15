@@ -31,17 +31,10 @@ export class StockController {
     return this.stockService.returnStockInfo()
   }
 
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.stockService.findOne(+id);
-  // }
   @UseGuards(AuthGuard('jwt'),RoleGuard)
-  @Patch()
+  @Post("update")
   update(@Request() req ,@Body() updateStockDto: UpdateStockDto) {
     const  userId  = req.user.UserId
     return this.stockService.updateStock(updateStockDto,userId); // Removed 'id' parameter
   }
-
-
 }
