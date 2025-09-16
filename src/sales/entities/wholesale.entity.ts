@@ -7,8 +7,7 @@ import { User } from "src/entities/user.entity";
 
 @Entity()
 export class WholeSales extends baseEntity{
-  @Column()
-  userId :number
+
 
   @Column()
   @IsString()

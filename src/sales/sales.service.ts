@@ -103,7 +103,7 @@ export class SalesService {
       TotalGenerated:TotalGenerated,
       TotalProfit: ProfitGenerated, 
       Epected_Profit:ExpectedProfit,
-      userId:userId,
+      user:{id:userId},
       percentage_cutoff:cutoff[1],
       Total_pc_pkg_litre: Dto.Total_pc_pkg_litre
 
@@ -118,7 +118,7 @@ export class SalesService {
       TotalGenerated:TotalGenerated,
       TotalProfit: ProfitGenerated, 
       Epected_Profit:ExpectedProfit,
-      userId:userId,
+      user:{id:userId},
       Total_pc_pkg_litre: Dto.Total_pc_pkg_litre
     })
     await this.WholesalesRepository.save(Addsales)
@@ -151,7 +151,7 @@ export class SalesService {
       TotalGenerated:TotalGenerated,
       TotalProfit: ProfitGenerated, 
       Epected_Profit:ExpectedProfit,
-      userId:userId,
+      user:{id:userId},
       percentage_cutoff:cutoff[1],
       Total_pc_pkg_litre: Dto.Total_pc_pkg_litre
 
@@ -166,7 +166,7 @@ export class SalesService {
       TotalGenerated:TotalGenerated,
       TotalProfit: ProfitGenerated, 
       Epected_Profit:ExpectedProfit,
-      userId:userId,
+      user:{id:userId},
       Total_pc_pkg_litre: Dto.Total_pc_pkg_litre
     })
     await this.WholesalesRepository.save(Addsales)
