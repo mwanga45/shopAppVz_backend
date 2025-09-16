@@ -15,11 +15,11 @@ export class WholeSales extends baseEntity{
 
   @Column()
   @IsString()
-  TotalGenerated:number
+  Revenue:number
 
   @Column()
   @IsString()
-  TotalProfit:number
+  Net_profit:number
 
   
   @Column()
