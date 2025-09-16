@@ -8,8 +8,9 @@ import { category, Product } from 'src/product/entities/product.entity';
 import { Repository } from 'typeorm';
 import { ResponseType } from 'src/type/type.interface';
 import { StockType } from './entities/stock.entity';
+import { from } from 'rxjs';
 // import { StockUpdateHelper } from 'src/common/helper/stockUpdate,helper';
-import { WebSocketSubjectConfig } from 'rxjs/webSocket';
+// import { WebSocketSubjectConfig } from 'rxjs/webSocket';
 @Injectable()
 
 export class StockService {
@@ -88,52 +89,50 @@ export class StockService {
 
    async updateStock(updateStockDto: UpdateStockDto,userId:any):Promise<ResponseType<any>> {
     if(updateStockDto.Method === ChangeType.ADD){
-    const findTotal = await this.stockRepo.createQueryBuilder('s')
-    .select('s.Total_stock', 'total') 
-    .where('s.product_id = :product_id',{product_id:updateStockDto.product_id})
-    .getRawOne<{total:number}>()
-    if(!findTotal){
-      return{
-        success:false,
-        message:'Failed  to find  the targeted product '
-      }
-    }
-    const FindSum = findTotal.total + updateStockDto.total_stock
-    const Updatestk = await this.stockRepo.update({ product: { id: updateStockDto.product_id } }, { 
-      Total_stock:FindSum,
-      user:{id:userId},
-    });
-    const stock_details = await this.recstockRepo.createQueryBuilder('S')
-    .select(['S.prev_stock','S.Quantity','S.new_stock' ])
-    .where('S.product_id = :product_id',{product_id:updateStockDto.product_id})
-    .orderBy('S.CreatedAt', 'ASC')
-    .getOne()
+        const findTotal = await this.stockRepo.createQueryBuilder('s')
+        .select('s.Total_stock', 'total') 
+        .where('s.product_id = :product_id',{product_id:updateStockDto.product_id})
+        .getRawOne<{total:number}>()
+        if(!findTotal){
+          return{
+            success:false,
+            message:'Failed  to find  the targeted product '
+          }
+        }
+        const FindSum = findTotal.total + updateStockDto.total_stock
 
-    if(!stock_details){
-      return{
-        message:"Failed  to get prev total",
-        success:false
-      }
-    }
-    const findNewstock = stock_details.new_stock + updateStockDto.total_stock
-    const updatestocktrans =   this.recstockRepo.create({
-      product:{id:updateStockDto.product_id},
-      product_category:updateStockDto.product_category,
-      type_Enum:StockType.IN,
-      new_stock:findNewstock,
-      prev_stock:stock_details.new_stock,
-      Quantity:updateStockDto.total_stock,
-      Change_type:updateStockDto.Method,
-      user:{id:userId},
-      Reasons:updateStockDto.Reasons
-    })
-    this.recstockRepo.save(updatestocktrans)
-      return{
-      message:"Succefuly Update Stock",
-      success:true
-    }
+        const Updatestk = await this.stockRepo.update({ product: { id: updateStockDto.product_id } }, { 
+          Total_stock:FindSum,
+          user:{id:userId},
+        });
 
-    }else if(updateStockDto.Method === ChangeType.REMOVE){
+        // Get the last stock transaction to determine the previous stock
+        const lastStockTransaction = await this.recstockRepo.createQueryBuilder('st')
+            .select('st.new_stock', 'newStock')
+            .where('st.product.id = :productId', { productId: updateStockDto.product_id })
+            .orderBy('st.CreatedAt', 'DESC')
+            .getRawOne<{newStock: number}>();
+
+        const prevStockForNewTransaction = lastStockTransaction ? lastStockTransaction.newStock : 0;
+
+        const updatestocktrans =   this.recstockRepo.create({
+          product:{id:updateStockDto.product_id},
+          product_category:updateStockDto.product_category,
+          type_Enum:StockType.IN,
+          new_stock:FindSum, // The new total stock after the addition
+          prev_stock:prevStockForNewTransaction, // The new_stock of the previous transaction
+          Quantity:updateStockDto.total_stock,
+          Change_type:updateStockDto.Method,
+          user:{id:userId},
+          Reasons:updateStockDto.Reasons
+        })
+        await this.recstockRepo.save(updatestocktrans)
+          return{
+          message:`Succefuly Update Stock ${FindSum}`,
+          success:true
+        }
+
+        }else if(updateStockDto.Method === ChangeType.REMOVE){
       const findTotal = await this.stockRepo.createQueryBuilder('s')
       .select('s.Total_stock', 'total')
       .where('s.product_id = :product_id',{product_id:updateStockDto.product_id})
@@ -186,23 +185,19 @@ export class StockService {
   }
 
   async returnStockInfo ():Promise<ResponseType<any>> {
-    // select  the  productname , productname , new_stock  of last Add COLUMN  and new_stock of the    coloumn  for each product in stock trans
     const getStockInfo = await this.recstockRepo
     .createQueryBuilder('s')
     .leftJoin('s.product', 'p')
-    .leftJoin('s.user', 'u')
     .select('p.id', 'product_id')
     .addSelect('p.product_category', 'product_category')
     .addSelect('p.product_name', 'product_name')
-    .addSelect('u.id', 'user_id')
-    .addSelect('u.fullname', 'fullname')
     .addSelect((subQuery) => {
       return subQuery
         .select('st.new_stock')
         .from('Stock_transaction', 'st')
         .where('st.product_id = p.id')
         .andWhere('st.Change_type = :addtype', { addtype: ChangeType.ADD })
-        .orderBy('st.CreatedAt', 'DESC')
+        .orderBy('st.UpdateAt', 'DESC')
         .limit(1);
     }, 'last_add_stock')
     .addSelect((subQuery) => {
@@ -210,21 +205,38 @@ export class StockService {
         .select('st.new_stock')
         .from('Stock_transaction', 'st')
         .where('st.product_id = p.id')
-        .orderBy('st.CreatedAt', 'DESC')
+        .orderBy('st.UpdateAt', 'DESC')
         .limit(1);
     }, 'last_stock')
     .addSelect((subQuery) => {
       return subQuery
-        .select('st.CreatedAt')
+        .select('st.UpdateAt')
         .from('Stock_transaction', 'st')
         .where('st.product_id = p.id')
-        .orderBy('st.CreatedAt', 'DESC')
+        .orderBy('st.UpdateAt', 'DESC')
         .limit(1);
-    }, 'CreatedAt')
-    .groupBy('p.id')
+    }, 'UpdateAt')
+    .addSelect((subQuery)=>{
+      return subQuery
+      .select('u.id')
+      .from('users', 'u')
+      .innerJoin('stock_transaction', 'st','st.user_id = u.id' )
+      .where('st.product_id = p.id')
+      .orderBy('st.UpdateAt')
+      .limit(1)
+    }, 'user_id')
+    .addSelect((subQuery)=>{
+      return subQuery
+      .select('u.fullname')
+      .from('users', 'u')
+      .innerJoin('stock_transaction', 'st', 'u.id = st.user_id')
+      .where('st.product_id = p.id')
+      .orderBy('st.UpdateAt')
+      .limit(1)
+    },'fullname')
+    .groupBy('p.product_category')
     .addGroupBy('p.product_name')
-    .addGroupBy('u.id')
-    .addGroupBy('u.fullname')
+    .addGroupBy('p.id')
     .getRawMany();
     
     const finalresult = getStockInfo.map((p)=>{
