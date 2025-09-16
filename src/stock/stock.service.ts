@@ -22,12 +22,29 @@ export class StockService {
   ){}
 
    async createStockRec (Dto:CreateStockDto, userId:any):Promise<ResponseType<any>>{
-    const checkExistence = await this.stockRepo.exists({
-      where:{product:{id:Number(Dto.product_id)}, product_category:Dto.product_category}
-    })
+    // const checkExistence = await this.stockRepo.exists({
+    //   where:{product:{id:Number(Dto.product_id)}, product_category:Dto.product_category}
+    // })
     const product = await this.productRepo.findOne({
       where:{id:Number(Dto.product_id)}
+    });
+
+    if(!product){
+      return{
+        message:"Cannot  create  stock for the product which is not Exist ",
+        success:true
+      }
+    }
+    //check if  the product_id is already  in stock table
+    const stock_product = await this.stockRepo.findOne({
+      where:{product:{id:Number(Dto.product_id)}}
     })
+    if(stock_product){
+      return{
+        message:"Please go to the Stock to make update  the product is already been initiated  stock ",
+        success:false
+      }
+    } 
 
     const stockRec =  this.stockRepo.create({
       product:{id: Number(Dto.product_id)},
