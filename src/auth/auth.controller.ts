@@ -1,8 +1,9 @@
-import { Body, Controller, Post, UseGuards, Req, HttpCode, HttpStatus, ConflictException } from "@nestjs/common";
+import { Body, Controller, Post, UseGuards, Req, HttpCode, HttpStatus, ConflictException, Get } from "@nestjs/common";
 import { LoginDto } from "./dto/create-auth.dto";
 import { RegisterDTO } from "./dto/create-auth.dto";
 import { AuthService } from "./auth.service";
 import { AuthGuard } from "@nestjs/passport";
+import { RoleGuard } from "src/guard/role.guard";
 
 @Controller("auth")
 export class AuthController {
@@ -23,4 +24,10 @@ export class AuthController {
     }
     return result;
   }
+  @UseGuards(AuthGuard('jwt'),RoleGuard)
+  @Get('user-list')
+  async UserList (){
+   return  await this.authService.Account_list()
+  }
+  
 }

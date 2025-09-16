@@ -6,6 +6,7 @@ import { User } from "src/entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { NidaValidate } from "src/common/helper/nide.helper";
 import { RegisterDTO } from "./dto/create-auth.dto";
+import { ResponseType } from "src/type/type.interface";
 
 
 @Injectable()
@@ -78,5 +79,20 @@ export class AuthService {
       });
       await this.userRepository.save(CreateUser)
       return {exist: false, proceed: true};
+    }
+
+    async  Account_list ():Promise<ResponseType<any>>{
+      const user_list = await this.userRepository.find()
+      if(!user_list){
+       return{
+        message:"No Account Available",
+        success:true
+       }
+      }
+      return{
+        message:"Successfuly",
+       success:true,
+       data:user_list
+      }
     }
 }
