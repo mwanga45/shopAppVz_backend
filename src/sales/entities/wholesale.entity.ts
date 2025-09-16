@@ -34,11 +34,11 @@ export class WholeSales extends baseEntity{
   @Column({default:0})
   percentage_cutoff:number
 
-  @ManyToOne(()=> User,{eager:true})
+  @ManyToOne(()=> User,(user)=>user.wholesales)
   @JoinColumn({name:'userId'})
   user:User;
 
-  @ManyToOne(() => Product, { eager: true })
+  @ManyToOne(() => Product, (product)=> product.wholesales)
   @JoinColumn({ name: 'productId' })
   product: Product;
   

@@ -2,6 +2,7 @@ import { Entity, Column, OneToMany, ManyToMany, ManyToOne } from 'typeorm';
 import { baseEntity } from 'src/common/base.entity';
 import { Product } from 'src/product/entities/product.entity';
 import { Stock, Stock_transaction } from 'src/stock/entities/stock.entity';
+import { WholeSales } from 'src/sales/entities/wholesale.entity';
 export enum UserType {
   Admin ="admin",
   User="user" 
@@ -37,5 +38,8 @@ export class User extends baseEntity {
 
   @ManyToOne(()=> Stock_transaction,(stocktrans)=> stocktrans.user)
   stocktrans:Stock_transaction[]
+  
+  @OneToMany(()=> WholeSales, (wholesales) => wholesales.user)
+  wholesales:WholeSales[]
 
 }

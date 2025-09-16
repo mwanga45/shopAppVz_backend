@@ -1,5 +1,6 @@
 import { baseEntity } from "src/common/base.entity";
 import { User } from "src/entities/user.entity";
+import { WholeSales } from "src/sales/entities/wholesale.entity";
 import { Stock, Stock_transaction } from "src/stock/entities/stock.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 export enum product_type{
@@ -46,5 +47,9 @@ export class Product extends baseEntity{
     
      @OneToOne(()=> Stock, (stock)=>stock.product)
      stock:Stock[]
+     
+     @OneToMany(()=> WholeSales, (wholesales)=> wholesales.product)
+     @JoinColumn({name:"product_id"})
+     wholesales:WholeSales[]
 }
 
