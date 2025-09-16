@@ -21,8 +21,6 @@ export class WholeSales extends baseEntity{
   @IsString()
   TotalProfit:number
 
-  @Column()
-  productId: number;
   
   @Column()
   Epected_Profit:number

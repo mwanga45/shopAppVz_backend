@@ -97,7 +97,7 @@ export class SalesService {
 
     if(cutoff[0]> 0){
       const Addsales =  this.WholesalesRepository.create({
-      productId:Dto.productId,
+      product:{id:Dto.productId},
       profit_deviation: deviation_profit,
       percentage_deviation: deviation_percentage,
       TotalGenerated:TotalGenerated,
@@ -112,7 +112,7 @@ export class SalesService {
 
     }else{
     const Addsales =  this.WholesalesRepository.create({
-      productId:Dto.productId,
+      product:{id:Dto.productId},
       profit_deviation: deviation_profit,
       percentage_deviation: deviation_percentage,
       TotalGenerated:TotalGenerated,
@@ -145,7 +145,7 @@ export class SalesService {
  );
  if(cutoff[0]> 0){
   const Addsales =  this.WholesalesRepository.create({
-      productId:Dto.productId,
+      product:{id:Dto.productId},
       profit_deviation: deviation_profit,
       percentage_deviation: deviation_percentage,
       TotalGenerated:TotalGenerated,
@@ -160,7 +160,7 @@ export class SalesService {
 
  }else{
       const Addsales =  this.WholesalesRepository.create({
-      productId:Dto.productId,
+      product:{id:Dto.productId},
       profit_deviation: deviation_profit,
       percentage_deviation: deviation_percentage,
       TotalGenerated:TotalGenerated,
@@ -204,8 +204,8 @@ export class SalesService {
       const Createsales =  this.RetailsalesRepository.create({
         Total_litre_kg:Dto.Total_pc_pkg_litre,
         TotalGenereted:TotalGenerated,
-        productId:Dto.productId,
-        userId:userId,
+        product:{id:Dto.productId},
+        user:{id:userId},
         Epected_Profit:ExpectedProfit,
         profit_deviation:deviation_profit,
         percentage_deviation:deviation_percentage,
@@ -222,8 +222,8 @@ export class SalesService {
         const Createsales =  this.RetailsalesRepository.create({
         Total_litre_kg:Dto.Total_pc_pkg_litre,
         TotalGenereted:TotalGenerated,
-        productId:Dto.productId,
-        userId:userId,
+        product:{id:Dto.productId},
+        user:{id:userId},
         Epected_Profit:ExpectedProfit,
         profit_deviation:deviation_profit,
         percentage_deviation:deviation_percentage,

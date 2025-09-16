@@ -19,12 +19,6 @@ export class RetailSales extends baseEntity{
     TotalProfit:number;
 
     @Column()
-    productId: number;
-    
-    @Column()
-    userId:number;
-
-    @Column()
     Epected_Profit:number
 
     @Column()
