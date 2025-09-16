@@ -10,8 +10,8 @@ import { NotFoundException } from '@nestjs/common';
 import { ProductWholesales } from './utils/whole.type';
 import { isDate, isEmpty } from 'class-validator';
 import { SalesHelper } from 'src/common/helper/sales.helper';
-// import { StockUpdateHelper } from 'src/common/helper/stockUpdate,helper';
-import { table } from 'console';
+import { ResponseType } from 'src/type/type.interface';
+
 
 @Injectable()
 export class SalesService {
@@ -29,7 +29,7 @@ export class SalesService {
   findAll() {
     return `This action returns all sales`;
   }
-  async Wholesale():Promise<any>{
+  async Wholesale():Promise<ResponseType<any>>{
      const wholesalesquery =   await this.ProductRepository.createQueryBuilder("product")
      .select([
       "product.id",
@@ -41,11 +41,17 @@ export class SalesService {
      ])
      .where("product.product_category = :category",{category:"wholesales"})
      .getMany();
-     if(WholeSales.length){
-      return "No product avalaible yet"
+     if(wholesalesquery.length === 0){
+      return{
+         message:'"No product avalaible yet"',
+         success:false
+      } 
      }
-     
-     return wholesalesquery
+     return {
+      message:"Successfuly",
+      success:true,
+      data:wholesalesquery
+     }
   }
   async RetailsSales():Promise<any>{
     const RetailSales = await this.ProductRepository.createQueryBuilder('product')

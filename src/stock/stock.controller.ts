@@ -33,8 +33,9 @@ export class StockController {
 
   @UseGuards(AuthGuard('jwt'),RoleGuard)
   @Post("update")
-  update(@Request() req ,@Body() updateStockDto: UpdateStockDto) {
-    const  userId  = req.user.UserId
-    return this.stockService.updateStock(updateStockDto,userId); // Removed 'id' parameter
+  updateStock(@Request() req ,@Body() updateStockDto: UpdateStockDto) {
+    console.log("USER Request", req.user.sub)
+    const  userId  = req.user.userId
+    return this.stockService.updateStock(updateStockDto,userId); 
   }
 }

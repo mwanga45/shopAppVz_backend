@@ -22,16 +22,13 @@ export class StockService {
   ){}
 
    async createStockRec (Dto:CreateStockDto, userId:any):Promise<ResponseType<any>>{
-    // check if the product is Already registered
     const checkExistence = await this.stockRepo.exists({
       where:{product:{id:Number(Dto.product_id)}, product_category:Dto.product_category}
     })
-    if(checkExistence){
-      return {
-        message:"Please you have already register the  product go to stock to update it",
-        success:false 
-      }
-    }
+    const product = await this.productRepo.findOne({
+      where:{id:Number(Dto.product_id)}
+    })
+
     const stockRec =  this.stockRepo.create({
       product:{id: Number(Dto.product_id)},
       Total_stock: Number(Dto.total_stock),
@@ -119,8 +116,8 @@ export class StockService {
           product:{id:updateStockDto.product_id},
           product_category:updateStockDto.product_category,
           type_Enum:StockType.IN,
-          new_stock:FindSum, // The new total stock after the addition
-          prev_stock:prevStockForNewTransaction, // The new_stock of the previous transaction
+          new_stock:FindSum,
+          prev_stock:prevStockForNewTransaction,
           Quantity:updateStockDto.total_stock,
           Change_type:updateStockDto.Method,
           user:{id:userId},
