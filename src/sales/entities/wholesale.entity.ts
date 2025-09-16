@@ -23,7 +23,7 @@ export class WholeSales extends baseEntity{
 
   
   @Column()
-  Epected_Profit:number
+  Expected_Profit:number
 
   @Column()
   profit_deviation:number

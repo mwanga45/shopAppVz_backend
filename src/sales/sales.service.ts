@@ -102,7 +102,7 @@ export class SalesService {
       percentage_deviation: deviation_percentage,
       TotalGenerated:TotalGenerated,
       TotalProfit: ProfitGenerated, 
-      Epected_Profit:ExpectedProfit,
+      Expected_Profit:ExpectedProfit,
       user:{id:userId},
       percentage_cutoff:cutoff[1],
       Total_pc_pkg_litre: Dto.Total_pc_pkg_litre
@@ -117,7 +117,7 @@ export class SalesService {
       percentage_deviation: deviation_percentage,
       TotalGenerated:TotalGenerated,
       TotalProfit: ProfitGenerated, 
-      Epected_Profit:ExpectedProfit,
+      Expected_Profit:ExpectedProfit,
       user:{id:userId},
       Total_pc_pkg_litre: Dto.Total_pc_pkg_litre
     })
@@ -150,7 +150,7 @@ export class SalesService {
       percentage_deviation: deviation_percentage,
       TotalGenerated:TotalGenerated,
       TotalProfit: ProfitGenerated, 
-      Epected_Profit:ExpectedProfit,
+      Expected_Profit:ExpectedProfit,
       user:{id:userId},
       percentage_cutoff:cutoff[1],
       Total_pc_pkg_litre: Dto.Total_pc_pkg_litre
@@ -165,7 +165,7 @@ export class SalesService {
       percentage_deviation: deviation_percentage,
       TotalGenerated:TotalGenerated,
       TotalProfit: ProfitGenerated, 
-      Epected_Profit:ExpectedProfit,
+      Expected_Profit:ExpectedProfit,
       user:{id:userId},
       Total_pc_pkg_litre: Dto.Total_pc_pkg_litre
     })
