@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
+import { CreateProductDto ,CreateProductDiscDto} from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -125,9 +125,9 @@ export class ProductService {
     await this.Productrepository.delete({id})
   }
 
-  async ProductAsignDisc (Dto:Create):Promise<ResponseType<any>>{
+  async ProductAsignDisc (Dto:CreateProductDiscDto):Promise<ResponseType<any>>{
     const DiscountExist =  await this.DiscountRepo.findOne({
-      where:{product:{id:}}
+      where:{product:{id:Dto.productId},Product_start_from:Dto.productNumber}
     })
 
     return{

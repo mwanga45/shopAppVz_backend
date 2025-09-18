@@ -1,4 +1,4 @@
-import { IsString } from "class-validator";
+import { IsNumber, IsString } from "class-validator";
 import { product_type } from "../entities/product.entity";
 import { category } from "../entities/product.entity";
 import { IsOptional, IsNotEmpty, IsNumberString } from 'class-validator';
@@ -32,7 +32,23 @@ export class CreateProductDto {
     @IsNumberString()
     rpurchase_price?:string
 }
-export class CreateProductDto{
-    
-    
+export class CreateProductDiscDto{
+    @IsNumber()
+    @IsNotEmpty()
+    productId:number
+
+    @IsNumber()
+    @IsNotEmpty()
+    percebntage:number
+
+    @IsNotEmpty()
+    @IsNumber()
+    cashDisc:number
+
+    @IsNotEmpty()
+    @IsNumber()
+    productNumber:number
+
+
+
 }
