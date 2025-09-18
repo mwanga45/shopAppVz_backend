@@ -129,6 +129,9 @@ export class ProductService {
     const DiscountExist =  await this.DiscountRepo.findOne({
       where:{product:{id:Dto.productId},Product_start_from:Dto.productNumber}
     })
+    if(Dto.UpdateFlag){
+      
+    }
 
     return{
       message:"Success",
