@@ -58,8 +58,8 @@ export class  SalesHelper {
       return [0]
     }
     const wholesale_price =  Number(wholesales_price ?? 0)
-    const AfterCutoff =  wholesale_price *(disc_Info.percentageCutoff/100) 
-    return[AfterCutoff, disc_Info.percentageCutoff]
+    const AfterCutoff =  wholesale_price *(disc_Info.percentageDiscaunt/100) 
+    return[AfterCutoff, disc_Info.percentageDiscaunt]
   }
  
 }

@@ -8,7 +8,10 @@ export class Product_discount extends baseEntity{
    product_id:number
 
    @Column()
-   percentageCutoff:number
+   percentageDiscaunt:number
+
+   @Column()
+   CashDiscount:number
 
    @Column()
    Product_startfrom:number
