@@ -49,12 +49,12 @@ export class  SalesHelper {
   async ValidateCutoff (Total_litre_kg:string,wholesales_price:string | null,product_Id:number, purchase_price:string | null):Promise<number[]>{
     const Amount = Number(Total_litre_kg ?? 0)
     const disc_Info = await this.dscountRepo.findOne({
-      where:{product_id:product_Id},
+      where:{product:{id:product_Id}},
     })
     if (!disc_Info){
       throw new NotFoundException("The product is not available")
     }
-    if(Amount < disc_Info.Product_startfrom ){
+    if(Amount < disc_Info.Product_start_from ){
       return [0]
     }
     const wholesale_price =  Number(wholesales_price ?? 0)
