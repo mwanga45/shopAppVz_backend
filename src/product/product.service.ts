@@ -4,6 +4,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { And, Repository } from 'typeorm';
+import { ResponseType } from 'src/type/type.interface';
 
 
 
@@ -120,5 +121,13 @@ export class ProductService {
 
   async Removeproduct(id: number):Promise<any> {
     await this.Productrepository.delete({id})
+  }
+
+  async ProductAsignDisc ():Promise<ResponseType<any>>{
+    
+    return{
+      message:"Success",
+      success:true
+    }
   }
 }

@@ -14,7 +14,7 @@ export class Product_discount extends baseEntity{
    CashDiscount:number
 
    @Column()
-   Product_startfrom:number
+   Product_start_from:number
 
    @ManyToOne(()=> Product,{eager:true})
    @JoinColumn({name:'productId'})
