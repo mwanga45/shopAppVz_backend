@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsBoolean, IsNumber, IsString } from "class-validator";
 import { product_type } from "../entities/product.entity";
 import { category } from "../entities/product.entity";
 import { IsOptional, IsNotEmpty, IsNumberString } from 'class-validator';
@@ -48,7 +48,10 @@ export class CreateProductDiscDto{
     @IsNotEmpty()
     @IsNumber()
     productNumber:number
-
+    
+    @IsOptional()
+    @IsBoolean()
+    UpdateFlag:boolean
 
 
 }

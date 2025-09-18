@@ -1,6 +1,7 @@
 import { baseEntity } from "src/common/base.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
 import { Product } from "./product.entity";
+import { User } from "src/entities/user.entity";
 
 @Entity()
 export class Product_discount extends baseEntity{
@@ -16,4 +17,9 @@ export class Product_discount extends baseEntity{
    @ManyToOne(()=> Product,product =>product.disc )
    @JoinColumn({name:'product_id'})
    product:Product
+
+   @ManyToOne(()=> User, user => user.disc)
+   @JoinColumn({name:"user_id"})
+   user:User
+
 }
