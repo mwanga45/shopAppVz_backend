@@ -130,7 +130,7 @@ export class ProductService {
       where:{product:{id:Dto.productId},Product_start_from:Dto.productNumber}
     })
     if(Dto.UpdateFlag){
-      
+      // const updateDisc = await this.DiscountRepo.update(Dto)
     }
 
     return{
