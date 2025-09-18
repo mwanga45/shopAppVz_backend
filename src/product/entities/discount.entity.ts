@@ -5,9 +5,6 @@ import { Product } from "./product.entity";
 @Entity()
 export class Product_discount extends baseEntity{
    @Column()
-   product_id:number
-
-   @Column()
    percentageDiscaunt:number
 
    @Column()
@@ -16,7 +13,7 @@ export class Product_discount extends baseEntity{
    @Column()
    Product_start_from:number
 
-   @ManyToOne(()=> Product,{eager:true})
-   @JoinColumn({name:'productId'})
-   Product:Product
+   @ManyToOne(()=> Product,product =>product.disc )
+   @JoinColumn({name:'product_id'})
+   product:Product
 }

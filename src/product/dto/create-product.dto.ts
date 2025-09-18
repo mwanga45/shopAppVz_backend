@@ -32,3 +32,7 @@ export class CreateProductDto {
     @IsNumberString()
     rpurchase_price?:string
 }
+export class CreateProductDto{
+    
+    
+}

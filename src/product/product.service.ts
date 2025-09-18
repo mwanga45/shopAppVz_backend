@@ -5,6 +5,7 @@ import { Product } from './entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { And, Repository } from 'typeorm';
 import { ResponseType } from 'src/type/type.interface';
+import { Product_discount } from './entities/discount.entity';
 
 
 
@@ -23,7 +24,8 @@ type Productpayload = {
 
 export class ProductService {
   constructor(
-   @InjectRepository(Product) private readonly  Productrepository:Repository<Product>
+   @InjectRepository(Product) private readonly  Productrepository:Repository<Product>,
+   @InjectRepository(Product_discount) private readonly DiscountRepo:Repository<Product_discount>
   ){}
   
   async create(createProductDto: CreateProductDto, userId:any):Promise<string> {
@@ -123,8 +125,11 @@ export class ProductService {
     await this.Productrepository.delete({id})
   }
 
-  async ProductAsignDisc ():Promise<ResponseType<any>>{
-    
+  async ProductAsignDisc (Dto:Create):Promise<ResponseType<any>>{
+    const DiscountExist =  await this.DiscountRepo.findOne({
+      where:{product:{id:}}
+    })
+
     return{
       message:"Success",
       success:true

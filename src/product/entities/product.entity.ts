@@ -3,6 +3,7 @@ import { User } from "src/entities/user.entity";
 import { WholeSales } from "src/sales/entities/wholesale.entity";
 import { Stock, Stock_transaction } from "src/stock/entities/stock.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Product_discount } from "./discount.entity";
 export enum product_type{
     Liquid= "Liquid",
     Solid = "Solid"
@@ -51,5 +52,9 @@ export class Product extends baseEntity{
      @OneToMany(()=> WholeSales, (wholesales)=> wholesales.product)
      @JoinColumn({name:"product_id"})
      wholesales:WholeSales[]
+
+     @OneToMany(()=> Product_discount, disc => disc.product)
+     @JoinColumn({name:'product_id'})
+     disc:Product_discount[]
 }
 
