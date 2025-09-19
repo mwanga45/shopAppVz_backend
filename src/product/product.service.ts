@@ -129,7 +129,12 @@ export class ProductService {
     const Product_existance = await this.Productrepository.findOne({
       where:{id:Dto.productId}
     })
-    
+    if(!Product_existance){
+      return{
+        message:"Product is not Exist",
+        success:false
+      }
+    }
     const DiscountExist =  await this.DiscountRepo.findOne({
       where:{product:{id:Dto.productId},Product_start_from:Dto.productNumber}
     })
@@ -144,8 +149,12 @@ export class ProductService {
         success:true
       }
     }
-
-
+    const Create_Disc =  this.DiscountRepo.create({
+      product:{id:Dto.productId},
+      percentageDiscaunt:Dto.percebntage,
+      Product_start_from:Dto.productNumber,
+      CashDiscount:Dto.cashDisc
+    })
     return{
       message:"Success",
       success:true
