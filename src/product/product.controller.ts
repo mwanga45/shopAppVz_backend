@@ -27,7 +27,7 @@ export class ProductController {
   findOne(@Param('id') id: string) {
     return this.productService.findOne(+id);
   }
-
+  
   @UseGuards(AuthGuard('jwt'),RoleGuard)
   @Patch(':id')
   updateProduct(@Param('id')id:number,
