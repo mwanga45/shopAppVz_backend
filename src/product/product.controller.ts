@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, HttpCode, Query,Request } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { CreateProductDto } from './dto/create-product.dto';
+import { CreateProductDto,CreateProductDiscDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleGuard } from 'src/guard/role.guard';
@@ -22,6 +22,14 @@ export class ProductController {
   findAll(@Query('category') category?: string, @Query('type') type?: string) {
     return this.productService.findAll({ category, type });
   }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Post('discount')
+  Create_Disc(@Body() DiscDto:CreateProductDiscDto){
+    return  this.productService.ProductAsignDisc(DiscDto)
+  }
+
+
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   findOne(@Param('id') id: string) {
