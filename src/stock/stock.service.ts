@@ -159,7 +159,7 @@ export class StockService {
         }
       }
       const updateTotalstock = findTotal.total - updateStockDto.total_stock;
-      const updatestock  = await this.stockRepo.update({ product: { id: updateStockDto.product_id } },{ // Updated to use product_id
+      const updatestock  = await this.stockRepo.update({ product: { id: updateStockDto.product_id } },{ 
       Total_stock:updateTotalstock,
       user:{id:userId}
       })

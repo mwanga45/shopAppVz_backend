@@ -67,7 +67,7 @@ export class ProductService {
       retailsales_price:createProductDto.Rs_price,
       wpurchase_price:createProductDto.wpurchase_price,
       rpurchase_price:createProductDto.rpurchase_price,
-      userId:userId
+      user:{id:userId}
 
     })
     await this.Productrepository.save(createproduct)
@@ -119,8 +119,18 @@ export class ProductService {
    StandadizeDiscont(wholesales_price:number, percentageDiscaunt:number){
         const CashDiscount = wholesales_price * percentageDiscaunt
   }
-  async updateproduct(id:number,updateProductDto:UpdateProductDto):Promise<ResponseType<any>>{
-    const updateprod = await this.Productrepository.update({id},{...updateProductDto})
+  async updateproduct(user_id:number,updateProductDto:UpdateProductDto):Promise<ResponseType<any>>{
+    const id = Number(updateProductDto.product_id)
+    console.log("product Id ", id)
+    const updateprod = await this.Productrepository.update({id:id},{
+      product_name:updateProductDto.product_name,
+      product_category:updateProductDto.product_category,
+      product_type:updateProductDto.product_type,
+      wholesales_price:updateProductDto.Ws_price, 
+      retailsales_price:updateProductDto.Rs_price,
+      rpurchase_price:updateProductDto.rpurchase_price,
+      wpurchase_price:updateProductDto.wpurchase_price,
+      user:{id:user_id}})
     if(updateprod.affected === 0){
       return{
         message:"No  update at",

@@ -15,7 +15,15 @@ export class ProductController {
   @HttpCode(201)
   create(@Request() req,@Body() createProductDto: CreateProductDto) {
     const userId = req.user.userId
-    return this.productService.create(createProductDto,userId);
+  return this.productService.create(createProductDto,userId);
+    }edit_prod
+
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Post('edit_prod')
+  Updateproduct(@Request() req , @Body() Dto:UpdateProductDto){
+   const user_id = req.user.userId 
+   this.productService.updateproduct(user_id, Dto)
+  
   }
   @UseGuards(AuthGuard('jwt'))
   @Get('getproduct')

@@ -18,8 +18,6 @@ export class Product extends baseEntity{
      @Column()
      product_name:string
 
-     @Column()
-     userId:number
      
      @Column({type:'enum', enum:category})
      product_category: category

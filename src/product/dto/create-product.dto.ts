@@ -31,6 +31,10 @@ export class CreateProductDto {
     @IsOptional()
     @IsNumberString()
     rpurchase_price?:string
+
+    @IsOptional()
+    @IsString()
+    product_id?:string
 }
 export class CreateProductDiscDto{
     @IsNumber()
