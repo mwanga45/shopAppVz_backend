@@ -116,7 +116,7 @@ export class ProductService {
     const ProductbyId = await this.Productrepository.findOne({where:{id:product_id}, select:["id","product_name","product_type","product_category",'product_type',"wpurchase_price","rpurchase_price" ,"wholesales_price","retailsales_price"]})
     return ProductbyId;
   }
-       StandadizeDiscont(wholesales_price:number, percentageDiscaunt:number){
+   StandadizeDiscont(wholesales_price:number, percentageDiscaunt:number){
         const CashDiscount = wholesales_price * percentageDiscaunt
   }
   async updateproduct(id:number,updateProductDto:UpdateProductDto):Promise<ResponseType<any>>{
