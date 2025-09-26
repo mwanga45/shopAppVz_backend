@@ -133,13 +133,13 @@ export class ProductService {
       user:{id:user_id}})
     if(updateprod.affected === 0){
       return{
-        message:"No  update at",
+        message:"Product not found or no changes made.",
         success:false
       }
     }
     return{
-      message:"Success update product",
-      success:false
+      message:"Product updated successfully.",
+      success:true
     }
 
   }
