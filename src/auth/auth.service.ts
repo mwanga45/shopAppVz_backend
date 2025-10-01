@@ -114,14 +114,17 @@ export class AuthService {
       .groupBy('u.role')
       .getRawMany()
 
-      console.log(roleAndisActive,return_user)
+      const ROleObj =  roleAndisActive.reduce((acc, curr)=>{
+        acc[curr.role] ={total:Number(curr.total), activeCount:Number(curr.activeCount)}
+        return acc
+      })
       return{
         message:"Succesfully returned",
         success:true,
   
         data:{
           return_user,
-          roleAndisActive
+          ROleObj
         }
       }
     }
