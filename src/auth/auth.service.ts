@@ -81,6 +81,7 @@ export class AuthService {
       return {exist: false, proceed: true};
     }
 
+    
     async  Account_list ():Promise<ResponseType<any>>{
       const user_list = await this.userRepository.find()
       if(!user_list){
