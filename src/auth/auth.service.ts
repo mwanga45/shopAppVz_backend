@@ -5,8 +5,9 @@ import bcrypt from 'bcrypt';
 import { User } from "src/entities/user.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { NidaValidate } from "src/common/helper/nide.helper";
-import { RegisterDTO } from "./dto/create-auth.dto";
+import { LoginDto, RegisterDTO } from "./dto/create-auth.dto";
 import { ResponseType } from "src/type/type.interface";
+import { UserType } from "src/entities/user.entity";
 
 
 @Injectable()
@@ -128,4 +129,27 @@ export class AuthService {
         }
       }
     }
+  async ValidateAdmin_Account (Dto:LoginDto):Promise<ResponseType<any>>{
+    const findAdmn = await this.userRepository.findOne({
+      where:{email:Dto.email, role:UserType.Admin}
+    })
+    if(!findAdmn){
+      return{
+        success:false,
+        message:"Adminis not found"
+      }
+    }
+    const compare_pwr = await bcrypt.compare(findAdmn.password, Dto.password)
+    if(!compare_pwr){
+      return{
+        message:"Password or email is Incorrect Failed",
+        success:false
+      }
+    }
+    return{
+      message:"Valid user admin role",
+      success:true,
+      data:findAdmn.id
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards, Req, HttpCode, HttpStatus, ConflictException, Get } from "@nestjs/common";
+import { Body, Controller, Post, UseGuards, Req, HttpCode, HttpStatus, ConflictException, Get,Request } from "@nestjs/common";
 import { LoginDto } from "./dto/create-auth.dto";
 import { RegisterDTO } from "./dto/create-auth.dto";
 import { AuthService } from "./auth.service";
@@ -34,5 +34,10 @@ export class AuthController {
    async Account_info(){
     return await this.authService.Account_details()
    }
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Post('validate-admin')
+  async Validate_admin(@Body() Dto:LoginDto){
+    return await this.authService.ValidateAdmin_Account(Dto)
+  }
   
 }
