@@ -29,6 +29,7 @@ export class AuthController {
   async UserList (){
    return  await this.authService.Account_list()
   }
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
    @Get('acc_info')
    async Account_info(){
     return await this.authService.Account_details()

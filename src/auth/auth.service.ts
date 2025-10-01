@@ -99,8 +99,14 @@ export class AuthService {
 
     async Account_details ():Promise<ResponseType<any>>{
       const return_user = await this.userRepository.find({
-        select:['fullname','isActive','email','nida','phone_number','CreatedAt','role',]
+        select:['fullname','isActive','email','nida','phone_number','CreatedAt','role','id',]
       })
+      if(return_user.length === 0){
+        return{
+          message:"No account Available",
+          success:false
+        }
+      }
       const roleAndisActive = await this.userRepository.createQueryBuilder('u')
       .select('u.role', 'role')
       .addSelect('COUNT(u.role)', 'total')
@@ -108,13 +114,11 @@ export class AuthService {
       .groupBy('u.role')
       .getRawMany()
 
-      const data = [
-        roleAndisActive,
-        return_user
-      ]
+      console.log(roleAndisActive,return_user)
       return{
         message:"Succesfully returned",
         success:true,
+  
         data:{
           return_user,
           roleAndisActive
