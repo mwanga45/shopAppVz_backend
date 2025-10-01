@@ -35,7 +35,8 @@ export class AuthController {
     return await this.authService.Account_details()
    }
   @UseGuards(AuthGuard('jwt'), RoleGuard)
-  @Post('validate-admin')
+  @Post('admin-verification')
+  @HttpCode(HttpStatus.OK)
   async Validate_admin(@Body() Dto:LoginDto){
     return await this.authService.ValidateAdmin_Account(Dto)
   }

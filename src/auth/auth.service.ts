@@ -130,19 +130,22 @@ export class AuthService {
       }
     }
   async ValidateAdmin_Account (Dto:LoginDto):Promise<ResponseType<any>>{
-    const findAdmn = await this.userRepository.findOne({
-      where:{email:Dto.email, role:UserType.Admin}
-    })
+    const findAdmn = await this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.email = :email', { email: Dto.email })
+      .andWhere('user.role = :role', { role: UserType.Admin })
+      .getOne()
     if(!findAdmn){
       return{
         success:false,
-        message:"Adminis not found"
+        message:"Admin is not found"
       }
     }
-    const compare_pwr = await bcrypt.compare(findAdmn.password, Dto.password)
+    const compare_pwr = await bcrypt.compare(Dto.password, findAdmn.password)
     if(!compare_pwr){
       return{
-        message:"Password or email is Incorrect Failed",
+        message:"Password or email is incorrect",
         success:false
       }
     }
