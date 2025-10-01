@@ -104,7 +104,7 @@ export class AuthService {
       const roleAndisActive = await this.userRepository.createQueryBuilder('u')
       .select('u.role', 'role')
       .addSelect('COUNT(u.role)', 'total')
-      .addSelect('SUM(CASE WHEN isActive = true THEN 1 ELSE 0 END)', 'activeCount')
+      .addSelect('SUM(CASE WHEN u.isActive = true THEN 1 ELSE 0 END)', 'activeCount')
       .groupBy('u.role')
       .getRawMany()
 
@@ -114,7 +114,11 @@ export class AuthService {
       ]
       return{
         message:"Succesfully returned",
-        success:true
+        success:true,
+        data:{
+          return_user,
+          roleAndisActive
+        }
       }
     }
 }
