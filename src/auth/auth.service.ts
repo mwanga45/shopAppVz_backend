@@ -96,4 +96,25 @@ export class AuthService {
        data:user_list
       }
     }
+
+    async Account_details ():Promise<ResponseType<any>>{
+      const return_user = await this.userRepository.find({
+        select:['fullname','isActive','email','nida','phone_number','CreatedAt','role',]
+      })
+      const roleAndisActive = await this.userRepository.createQueryBuilder('u')
+      .select('u.role', 'role')
+      .addSelect('COUNT(u.role)', 'total')
+      .addSelect('SUM(CASE WHEN isActive = true THEN 1 ELSE 0 END)', 'activeCount')
+      .groupBy('u.role')
+      .getRawMany()
+
+      const data = [
+        roleAndisActive,
+        return_user
+      ]
+      return{
+        message:"Succesfully returned",
+        success:true
+      }
+    }
 }
