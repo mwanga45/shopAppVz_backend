@@ -1,5 +1,5 @@
 import { match } from "assert";
-import { IsEmail, IsNotEmpty, IsString, Length, Matches, IsOptional } from "class-validator";
+import { IsEmail, IsNotEmpty, IsString, Length, Matches, IsOptional, ValidateIf } from "class-validator";
 import { UserType } from "src/entities/user.entity";
 
 export class LoginDto {
@@ -31,8 +31,8 @@ export class RegisterDTO{
     
     @IsString()
     @Length(6,20)
-    @Matches(/^[A-Z].*[@$!%*?&]/,{
-        message:"Password must start with capital letter and contain special character"
+    @Matches(/.*[@$!%*?&]/,{
+        message:"Password must contain at least one special character (@$!%*?&)"
     })
     password:string
 
@@ -47,4 +47,8 @@ export class RegisterDTO{
 
     @IsString()
     role:UserType
+
+    @IsOptional()
+    @IsString()
+    confirm_password?: string
 }

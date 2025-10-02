@@ -1,3 +1,4 @@
+
 export class NidaValidate{
 static  validateNidaNumber(nida: string): { Isvalid: boolean; reason?: string } {
     const nidaregx = /^(\d{8})-(\d{5})-(\d{5})-(\d{2})$/;

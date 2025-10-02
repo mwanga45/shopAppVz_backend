@@ -75,9 +75,8 @@ export class AuthService {
 
       const isValid = NidaValidate.validateNidaNumber(Dto.nida)
       if(isValid.Isvalid === false){
-        throw new UnauthorizedException(isValid.reason)
         return{
-          message:"Invalid  nida number format",
+          message:isValid?.reason,
           success:false
         }
       }
@@ -128,6 +127,7 @@ export class AuthService {
       .select('u.role', 'role')
       .addSelect('COUNT(u.role)', 'total')
       .addSelect('SUM(CASE WHEN u.isActive = true THEN 1 ELSE 0 END)', 'activeCount')
+      .addSelect('SUM(CASE WHEN u.isActive = false THEN 1 ELSE 0 END)', "inActiveCount")
       .groupBy('u.role')
       .getRawMany()
 
