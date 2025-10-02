@@ -17,6 +17,11 @@ export class ProductController {
     const userId = req.user.userId
     return this.productService.create(createProductDto,userId);
   }
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
+  @Post('update')
+  Updateproduct(@Request() req ,@Body() dto:UpdateProductDto){
+    const userId = req.user.userId
+  }
   @UseGuards(AuthGuard('jwt'))
   @Get('getproduct')
   findAll(@Query('category') category?: string, @Query('type') type?: string) {
