@@ -74,6 +74,15 @@ export class ProductService {
     return "Successfuly create  new product"
   }
 
+   async UpdateProduct (Dto:UpdateProductDto, userId:any):Promise<ResponseType<any>>{
+    
+    return{
+      message:"Successfuly made an update",
+      success:true
+    }
+  }
+ 
+
   async findAll(filter?:{category?:string,type?:string}):Promise<any> {
     const query = this.Productrepository.createQueryBuilder("product")
       .leftJoinAndSelect("product.user", "user")
