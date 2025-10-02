@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumberString, IsOptional, IsString } from "class-validator"
+import { IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString } from "class-validator"
 import { category, product_type } from "../entities/product.entity"
 
 
@@ -6,6 +6,10 @@ export class UpdateProductDto{
         @IsString()
         @IsNotEmpty()
         product_name:string
+
+        @IsNumber()
+        @IsNotEmpty()
+        id:number
     
         @IsString()
         @IsNotEmpty()

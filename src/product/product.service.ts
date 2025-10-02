@@ -75,9 +75,18 @@ export class ProductService {
   }
 
    async UpdateProduct (Dto:UpdateProductDto, userId:any):Promise<ResponseType<any>>{
-    
+    const update_pr = await this.Productrepository.update({id:Dto.id}, {
+      product_name:Dto.product_name,
+      product_category:Dto.product_category,
+      product_type:Dto.product_type,
+      wholesales_price:Dto.Ws_price,
+      retailsales_price:Dto.Rs_price,
+      wpurchase_price:Dto.wpurchase_price,
+      rpurchase_price:Dto.rpurchase_price,
+      userId:userId
+    })
     return{
-      message:"Successfuly made an update",
+      message:`Successfuly made an update product ${Dto.product_name}`,
       success:true
     }
   }
