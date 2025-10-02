@@ -75,6 +75,15 @@ export class ProductService {
   }
 
    async UpdateProduct (Dto:UpdateProductDto, userId:any):Promise<ResponseType<any>>{
+    const checkproduct = await this.Productrepository.findOne({
+      where:{id:Dto.id}
+    })
+     if(!checkproduct){
+      return{
+        message:"Product is not exist",
+        success:false
+      }
+     }
     const update_pr = await this.Productrepository.update({id:Dto.id}, {
       product_name:Dto.product_name,
       product_category:Dto.product_category,
