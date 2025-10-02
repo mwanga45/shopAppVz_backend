@@ -80,7 +80,7 @@ export class ProductService {
     })
      if(!checkproduct){
       return{
-        message:"Product is not exist",
+        message:`product ${Dto.product_name} is not exist` ,
         success:false
       }
      }
@@ -143,9 +143,31 @@ export class ProductService {
     const ProductbyId = await this.Productrepository.findOne({where:{id:product_id}, select:["id","product_name","product_type","product_category",'product_type',"wpurchase_price","rpurchase_price" ,"wholesales_price","retailsales_price"]})
     return ProductbyId;
   }
-  async updateproduct(id:number,updateProductDto:UpdateProductDto):Promise<any>{
-    return await this.Productrepository.update({id},{...updateProductDto})
+  async updateproduct(id:number,updateProductDto:UpdateProductDto):Promise<ResponseType<any>>{
+    const updatePayload: Partial<Product> = {
+      product_name: updateProductDto.product_name,
+      product_category: updateProductDto.product_category as any,
+      product_type: updateProductDto.product_type as any,
+    };
 
+    if (typeof updateProductDto.Ws_price !== 'undefined' && updateProductDto.Ws_price !== null) {
+      (updatePayload as any).wholesales_price = updateProductDto.Ws_price;
+    }
+    if (typeof updateProductDto.wpurchase_price !== 'undefined' && updateProductDto.wpurchase_price !== null) {
+      updatePayload.wpurchase_price = updateProductDto.wpurchase_price as any;
+    }
+    if (typeof updateProductDto.Rs_price !== 'undefined' && updateProductDto.Rs_price !== null) {
+      (updatePayload as any).retailsales_price = updateProductDto.Rs_price;
+    }
+    if (typeof updateProductDto.rpurchase_price !== 'undefined' && updateProductDto.rpurchase_price !== null) {
+      updatePayload.rpurchase_price = updateProductDto.rpurchase_price as any;
+    }
+
+    const update = await this.Productrepository.update({ id }, updatePayload);
+    return{
+      message:`Successfuly register ${updatePayload.product_name}`, 
+      success:true
+    }
   }
 
   async Removeproduct(id: number):Promise<any> {

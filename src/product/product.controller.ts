@@ -45,7 +45,7 @@ export class ProductController {
   @Patch(':id')
   updateProduct(@Param('id')id:number,
   @Body()updateDto:UpdateProductDto){
-    this.productService.updateproduct(id,updateDto)
+    return this.productService.updateproduct(+id,updateDto)
   }
   @UseGuards(AuthGuard('jwt'), RoleGuard)
   @Delete(':id')
