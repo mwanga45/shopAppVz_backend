@@ -50,26 +50,39 @@ export class AuthService {
       role: user.role,
     };
   }
-      async  register(Dto:RegisterDTO){
+      async  register(Dto:RegisterDTO):Promise<ResponseType<any>>{
       const existing = await this.userRepository.findOne({
-        where:{
-          email:Dto.email,
-          phone_number:Dto.phone_number,
-          nida:Dto.nida
-        }
+        where:[
+          {email:Dto.email},
+          {nida:Dto.nida},
+          {phone_number:Dto.phone_number}
+        ]
       });
       if(existing){
-        if((existing as any).email === Dto.email) return {exist: true, field: 'email'};
-        if((existing as any).phone_number === Dto.phone_number) return {exist: true, field: 'phone_number'};
-        if((existing as any).nida === Dto.nida) return {exist: true, field: 'nida'};
+        if((existing as any).email === Dto.email) return {
+          message:"email already exist",
+          success:false
+        };
+        if((existing as any).phone_number === Dto.phone_number) return {
+          message:"Phone number is already exist",
+          success:false
+        };
+        if((existing as any).nida === Dto.nida) return {
+          message:"Nida number is already exist",
+          success:false
+        };
       }
 
       const isValid = NidaValidate.validateNidaNumber(Dto.nida)
       if(isValid.Isvalid === false){
         throw new UnauthorizedException(isValid.reason)
+        return{
+          message:"Invalid  nida number format",
+          success:false
+        }
       }
       const hashedPassword = await bcrypt.hash(Dto.password,10)
-      const fullname = Dto.firstname.concat(" ",Dto.lastname)
+      const fullname = Dto.firstname.concat(" ",Dto.secondname)
       const CreateUser = this.userRepository.create({
        email:Dto.email,
        password:hashedPassword,
@@ -79,7 +92,10 @@ export class AuthService {
        role:Dto.role
       });
       await this.userRepository.save(CreateUser)
-      return {exist: false, proceed: true};
+      return {
+        message:"Success register new user",
+        success:true
+      };
     }
 
     

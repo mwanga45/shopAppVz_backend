@@ -23,7 +23,7 @@ export class RegisterDTO{
     @IsString()
     @IsNotEmpty()
     @Length(4,20)
-    lastname:string;
+    secondname:string;
 
     @IsEmail()
     @IsNotEmpty()
@@ -32,7 +32,7 @@ export class RegisterDTO{
     @IsString()
     @Length(6,20)
     @Matches(/^[A-Z].*[@$!%*?&]/,{
-        message:"Password is too week"
+        message:"Password must start with capital letter and contain special character"
     })
     password:string
 

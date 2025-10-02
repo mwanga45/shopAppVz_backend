@@ -19,9 +19,6 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   async register(@Body() dto: RegisterDTO) {
     const result = await this.authService.register(dto);
-    if (result && result.exist === true) {
-      throw new ConflictException({ field: result.field, message: `${result.field} already exists` });
-    }
     return result;
   }
   @UseGuards(AuthGuard('jwt'),RoleGuard)
