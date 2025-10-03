@@ -190,19 +190,34 @@ export class ProductService {
     if(DiscountExist){
       return{
         message:"The product has already have an Discount Do you wish to update it ?",
-        success:false,
+        success:true,
         confirm:true
       }
     }
     if(Dto.UpdateFlag){
+      const existing =  await this.DiscountRepo.findOne({
+        where:{product:{id:Dto.product_id}, Product_start_from:Dto.pnum, percentageDiscaunt:Dto.percentage, CashDiscount:Dto.Amount}
+      })
+      if(existing){
+        return{
+          message:`Update of product ${Dto.product_name} request received but values are identical to existing ones `,
+          success:false
+        }
+      }
       const updateDisc = await this.DiscountRepo.update({product:{id:Dto.product_id}}, {
         Product_start_from:Dto.pnum,
         percentageDiscaunt:Dto.percentage,
         CashDiscount:Dto.Amount
       })
+      if(updateDisc.affected && updateDisc.affected> 0){
+        return{
+          message:"Successfuly Update the Discount of this product",
+          success:true
+        }
+      }
       return{
-        message:"Successfuly Update the Discount of this product",
-        success:true
+        message:`Something went wrong failed to Update`,
+        success:false
       }
     }
     const Create_Disc =  this.DiscountRepo.create({
