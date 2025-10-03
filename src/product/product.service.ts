@@ -176,7 +176,7 @@ export class ProductService {
 
   async ProductAsignDisc (Dto:CreateProductDiscDto):Promise<ResponseType<any>>{
     const Product_existance = await this.Productrepository.findOne({
-      where:{id:Dto.productId}
+      where:{id:Dto.product_id}
     })
     if(!Product_existance){
       return{
@@ -185,13 +185,20 @@ export class ProductService {
       }
     }
     const DiscountExist =  await this.DiscountRepo.findOne({
-      where:{product:{id:Dto.productId},Product_start_from:Dto.productNumber}
+      where:{product:{id:Dto.product_id},Product_start_from:Dto.pnum}
     })
+    if(DiscountExist){
+      return{
+        message:"The product has already have an Discount Do you wish to update it ?",
+        success:false,
+        confirm:true
+      }
+    }
     if(Dto.UpdateFlag){
-      const updateDisc = await this.DiscountRepo.update({product:{id:Dto.productId}}, {
-        Product_start_from:Dto.productNumber,
-        percentageDiscaunt:Dto.percebntage,
-        CashDiscount:Dto.cashDisc
+      const updateDisc = await this.DiscountRepo.update({product:{id:Dto.product_id}}, {
+        Product_start_from:Dto.pnum,
+        percentageDiscaunt:Dto.percentage,
+        CashDiscount:Dto.Amount
       })
       return{
         message:"Successfuly Update the Discount of this product",
@@ -199,13 +206,13 @@ export class ProductService {
       }
     }
     const Create_Disc =  this.DiscountRepo.create({
-      product:{id:Dto.productId},
-      percentageDiscaunt:Dto.percebntage,
-      Product_start_from:Dto.productNumber,
-      CashDiscount:Dto.cashDisc
+      product:{id:Dto.product_id},
+      percentageDiscaunt:Dto.percentage,
+      Product_start_from:Dto.pnum,
+      CashDiscount:Dto.Amount
     })
     return{
-      message:`Successfuly add new Discount of  ${Dto.product_name} start from number ${Dto.productNumber} product`,
+      message:`Successfuly add new Discount of  ${Dto.product_name} start from number ${Dto.pnum} product`,
       success:true
     }
   }

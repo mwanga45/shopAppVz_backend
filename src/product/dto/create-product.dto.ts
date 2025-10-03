@@ -35,19 +35,19 @@ export class CreateProductDto {
 export class CreateProductDiscDto{
     @IsNumber()
     @IsNotEmpty()
-    productId:number
+    product_id:number
 
     @IsNumber()
     @IsNotEmpty()
-    percebntage:number
+    percentage:number
 
     @IsNotEmpty()
     @IsNumber()
-    cashDisc:number
+    Amount:number
 
     @IsNotEmpty()
     @IsNumber()
-    productNumber:number
+    pnum:number
     
     @IsOptional()
     @IsBoolean()
