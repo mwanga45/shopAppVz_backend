@@ -52,6 +52,4 @@ export class CreateProductDiscDto{
     @IsOptional()
     @IsBoolean()
     UpdateFlag:boolean
-
-
 }
