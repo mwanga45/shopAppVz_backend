@@ -39,7 +39,7 @@ export class CreateProductDiscDto{
 
     @IsNumber()
     @IsNotEmpty()
-    percentage:number
+    perc:number
 
     @IsNotEmpty()
     @IsNumber()

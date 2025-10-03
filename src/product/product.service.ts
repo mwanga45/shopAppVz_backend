@@ -196,7 +196,7 @@ export class ProductService {
     }
     if(Dto.UpdateFlag){
       const existing =  await this.DiscountRepo.findOne({
-        where:{product:{id:Dto.product_id}, Product_start_from:Dto.pnum, percentageDiscaunt:Dto.percentage, CashDiscount:Dto.Amount}
+        where:{product:{id:Dto.product_id}, Product_start_from:Dto.pnum, percentageDiscaunt:Dto.perc, CashDiscount:Dto.Amount}
       })
       if(existing){
         return{
@@ -206,7 +206,7 @@ export class ProductService {
       }
       const updateDisc = await this.DiscountRepo.update({product:{id:Dto.product_id}}, {
         Product_start_from:Dto.pnum,
-        percentageDiscaunt:Dto.percentage,
+        percentageDiscaunt:Dto.perc,
         CashDiscount:Dto.Amount,
         user:{id:userId}
       })
@@ -223,7 +223,7 @@ export class ProductService {
     }
     const Create_Disc =  this.DiscountRepo.create({
       product:{id:Dto.product_id},
-      percentageDiscaunt:Dto.percentage,
+      percentageDiscaunt:Dto.perc,
       Product_start_from:Dto.pnum,
       CashDiscount:Dto.Amount,
       user:{id:userId}

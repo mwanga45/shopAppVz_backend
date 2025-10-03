@@ -5,7 +5,7 @@ import { User } from "src/entities/user.entity";
 
 @Entity()
 export class Product_discount extends baseEntity{
-   @Column()
+   @Column('decimal', {precision:10, scale:4})
    percentageDiscaunt:number
 
    @Column()
