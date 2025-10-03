@@ -51,5 +51,9 @@ export class CreateProductDiscDto{
     
     @IsOptional()
     @IsBoolean()
-    UpdateFlag:boolean
+    UpdateFlag:boolean = false
+
+    @IsOptional()
+    @IsString()
+    product_name:string
 }

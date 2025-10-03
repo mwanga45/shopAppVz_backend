@@ -205,7 +205,7 @@ export class ProductService {
       CashDiscount:Dto.cashDisc
     })
     return{
-      message:"Success",
+      message:`Successfuly add new Discount of  ${Dto.product_name} start from number ${Dto.productNumber} product`,
       success:true
     }
   }
