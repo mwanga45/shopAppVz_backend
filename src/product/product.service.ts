@@ -174,7 +174,7 @@ export class ProductService {
     await this.Productrepository.delete({id})
   }
 
-  async ProductAsignDisc (Dto:CreateProductDiscDto):Promise<ResponseType<any>>{
+  async ProductAsignDisc (Dto:CreateProductDiscDto, userId:number):Promise<ResponseType<any>>{
     const Product_existance = await this.Productrepository.findOne({
       where:{id:Dto.product_id}
     })
@@ -207,7 +207,8 @@ export class ProductService {
       const updateDisc = await this.DiscountRepo.update({product:{id:Dto.product_id}}, {
         Product_start_from:Dto.pnum,
         percentageDiscaunt:Dto.percentage,
-        CashDiscount:Dto.Amount
+        CashDiscount:Dto.Amount,
+        user:{id:userId}
       })
       if(updateDisc.affected && updateDisc.affected> 0){
         return{
@@ -224,8 +225,10 @@ export class ProductService {
       product:{id:Dto.product_id},
       percentageDiscaunt:Dto.percentage,
       Product_start_from:Dto.pnum,
-      CashDiscount:Dto.Amount
+      CashDiscount:Dto.Amount,
+      user:{id:userId}
     })
+    await this.DiscountRepo.save(Create_Disc)
     return{
       message:`Successfuly add new Discount of  ${Dto.product_name} start from number ${Dto.pnum} product`,
       success:true

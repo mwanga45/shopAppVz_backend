@@ -28,10 +28,11 @@ export class ProductController {
     return this.productService.findAll({ category, type });
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), RoleGuard)
   @Post('discount')
-  Create_Disc(@Body() DiscDto:CreateProductDiscDto){
-    return  this.productService.ProductAsignDisc(DiscDto)
+  Create_Disc(@Request() req,@Body() DiscDto:CreateProductDiscDto){
+    const userId = req.user.userId
+    return  this.productService.ProductAsignDisc(DiscDto, userId)
   }
 
 
