@@ -46,6 +46,11 @@ export class ProductController {
   findOne(@Param('id') id: string) {
     return this.productService.findOne(+id);
   }
+  @UseGuards(AuthGuard('jwt'))
+  @Get('spec/:id')
+  async SpecRec(@Param('id') id:string){
+     return  await this.productService.SpecDiscount(id)
+  }
   
   @UseGuards(AuthGuard('jwt'),RoleGuard)
   @Patch(':id')
