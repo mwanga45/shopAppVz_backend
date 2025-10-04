@@ -238,6 +238,7 @@ async SpecDiscount(id: string): Promise<ResponseType<any>> {
     .select('p.product_name', 'product_name')
     .addSelect('D.percentageDiscaunt', 'percentage')
     .addSelect('D.CashDiscount', 'CashDiscount')
+    .addSelect('D.Product_start_from', 'start_from')
     .addSelect('D.UpdateAt', 'UpdateAt')
     .where('p.id = :id', { id })
     .getRawOne(); 
@@ -249,7 +250,8 @@ async SpecDiscount(id: string): Promise<ResponseType<any>> {
     }
     return{
       message:"successfuly  return",
-      success:true
+      success:true,
+      data:spec
     }
   }
   async ReturnDiscount ():Promise<ResponseType<any>>{
@@ -258,12 +260,14 @@ async SpecDiscount(id: string): Promise<ResponseType<any>> {
     .select('p.product_name', 'p.product_name')
     .addSelect('D.percentageDiscaunt', 'percentage')
     .addSelect('D.CashDiscount', 'CashDiscount')
+    .addSelect('D.Product_start_from', 'start_from')
     .addSelect('D.UpdateAt', 'UpdateAt')
     .groupBy('p.id')
     .addGroupBy('D.id')
     .addGroupBy('p.product_name')
     .addGroupBy('D.percentageDiscaunt')
     .addGroupBy('D.CashDiscount')
+    .addGroupBy('D.Product_start_from')
     .addGroupBy('D.UpdateAt')
 
     .getRawMany()
