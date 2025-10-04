@@ -232,7 +232,21 @@ export class ProductService {
       success:true
     }
   }
-  async SpecDiscount():Promise<ResponseType<any>>{
+async SpecDiscount(id: number): Promise<ResponseType<any>> {
+  const spec = await this.DiscountRepo.createQueryBuilder('D')
+    .leftJoin('D.product', 'p')
+    .select('p.product_name', 'product_name')
+    .addSelect('D.percentageDiscaunt', 'percentage')
+    .addSelect('D.CashDiscount', 'CashDiscount')
+    .addSelect('D.UpdateAt', 'UpdateAt')
+    .where('p.id = :id', { id })
+    .getRawMany(); 
+    if(spec.length === 0){
+      return{
+        message:"No record od Discount for this product",
+        success:false
+      }
+    }
     return{
       message:"successfuly  return",
       success:true
