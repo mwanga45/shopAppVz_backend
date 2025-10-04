@@ -30,6 +30,7 @@ export class ProductController {
 
   @UseGuards(AuthGuard('jwt'), RoleGuard)
   @Post('discount')
+  @HttpCode(200)
   Create_Disc(@Request() req,@Body() DiscDto:CreateProductDiscDto){
     const userId = req.user.userId
     return  this.productService.ProductAsignDisc(DiscDto, userId)

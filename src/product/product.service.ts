@@ -204,11 +204,10 @@ export class ProductService {
           success:false
         }
       }
-      const updateDisc = await this.DiscountRepo.update({product:{id:Dto.product_id}}, {
+      const updateDisc = await this.DiscountRepo.update({product:{id:Dto.product_id}, Product_start_from: Dto.pnum}, {
         Product_start_from:Dto.pnum,
         percentageDiscaunt:Dto.perc,
-        CashDiscount:Dto.Amount,
-        user:{id:userId}
+        CashDiscount:Dto.Amount
       })
       if(updateDisc.affected && updateDisc.affected> 0){
         return{
@@ -217,7 +216,7 @@ export class ProductService {
         }
       }
       return{
-        message:`Something went wrong failed to Update`,
+        message:`No matching discount found to update`,
         success:false
       }
     }
@@ -225,8 +224,7 @@ export class ProductService {
       product:{id:Dto.product_id},
       percentageDiscaunt:Dto.perc,
       Product_start_from:Dto.pnum,
-      CashDiscount:Dto.Amount,
-      user:{id:userId}
+      CashDiscount:Dto.Amount
     })
     await this.DiscountRepo.save(Create_Disc)
     return{
