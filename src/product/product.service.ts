@@ -187,7 +187,7 @@ export class ProductService {
     const DiscountExist =  await this.DiscountRepo.findOne({
       where:{product:{id:Dto.product_id},Product_start_from:Dto.pnum}
     })
-    if(DiscountExist){
+    if(DiscountExist && Dto.UpdateFlag == false){
       return{
         message:"The product has already have an Discount Do you wish to update it ?",
         success:true,
@@ -230,6 +230,40 @@ export class ProductService {
     return{
       message:`Successfuly add new Discount of  ${Dto.product_name} start from number ${Dto.pnum} product`,
       success:true
+    }
+  }
+  async SpecDiscount():Promise<ResponseType<any>>{
+    return{
+      message:"successfuly  return",
+      success:true
+    }
+  }
+  async ReturnDiscount ():Promise<ResponseType<any>>{
+    const DiscResult = await this.DiscountRepo.createQueryBuilder('D')
+    .leftJoin('D.product', 'p')
+    .select('p.product_name', 'p.product_name')
+    .addSelect('D.percentageDiscaunt', 'percentage')
+    .addSelect('D.CashDiscount', 'CashDiscount')
+    .addSelect('D.UpdateAt', 'UpdateAt')
+    .groupBy('p.id')
+    .addGroupBy('D.id')
+    .addGroupBy('p.product_name')
+    .addGroupBy('D.percentageDiscaunt')
+    .addGroupBy('D.CashDiscount')
+    .addGroupBy('D.UpdateAt')
+
+    .getRawMany()
+    if(!DiscResult){
+      return{
+        message:"No Discount of any product exixt",
+        success:false
+      }
+    }
+    return{
+      message:"Success returned",
+      success:true,
+      data:DiscResult
+      
     }
   }
 }

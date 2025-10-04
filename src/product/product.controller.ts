@@ -4,6 +4,7 @@ import { CreateProductDto,CreateProductDiscDto } from './dto/create-product.dto'
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { RoleGuard } from 'src/guard/role.guard';
+import { useContainer } from 'class-validator';
 
 
 @Controller('product')
@@ -35,8 +36,11 @@ export class ProductController {
     const userId = req.user.userId
     return  this.productService.ProductAsignDisc(DiscDto, userId)
   }
-
-
+  @UseGuards(AuthGuard('jwt'))
+  @Get('Disc_result')
+   async ReturnDisc (){
+    return await this.productService.ReturnDiscount()
+  }
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   findOne(@Param('id') id: string) {
