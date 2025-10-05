@@ -7,8 +7,6 @@ import { User } from "src/entities/user.entity";
 
 @Entity()
 export class WholeSales extends baseEntity{
-
-
   @Column()
   @IsString()
   Total_pc_pkg_litre:string
@@ -32,6 +30,9 @@ export class WholeSales extends baseEntity{
 
   @Column({default:0})
   percentage_discount:number
+
+  @Column()
+  paymentstatus:
 
   @ManyToOne(()=> User,(user)=>user.wholesales)
   @JoinColumn({name:'userId'})

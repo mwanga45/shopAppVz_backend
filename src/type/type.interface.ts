@@ -6,3 +6,8 @@ export interface ResponseType<T = any>{
     datasec?:T
     
 }
+export enum paymentstatus{
+    Paid = 'paid',
+    Pending = 'pending...',
+    Parctial = 'partialpaid'
+}
