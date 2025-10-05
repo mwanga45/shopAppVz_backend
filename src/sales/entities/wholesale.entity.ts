@@ -31,7 +31,7 @@ export class WholeSales extends baseEntity{
   percentage_deviation:number
 
   @Column({default:0})
-  percentage_cutoff:number
+  percentage_discount:number
 
   @ManyToOne(()=> User,(user)=>user.wholesales)
   @JoinColumn({name:'userId'})
@@ -40,7 +40,5 @@ export class WholeSales extends baseEntity{
   @ManyToOne(() => Product, (product)=> product.wholesales)
   @JoinColumn({ name: 'productId' })
   product: Product;
-  
- 
 
 }
