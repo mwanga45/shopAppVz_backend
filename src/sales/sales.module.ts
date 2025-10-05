@@ -6,7 +6,6 @@ import { WholeSales} from './entities/wholesale.entity';
 import { RetailSales} from './entities/retailsale.entity'
 import { ProductModule } from 'src/product/product.module';
 import { StockModule } from 'src/stock/stock.module';
-import { SalesHelper } from 'src/common/helper/sales.helper';
 import { Stock,Stock_transaction } from 'src/stock/entities/stock.entity';
 
 @Module({
@@ -16,6 +15,6 @@ import { Stock,Stock_transaction } from 'src/stock/entities/stock.entity';
     StockModule,
   ],
   controllers: [SalesController],
-  providers: [SalesService,SalesHelper],
+  providers: [SalesService],
 })
 export class SalesModule {}
