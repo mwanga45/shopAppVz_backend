@@ -35,7 +35,7 @@ export class SalesService {
         }
       }
       if(FindStock > productAmount){
-
+       const product_status  = 'Not Enough'
         return{
           message:"Not enough product",
           success:true
