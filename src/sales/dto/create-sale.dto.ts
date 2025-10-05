@@ -2,18 +2,42 @@ import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 export class CreateSaleDto {
   @IsString()
   @IsNotEmpty()
-  Total_pc_pkg_litre: string;
+  Total_pc_pkg_litre: number; 
 
   @IsString()
   @IsOptional()
-  product_type:string
+  Product_type:string;
 
   @IsString()
-  product_category:string
+  Product_category:string;
 
   @IsNumber()
   @IsNotEmpty()
-  productId: number;
+  ProductId: number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  Expecte_profit:number;
+
+  @IsNumber()
+  @IsNotEmpty()
+  Net_profit:number;
+
+  @IsNumber()
+  @IsOptional()
+  Discount_percentage:number
+
+  @IsNumber()
+  @IsOptional()
+  Percentage_deviation:number
+
+  @IsNumber()
+  @IsNotEmpty()
+  Revenue:number
+
+  @IsNotEmpty()
+  @IsString()
+  Stock_status:string
 
 }
 

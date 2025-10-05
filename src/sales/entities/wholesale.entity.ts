@@ -23,13 +23,13 @@ export class WholeSales extends baseEntity{
   @Column()
   Expected_Profit:number
 
-  @Column()
+  @Column('decimal', {precision:10, scale:4})
   profit_deviation:number
 
   @Column()
   percentage_deviation:number
 
-  @Column({default:0})
+  @Column('decimal', {precision:10, scale:4 , default:0})
   percentage_discount:number
 
   @Column({default:paymentstatus.Paid})
