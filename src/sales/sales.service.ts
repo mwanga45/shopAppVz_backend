@@ -23,8 +23,7 @@ export class SalesService {
 
   ){}
 
-   StockCheck = async(productId:string):Promise<ResponseType<any>>=>{
-    const id = Number(productId)
+   StockCheck = async(id:number):Promise<ResponseType<any>>=>{
     const FindStock = await this.Stockrepo.createQueryBuilder('s')
     .leftJoin('s.product', 'p')
     .select('s.Total_stock', 'totalstock')
@@ -36,12 +35,17 @@ export class SalesService {
       data:FindStock
      }
   }
-  CheckDiscountCalculate = async (productId):Promise<ResponseType<any>> =>{
+  CheckDiscountCalculate = async (productId:number):Promise<ResponseType<any>> =>{
     const checkDisc =  await this.ProductDiscrepo.createQueryBuilder('d')
-    
+    .leftJoin('d.product', 'p')
+    .select('d.percentageDiscaunt', 'percentageDiscaunt')
+    .addSelect('d.Product_start_from', 'start_from')
+    .where('p.id = :productId', {productId})
+    .getRawMany()
     return{
       message:"Successfuly",
-      success:true
+      success:true,
+      data:checkDisc
     }
   }
   
