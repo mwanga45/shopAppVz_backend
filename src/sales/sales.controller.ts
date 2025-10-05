@@ -6,6 +6,10 @@ import { AuthGuard } from '@nestjs/passport';
 export class SalesController {
   constructor(private readonly salesService: SalesService) {}
 
+@Get(':id')
+async Getproduct(@Param('id')productId:string){
+  return this.salesService.StockCheck(productId)
+}
 
 
 }
