@@ -23,12 +23,13 @@ export class SalesService {
 
   ){}
 
-   StockCheck = async(id:number):Promise<ResponseType<any>>=>{
+   StockCheck = async(id:number,productAmount:number):Promise<ResponseType<any>>=>{
     const FindStock = await this.Stockrepo.createQueryBuilder('s')
     .leftJoin('s.product', 'p')
     .select('s.Total_stock', 'totalstock')
     .where('p.id = :id', {id})
-    .getRawMany()
+    .getRawOne()
+    
      return{
       message:"sucessfuly  return",
       success:true,
@@ -42,10 +43,12 @@ export class SalesService {
     .addSelect('d.Product_start_from', 'start_from')
     .where('p.id = :productId', {productId})
     .getRawMany()
+    
     return{
       message:"Successfuly",
       success:true,
-      data:checkDisc
+      data:checkDisc[0].start_from
+      
     }
   }
   
