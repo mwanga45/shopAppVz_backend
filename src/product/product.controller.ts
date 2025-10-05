@@ -41,6 +41,10 @@ export class ProductController {
    async ReturnDisc (){
     return await this.productService.ReturnDiscount()
   }
+  @Get('salesInfo')
+  async ReturnInfoProduct(){
+    return await this.productService.SalesProductInfo()
+  }
   @UseGuards(AuthGuard('jwt'))
   @Get(':id')
   findOne(@Param('id') id: string) {
