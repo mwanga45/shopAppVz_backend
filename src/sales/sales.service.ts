@@ -28,7 +28,12 @@ export class SalesService {
     .select('s.Total_stock', 'totalstock')
     .where('p.id = :id', {id})
     .getRawOne()
-    
+      if(!FindStock){
+        return{
+          message:"No such product",
+          success:false
+        }
+      }
      return{
       message:"sucessfuly  return",
       success:true,
