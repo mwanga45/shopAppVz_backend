@@ -8,7 +8,6 @@ import { Product } from 'src/product/entities/product.entity';
 import { Stock } from 'src/stock/entities/stock.entity';
 import { RetailSales } from './entities/retailsale.entity';
 import { Product_discount } from 'src/product/entities/discount.entity';
-import { NotFoundException } from '@nestjs/common';
 import { ResponseType } from 'src/type/type.interface';
 
 
