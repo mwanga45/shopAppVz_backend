@@ -34,6 +34,14 @@ export class SalesService {
           success:false
         }
       }
+      if(FindStock > productAmount){
+
+        return{
+          message:"Not enough product",
+          success:true
+          
+        }
+      }
      return{
       message:"sucessfuly  return",
       success:true,
