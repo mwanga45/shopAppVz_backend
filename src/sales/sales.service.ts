@@ -9,6 +9,7 @@ import { Stock } from 'src/stock/entities/stock.entity';
 import { RetailSales } from './entities/retailsale.entity';
 import { Product_discount } from 'src/product/entities/discount.entity';
 import { ResponseType } from 'src/type/type.interface';
+import { StockStatus } from 'src/type/type.interface';
 
 
 @Injectable()
@@ -35,7 +36,7 @@ export class SalesService {
         }
       }
       if(FindStock.totalstock >productAmount){
-       const product_status  = 'Not Enough'
+       const product_status  = StockStatus.NotEnough
         return{
           message:"Not enough product",
           success:true,
@@ -43,10 +44,11 @@ export class SalesService {
           
         }
       }
+      const product_status = StockStatus.Enough
      return{
       message:"sucessfuly  return",
       success:true,
-      data:FindStock
+      data:{...FindStock, product_status }
      }
   }
   CheckDiscountCalculate = async (productId:number):Promise<ResponseType<any>> =>{
