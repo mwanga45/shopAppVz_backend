@@ -8,6 +8,6 @@ export interface ResponseType<T = any>{
 }
 export enum paymentstatus{
     Paid = 'paid',
-    Pending = 'pending...',
+    Pending = 'pending',
     Parctial = 'partialpaid'
 }
