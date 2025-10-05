@@ -4,6 +4,7 @@ import { IsString } from "class-validator";
 import { Product } from "src/product/entities/product.entity";
 import { ManyToOne, JoinColumn } from "typeorm";
 import { User } from "src/entities/user.entity";
+import { paymentstatus } from "src/type/type.interface";
 
 @Entity()
 export class WholeSales extends baseEntity{
@@ -31,8 +32,8 @@ export class WholeSales extends baseEntity{
   @Column({default:0})
   percentage_discount:number
 
-  @Column()
-  paymentstatus:
+  @Column({default:paymentstatus.Paid})
+  paymentstatus:paymentstatus
 
   @ManyToOne(()=> User,(user)=>user.wholesales)
   @JoinColumn({name:'userId'})
