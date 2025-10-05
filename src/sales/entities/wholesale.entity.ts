@@ -21,7 +21,6 @@ export class WholeSales extends baseEntity{
   @IsString()
   Net_profit:number
 
-  
   @Column()
   Expected_Profit:number
 
