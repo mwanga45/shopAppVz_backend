@@ -38,7 +38,8 @@ export class SalesService {
        const product_status  = 'Not Enough'
         return{
           message:"Not enough product",
-          success:true
+          success:true,
+          data:{...FindStock, product_status}
           
         }
       }
