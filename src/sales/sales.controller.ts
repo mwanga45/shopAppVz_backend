@@ -24,18 +24,10 @@ export class SalesController {
     return this.salesService.Retail_Sale_Record(createreDto,userId)
     
   }
-  @Get('wholesales')
-  WholesalesInfo(){
-    return this.salesService.Wholesale()
-  }
+
   @Post()
   create(@Body() createSaleDto: CreateSaleDto) {
     return this.salesService.create(createSaleDto);
-  }
-
-  @Get('retailsale')
-  RetailsalesInfo() {
-    return this.salesService.RetailsSales();
   }
 
   @Get(':id')

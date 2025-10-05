@@ -27,47 +27,7 @@ export class SalesService {
   findAll() {
     return `This action returns all sales`;
   }
-  async Wholesale():Promise<ResponseType<any>>{
-     const wholesalesquery =   await this.ProductRepository.createQueryBuilder("product")
-     .select([
-      "product.id",
-      "product.product_name",
-      "product.product_category",
-      "product.product_type",
-      "product.wpurchase_price",
-      "product.wholesales_price",
-     ])
-     .where("product.product_category = :category",{category:"wholesales"})
-     .getMany();
-     if(wholesalesquery.length === 0){
-      return{
-         message:'"No product avalaible yet"',
-         success:false
-      } 
-     }
-     return {
-      message:"Successfuly",
-      success:true,
-      data:wholesalesquery
-     }
-  }
-  async RetailsSales():Promise<any>{
-    const RetailSales = await this.ProductRepository.createQueryBuilder('product')
-    .select([
-      "product.id",
-      "product.product_name",
-      "product.product_category",
-      "product.product_type",
-      "product.rpurchase_price",
-      "product.retailsales_price"
-    ])
-    .where("product.product_category =:category",{category:"retailsales"})
-    .getMany();
-    if (RetailSales.length === 0){
-      return "No Product Available yet"
-    }
-    return RetailSales
-  }
+
 
   async Whole_Sales_Record(Dto:CreateSaleDto,userId:number):Promise<any>{
    const check_product = await this.ProductRepository.exists({
