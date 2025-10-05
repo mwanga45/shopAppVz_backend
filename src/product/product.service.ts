@@ -243,8 +243,9 @@ async SpecDiscount(id: string): Promise<ResponseType<any>> {
     .addSelect('D.CashDiscount', 'CashDiscount')
     .addSelect('D.Product_start_from', 'start_from')
     .addSelect('D.UpdateAt', 'UpdateAt')
+    .addSelect('p.id', 'id')
     .where('p.id = :id', { id })
-    .getRawOne(); 
+    .getRawMany(); 
     if(spec.length === 0){
       return{
         message:"No record od Discount for this product",

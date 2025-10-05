@@ -7,8 +7,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/product/entities/product.entity';
 import { RetailSales } from './entities/retailsale.entity';
 import { NotFoundException } from '@nestjs/common';
-import { ProductWholesales } from './utils/whole.type';
-import { isDate, isEmpty } from 'class-validator';
 import { SalesHelper } from 'src/common/helper/sales.helper';
 import { ResponseType } from 'src/type/type.interface';
 
