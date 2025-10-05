@@ -3,5 +3,6 @@ export interface ResponseType<T = any>{
     message?:String
     confirm?:boolean
     data?:T
+    datasec?:T
     
 }

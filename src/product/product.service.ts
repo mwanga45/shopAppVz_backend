@@ -6,7 +6,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { And, Repository } from 'typeorm';
 import { ResponseType } from 'src/type/type.interface';
 import { Product_discount } from './entities/discount.entity';
-
+import { WholeSales } from 'src/sales/entities/wholesale.entity';
+import { RetailSales } from 'src/sales/entities/retailsale.entity';
 
 
 type Productpayload = {
@@ -25,7 +26,9 @@ type Productpayload = {
 export class ProductService {
   constructor(
    @InjectRepository(Product) private readonly  Productrepository:Repository<Product>,
-   @InjectRepository(Product_discount) private readonly DiscountRepo:Repository<Product_discount>
+   @InjectRepository(Product_discount) private readonly DiscountRepo:Repository<Product_discount>,
+   @InjectRepository(WholeSales)private  readonly WHsalesrepo:Repository<WholeSales>,
+   @InjectRepository(RetailSales) private  readonly RTsalasrepo:Repository<RetailSales>
   ){}
   
   async create(createProductDto: CreateProductDto, userId:any):Promise<string> {
@@ -67,7 +70,7 @@ export class ProductService {
       retailsales_price:createProductDto.Rs_price,
       wpurchase_price:createProductDto.wpurchase_price,
       rpurchase_price:createProductDto.rpurchase_price,
-      userId:userId
+      user:{id:userId}
 
     })
     await this.Productrepository.save(createproduct)
@@ -92,7 +95,7 @@ export class ProductService {
       retailsales_price:Dto.Rs_price,
       wpurchase_price:Dto.wpurchase_price,
       rpurchase_price:Dto.rpurchase_price,
-      userId:userId
+      user:{id:userId}
     })
     return{
       message:`Successfuly made an update product ${Dto.product_name}`,
@@ -254,6 +257,7 @@ async SpecDiscount(id: string): Promise<ResponseType<any>> {
       data:spec
     }
   }
+  
   async ReturnDiscount ():Promise<ResponseType<any>>{
     const DiscResult = await this.DiscountRepo.createQueryBuilder('D')
     .leftJoin('D.product', 'p')
@@ -282,6 +286,18 @@ async SpecDiscount(id: string): Promise<ResponseType<any>> {
       success:true,
       data:DiscResult
       
+    }
+  }
+
+  async SalesProductInfo ():Promise<ResponseType<any>>{
+    const productInfo = await this.Productrepository.createQueryBuilder('p')
+    .leftJoin('p.Product_discount', 'd')
+    .select('p.id', 'id')
+    .select('p.product_name', 'product_name')
+    .select('')
+    return{
+      message:'successfuly',
+      success:true
     }
   }
 }

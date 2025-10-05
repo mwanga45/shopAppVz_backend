@@ -104,7 +104,7 @@ export class SalesService {
       Net_profit: ProfitGenerated, 
       Expected_Profit:ExpectedProfit,
       user:{id:userId},
-      percentage_cutoff:cutoff[1],
+      percentage_discount:cutoff[1],
       Total_pc_pkg_litre: Dto.Total_pc_pkg_litre
 
     })
@@ -152,7 +152,7 @@ export class SalesService {
       Net_profit: ProfitGenerated, 
       Expected_Profit:ExpectedProfit,
       user:{id:userId},
-      percentage_cutoff:cutoff[1],
+      percentage_discount:cutoff[1],
       Total_pc_pkg_litre: Dto.Total_pc_pkg_litre
 
     })
