@@ -11,3 +11,9 @@ export enum paymentstatus{
     Pending = 'pending',
     Parctial = 'partialpaid' 
 }  
+
+export enum StockStatus{
+  Enough = 'Enough',
+  NotEnough = 'NotEnough'
+
+}

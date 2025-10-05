@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateRetailsalesDto, CreateSaleDto } from './dto/create-sale.dto';
+import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
 import { WholeSales } from './entities/wholesale.entity';
 import { Repository } from 'typeorm';
