@@ -9,7 +9,8 @@ export class SalesController {
 @Get(':id')
 async Getproduct(@Param('id')productId:string){
   const id = Number(productId)
-  return this.salesService.CheckDiscountCalculate(id)
+  const Amunt = 60
+  return this.salesService.StockCheck(id, 10)
 }
 
 
