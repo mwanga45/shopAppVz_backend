@@ -292,7 +292,6 @@ async SpecDiscount(id: string): Promise<ResponseType<any>> {
 
   async SalesProductInfo ():Promise<ResponseType<any>>{
     const productInfo = await this.Productrepository.createQueryBuilder('p')
-    .leftJoin('p.disc', 'd')
     .leftJoin('p.stock', 's')
     .select('p.id', 'id')
     .addSelect('p.product_name', 'product_name')
@@ -300,9 +299,6 @@ async SpecDiscount(id: string): Promise<ResponseType<any>> {
     .addSelect('p.product_category', 'product_category')
     .addSelect('p.wholesales_price', 'wholesales_price')
     .addSelect('p.retailsales_price', 'retailsales_price')
-    .addSelect('d.percentageDiscaunt', 'percentageDiscaunt')
-    .addSelect('d.percentageDiscaunt', 'percentageDiscaunt')
-    .addSelect('d.Product_start_from', ' Product_start_from')
     .addSelect('s.Total_stock', 'Total_stock')
     .getRawMany()
     const wholesale = productInfo.filter((item)=> item.product_category === 'wholesales')
