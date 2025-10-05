@@ -1,4 +1,5 @@
 import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
+import { StockStatus } from 'src/type/type.interface';
 export class CreateSaleDto {
   @IsString()
   @IsNotEmpty()
@@ -37,12 +38,21 @@ export class CreateSaleDto {
 
   @IsNotEmpty()
   @IsString()
-  Stock_status:string
-
+  Stock_status:StockStatus
 }
 
 export class SalesResponseDto{
-  
+ @IsNotEmpty()
+ @IsNumber()
+ ProductId:number
+
+ @IsNotEmpty()
+ @IsNumber()
+ Selling_price:number
+
+ @IsNotEmpty()
+ @IsNumber()
+ Total_product:number
 }
 
 
