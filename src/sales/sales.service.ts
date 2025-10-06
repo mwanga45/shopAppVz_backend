@@ -99,6 +99,7 @@ export class SalesService {
   }
 
    CalculateDeviation = async():Promise<ResponseType<any>> =>{
+
     return{
       message:"",
       success:true

@@ -17,3 +17,8 @@ export enum StockStatus{
   NotEnough = 'NotEnough'
 
 }
+export interface DeviationInput< T = any>{
+  percentageDisc?:number
+  sales:number
+  id:number
+}
