@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateSaleDto } from './dto/create-sale.dto';
+import { CreateSaleDto, SalesResponseDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
 import { WholeSales } from './entities/wholesale.entity';
 import { Repository } from 'typeorm';
@@ -63,16 +63,22 @@ export class SalesService {
     .addGroupBy('d.Product_start_from') 
     .addGroupBy('d.id')
     .getRawMany()
-    
-    if(checkDisc.length === 0){
-      const Inforeport = null
+
+    if(!checkDisc){
       return{
-        message:"Product has no  discount",
-        success:false,
-        data:Inforeport
+        message:"Failed to check  check discount info",
+        success:true
       }
     }
     let matchDiscount = null
+    if(checkDisc.length === 0){
+      return{
+        message:"Product has no  discount",
+        success:true,
+        data:matchDiscount
+      }
+    }
+    
     let discountAmount:any
     const SortDisc = checkDisc.sort((a,b)=> a.start_from - b.start_from)
     for(let i = 0; i < SortDisc.length; i++){
@@ -100,7 +106,7 @@ export class SalesService {
   }
 
  
-  CalculateDeviation = async(input:DeviationInput):Promise<ResponseType<any>> =>{
+  CalculateDeviation = async( input: DeviationInput):Promise<ResponseType<any>> =>{
      const id = input.id
      const findSale_price = await this.ProductRepository.createQueryBuilder('p')
      .select('p.wholesales_price', 'wholesales_price')
@@ -129,10 +135,11 @@ export class SalesService {
     const per_profitdeviation  = Exp_profit_pereach - pereach_actual_profit
     const  total_productdeviation = Expect_profit - total_profit
     const  revenue_product = Expect_revenue - actual_revenue 
+    const percentageDviation = ( actual_revenue * 100)/Expect_revenue
     return{
       message:"",
       success:true,
-      data:{per_profitdeviation, total_productdeviation , revenue_product}
+      data:{per_profitdeviation, total_productdeviation , revenue_product, percentageDviation}
     }
     }else{
     const Exp_profit_pereach = (actualseling_price - bought_price)/input.percentageDisc
@@ -151,6 +158,42 @@ export class SalesService {
       data:{per_profitdeviation, total_productdeviation , revenue_product, percentageDviation}
     }
     } 
+ }
+
+ async SaleResponse (dto:SalesResponseDto):Promise<ResponseType<any>>{
+  const stock_check =  await this.StockCheck(dto.ProductId,dto.Total_product)
+  if(!stock_check.data.success){
+    return{
+      message:stock_check.data.message,
+      success:false
+    }
+  }
+  const DiscontResult = await this.CheckDiscountCalculate(dto.ProductId, dto.Total_product, )
+  if(!DiscontResult.data.success){
+    return{
+      message:DiscontResult.data.message,
+      success:false
+    }
+  }
+
+const CalculateDeviation = await this.CalculateDeviation({  
+  percentageDisc: DiscontResult.data,
+  id: dto.ProductId,
+  sales: dto.Selling_price,
+  pnum: dto.Total_product})
+  if(!CalculateDeviation.data.success){
+    return{
+      message:CalculateDeviation.data.message,
+      success:false
+    }
+  }
+
+    return{
+    message:"successfuly",
+    success:true,
+    data:{stock_check, DiscontResult, CalculateDeviation}
+  }
+  
  }
 
   }

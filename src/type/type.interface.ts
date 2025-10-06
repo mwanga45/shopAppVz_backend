@@ -18,7 +18,7 @@ export enum StockStatus{
 
 }
 export interface DeviationInput< T = any>{
-  percentageDisc:number
+  percentageDisc:number |null
   sales:number
   id:number
   pnum:number
