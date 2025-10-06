@@ -36,7 +36,7 @@ export class SalesService {
           success:false
         }
       }
-      if(FindStock.totalstock >productAmount){
+      if(FindStock.totalstock < productAmount){
        const product_status  = StockStatus.NotEnough
         return{
           message:"Not enough product",
@@ -92,7 +92,7 @@ export class SalesService {
      return{
         message:"Successfuly find discount ",
         success:true,
-        data:filter_discont
+        data:{filter_discont}
       }
       }
     }
@@ -123,7 +123,7 @@ export class SalesService {
       }
      }
 
-    const actualseling_price = findSale_price.wholesales_price ?? findSale_price.retailsales_price
+    const actualseling_price =  Number(findSale_price.wholesales_price) ?? Number(findSale_price.retailsales_price)
     const bought_price = findSale_price.wpurchase_price ?? findSale_price.rpurchase_price
     if(input.percentageDisc == null){
     const Exp_profit_pereach = actualseling_price - bought_price
@@ -134,24 +134,24 @@ export class SalesService {
     const total_profit = pereach_actual_profit * input.pnum
     const per_profitdeviation  = Exp_profit_pereach - pereach_actual_profit
     const  total_productdeviation = Expect_profit - total_profit
-    const  revenue_product = Expect_revenue - actual_revenue 
-    const percentageDviation = ( actual_revenue * 100)/Expect_revenue
+    const  revenue_product =  input.sales * input.pnum 
+     const percentageDviation = 100 -((revenue_product * 100  )/Expect_revenue)
     return{
-      message:"",
+      message:"y",
       success:true,
-      data:{per_profitdeviation, total_productdeviation , revenue_product, percentageDviation}
+      data:{per_profitdeviation, total_productdeviation , revenue_product, percentageDviation ,Expect_revenue}
     }
     }else{
-    const Exp_profit_pereach = (actualseling_price - bought_price)/input.percentageDisc
+    const Exp_profit_pereach = (actualseling_price - bought_price)/Number(input.percentageDisc)
     const Expect_profit = input.pnum * Exp_profit_pereach
-    const Expect_revenue = (actualseling_price * input.pnum)/input.percentageDisc
-    const actual_revenue = (input.sales * input.pnum)/input.percentageDisc
-    const pereach_actual_profit = (input.sales - bought_price) /input.percentageDisc
+    const Expect_revenue = (actualseling_price * input.pnum)/Number(input.percentageDisc)
+    const actual_revenue = (input.sales * input.pnum)/Number(input.percentageDisc)
+    const pereach_actual_profit = (input.sales - bought_price) /Number(input.percentageDisc)
     const total_profit = pereach_actual_profit * input.pnum
     const per_profitdeviation  = Exp_profit_pereach -pereach_actual_profit
     const  total_productdeviation = Expect_profit - total_profit
     const  revenue_product = Expect_revenue - actual_revenue 
-    const percentageDviation = ( actual_revenue * 100)/Expect_revenue
+    const percentageDviation = ((revenue_product * 100 )/Expect_revenue) - 100
     return{
       message:"",
       success:true,
@@ -177,7 +177,7 @@ export class SalesService {
   // }
 
 const CalculateDeviation = await this.CalculateDeviation({  
-  percentageDisc: DiscontResult.data,
+  percentageDisc: DiscontResult.data.filter_discont?.[0]?.percentageDiscaunt ?? null,
   id: dto.ProductId,
   sales: dto.Selling_price,
   pnum: dto.Total_product})
