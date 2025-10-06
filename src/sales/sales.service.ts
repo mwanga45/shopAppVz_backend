@@ -111,6 +111,10 @@ export class SalesService {
 
     const actualseling_price = findSale_price.wholesales_price ?? findSale_price.retailsales_price
     const bought_price = findSale_price.wpurchase_price ?? findSale_price.rpurchase_price
+    const Exp_dif = actualseling_price - bought_price
+    const Expect_profit = input.pnum * Exp_dif
+    const Expect_revenue = actualseling_price * input.pnum
+    const actual_revenue = input.sales * input.pnum
     
     return{
       message:"",
