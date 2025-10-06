@@ -44,7 +44,7 @@ export class SalesService {
           
         }
       }
-      const product_status = StockStatus.Enough
+    const product_status = StockStatus.Enough
      return{
       message:"sucessfuly  return",
       success:true,
@@ -55,15 +55,26 @@ export class SalesService {
     const checkDisc =  await this.ProductDiscrepo.createQueryBuilder('d')
     .leftJoin('d.product', 'p')
     .select('d.percentageDiscaunt', 'percentageDiscaunt')
-    .addSelect('d.Product_start_from', 'start_from')
+    .addSelect('d.Product_start_from', 'start_from') 
     .where('p.id = :productId', {productId})
+    .groupBy('p.id')
+    .addGroupBy('d.percentageDiscaunt')
+    .addGroupBy('d.Product_start_from') 
+    .addGroupBy('d.id')
     .getRawMany()
     
     return{
       message:"Successfuly",
       success:true,
-      data:checkDisc[0].start_from
+      data:checkDisc
       
+    }
+  }
+
+   CalculateDeviation = async():Promise<ResponseType<any>> =>{
+    return{
+      message:"",
+      success:true
     }
   }
   
