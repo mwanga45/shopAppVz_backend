@@ -100,7 +100,18 @@ export class SalesService {
   }
 
    CalculateDeviation = async(input:DeviationInput):Promise<ResponseType<any>> =>{
-     
+     const id = input.id
+     const findSale_price = await this.ProductRepository.createQueryBuilder('p')
+     .select('p.wholesales_price', 'wholesales_price')
+     .addSelect('p.retailsales_price', 'retailsales_price')
+     .addSelect('p,rpurchase_price', 'rpurchase_price')
+     .addSelect('p.wpurchase_price', 'wpurchase_price')
+     .where('p.id = :id',{id})
+     .getRawOne()
+
+    const actualseling_price = findSale_price.wholesales_price ?? findSale_price.retailsales_price
+    const bought_price = findSale_price.wpurchase_price ?? findSale_price.rpurchase_price
+    
     return{
       message:"",
       success:true

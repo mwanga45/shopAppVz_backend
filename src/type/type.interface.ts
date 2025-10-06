@@ -21,4 +21,5 @@ export interface DeviationInput< T = any>{
   percentageDisc?:number
   sales:number
   id:number
+  pnum:number
 }
