@@ -109,13 +109,32 @@ export class SalesService {
      .where('p.id = :id',{id})
      .getRawOne()
 
+     if(!findSale_price){
+      return{
+        message:"No such product",
+        success:false
+      }
+     }
+
     const actualseling_price = findSale_price.wholesales_price ?? findSale_price.retailsales_price
     const bought_price = findSale_price.wpurchase_price ?? findSale_price.rpurchase_price
-    const Exp_dif = actualseling_price - bought_price
-    const Expect_profit = input.pnum * Exp_dif
+    if(input.percentageDisc == null){
+    const Exp_profit_pereach = actualseling_price - bought_price
+    const Expect_profit = input.pnum * Exp_profit_pereach
     const Expect_revenue = actualseling_price * input.pnum
     const actual_revenue = input.sales * input.pnum
-    
+    const actual_profit = input.sales - bought_price
+    const total_profit = actual_profit * input.pnum
+    }else{
+    const Exp_profit_pereach = (actualseling_price - bought_price)/input.percentageDisc
+    const Expect_profit = input.pnum * Exp_profit_pereach
+    const Expect_revenue = (actualseling_price * input.pnum)/input.percentageDisc
+    const actual_revenue = (input.sales * input.pnum)/input.percentageDisc
+    const actual_profit = (input.sales - bought_price) /input.percentageDisc
+    const total_profit = actual_profit * input.pnum
+    }
+  
+     
     return{
       message:"",
       success:true
