@@ -10,6 +10,7 @@ import { RetailSales } from './entities/retailsale.entity';
 import { Product_discount } from 'src/product/entities/discount.entity';
 import { ResponseType } from 'src/type/type.interface';
 import { StockStatus } from 'src/type/type.interface';
+import { DeviationInput } from 'src/type/type.interface';
 
 
 @Injectable()
@@ -98,8 +99,8 @@ export class SalesService {
     }
   }
 
-   CalculateDeviation = async():Promise<ResponseType<any>> =>{
-
+   CalculateDeviation = async(input:DeviationInput):Promise<ResponseType<any>> =>{
+     
     return{
       message:"",
       success:true
