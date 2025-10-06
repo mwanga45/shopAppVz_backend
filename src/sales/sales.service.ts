@@ -162,32 +162,31 @@ export class SalesService {
 
  async SaleResponse (dto:SalesResponseDto):Promise<ResponseType<any>>{
   const stock_check =  await this.StockCheck(dto.ProductId,dto.Total_product)
-  if(!stock_check.data.success){
-    return{
-      message:stock_check.data.message,
-      success:false
-    }
-  }
+  // if(!stock_check.data.success){
+  //   return{
+  //     message:"stock fail",
+  //     success:false
+  //   }
+  // }
   const DiscontResult = await this.CheckDiscountCalculate(dto.ProductId, dto.Total_product, )
-  if(!DiscontResult.data.success){
-    return{
-      message:DiscontResult.data.message,
-      success:false
-    }
-  }
+  // if(!DiscontResult.data.success){
+  //   return{
+  //     message:"Discount fail",
+  //     success:false
+  //   }
+  // }
 
 const CalculateDeviation = await this.CalculateDeviation({  
   percentageDisc: DiscontResult.data,
   id: dto.ProductId,
   sales: dto.Selling_price,
   pnum: dto.Total_product})
-  if(!CalculateDeviation.data.success){
-    return{
-      message:CalculateDeviation.data.message,
-      success:false
-    }
-  }
-
+  // if(!CalculateDeviation.data.success){
+  //   return{
+  //     message:"Deviation fail",
+  //     success:false
+  //   }
+  // }
     return{
     message:"successfuly",
     success:true,
