@@ -51,7 +51,7 @@ export class SalesService {
       data:{...FindStock, product_status }
      }
   }
-  CheckDiscountCalculate = async (productId:number):Promise<ResponseType<any>> =>{
+  CheckDiscountCalculate = async (productId:number,productAmount:number):Promise<ResponseType<any>> =>{
     const checkDisc =  await this.ProductDiscrepo.createQueryBuilder('d')
     .leftJoin('d.product', 'p')
     .select('d.percentageDiscaunt', 'percentageDiscaunt')
@@ -71,12 +71,21 @@ export class SalesService {
         data:Inforeport
       }
     }
+    let matchDiscount = null
     const SortDisc = checkDisc.sort((a,b)=> a.start_from - b.start_from)
-
-    for(let i = 0; i >= SortDisc[i].start_from; i++){
+    for(let i = 0; i < SortDisc.length; i++){
       let currentDisc = SortDisc[i].start_from
-      let nextDIsc = SortDisc[i +1].start_from
-      
+      let nextDIsc = SortDisc[i +1].start_from ? SortDisc[i + 1].start_from: null
+
+      if(productAmount >= currentDisc  && (!nextDIsc ||productAmount < nextDIsc )){
+        matchDiscount = currentDisc;
+     return{
+        message:"Successfuly find discount ",
+        success:true
+        
+      }
+      break
+      }
     }
     
     return{
