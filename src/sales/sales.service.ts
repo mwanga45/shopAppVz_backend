@@ -62,7 +62,8 @@ export class SalesService {
     .addGroupBy('d.Product_start_from') 
     .addGroupBy('d.id')
     .getRawMany()
-    if(!checkDisc){
+    
+    if(checkDisc.length === 0){
       const Inforeport = null
       return{
         message:"Product has no  discount",
@@ -70,11 +71,18 @@ export class SalesService {
         data:Inforeport
       }
     }
+    const SortDisc = checkDisc.sort((a,b)=> a.start_from - b.start_from)
+
+    for(let i = 0; i >= SortDisc[i].start_from; i++){
+      let currentDisc = SortDisc[i].start_from
+      let nextDIsc = SortDisc[i +1].start_from
+      
+    }
     
     return{
       message:"Successfuly",
       success:true,
-      data:checkDisc
+      data:SortDisc
       
     }
   }
