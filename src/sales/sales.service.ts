@@ -99,7 +99,8 @@ export class SalesService {
     }
   }
 
-   CalculateDeviation = async(input:DeviationInput):Promise<ResponseType<any>> =>{
+ 
+  CalculateDeviation = async(input:DeviationInput):Promise<ResponseType<any>> =>{
      const id = input.id
      const findSale_price = await this.ProductRepository.createQueryBuilder('p')
      .select('p.wholesales_price', 'wholesales_price')
@@ -150,11 +151,7 @@ export class SalesService {
       data:{per_profitdeviation, total_productdeviation , revenue_product, percentageDviation}
     }
     } 
-    return{
-      message:"",
-      success:true
-    }
+ }
 
   }
   
-}
