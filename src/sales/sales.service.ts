@@ -123,22 +123,37 @@ export class SalesService {
     const Expect_profit = input.pnum * Exp_profit_pereach
     const Expect_revenue = actualseling_price * input.pnum
     const actual_revenue = input.sales * input.pnum
-    const actual_profit = input.sales - bought_price
-    const total_profit = actual_profit * input.pnum
+    const pereach_actual_profit = input.sales - bought_price
+    const total_profit = pereach_actual_profit * input.pnum
+    const per_profitdeviation  = Exp_profit_pereach - pereach_actual_profit
+    const  total_productdeviation = Expect_profit - total_profit
+    const  revenue_product = Expect_revenue - actual_revenue 
+    return{
+      message:"",
+      success:true,
+      data:{per_profitdeviation, total_productdeviation , revenue_product}
+    }
     }else{
     const Exp_profit_pereach = (actualseling_price - bought_price)/input.percentageDisc
     const Expect_profit = input.pnum * Exp_profit_pereach
     const Expect_revenue = (actualseling_price * input.pnum)/input.percentageDisc
     const actual_revenue = (input.sales * input.pnum)/input.percentageDisc
-    const actual_profit = (input.sales - bought_price) /input.percentageDisc
-    const total_profit = actual_profit * input.pnum
+    const pereach_actual_profit = (input.sales - bought_price) /input.percentageDisc
+    const total_profit = pereach_actual_profit * input.pnum
+    const per_profitdeviation  = Exp_profit_pereach -pereach_actual_profit
+    const  total_productdeviation = Expect_profit - total_profit
+    const  revenue_product = Expect_revenue - actual_revenue 
+    return{
+      message:"",
+      success:true,
+      data:{per_profitdeviation, total_productdeviation , revenue_product}
     }
-  
-     
+    } 
     return{
       message:"",
       success:true
     }
+
   }
   
 }
