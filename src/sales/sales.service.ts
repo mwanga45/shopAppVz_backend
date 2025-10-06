@@ -72,19 +72,21 @@ export class SalesService {
       }
     }
     let matchDiscount = null
+    let discountAmount:any
     const SortDisc = checkDisc.sort((a,b)=> a.start_from - b.start_from)
     for(let i = 0; i < SortDisc.length; i++){
       let currentDisc = SortDisc[i].start_from
-      let nextDIsc = SortDisc[i +1].start_from ? SortDisc[i + 1].start_from: null
-
+      
+      let nextDIsc = SortDisc[i +1]?SortDisc[i + 1].start_from: null
+      
       if(productAmount >= currentDisc  && (!nextDIsc ||productAmount < nextDIsc )){
         matchDiscount = currentDisc;
+        const filter_discont  = SortDisc.filter((item)=> item.start_from === matchDiscount)
      return{
         message:"Successfuly find discount ",
-        success:true
-        
+        success:true,
+        data:filter_discont
       }
-      break
       }
     }
     
