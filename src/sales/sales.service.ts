@@ -143,10 +143,11 @@ export class SalesService {
     const per_profitdeviation  = Exp_profit_pereach -pereach_actual_profit
     const  total_productdeviation = Expect_profit - total_profit
     const  revenue_product = Expect_revenue - actual_revenue 
+    const percentageDviation = ( actual_revenue * 100)/Expect_revenue
     return{
       message:"",
       success:true,
-      data:{per_profitdeviation, total_productdeviation , revenue_product}
+      data:{per_profitdeviation, total_productdeviation , revenue_product, percentageDviation}
     }
     } 
     return{
