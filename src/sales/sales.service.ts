@@ -62,6 +62,14 @@ export class SalesService {
     .addGroupBy('d.Product_start_from') 
     .addGroupBy('d.id')
     .getRawMany()
+    if(!checkDisc){
+      const Inforeport = null
+      return{
+        message:"Product has no  discount",
+        success:false,
+        data:Inforeport
+      }
+    }
     
     return{
       message:"Successfuly",
