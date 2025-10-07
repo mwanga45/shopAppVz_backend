@@ -132,40 +132,42 @@ export class SalesService {
     const Exp_Net_profit = Exp_profit_pereach * input.pnum
     const Net_profit = (input.sales - bought_price)*input.pnum;
     const Profit_deviation = Exp_Net_profit -Net_profit
-    const Expect_profit = input.pnum * Exp_profit_pereach
     const Expect_revenue = actualseling_price * input.pnum
-    const actual_revenue = input.sales * input.pnum
-    const pereach_actual_profit = input.sales - bought_price
-    const per_profitdeviation  = Exp_profit_pereach - pereach_actual_profit
-    const total_profit = pereach_actual_profit * input.pnum
-    const  total_productdeviation = Expect_profit - total_profit
-    const  revenue_product =  input.sales * input.pnum 
-     const percentageDviation = 100 -((revenue_product * 100  )/Expect_revenue)
+    const  Revenue =  input.sales * input.pnum 
+    const deviationFromMeanPercent = ((actualseling_price-input.sales))/Exp_profit_pereach * 100
     return{
-      message:"y",
+      message:"no",
       success:true,
-      data:{per_profitdeviation, total_productdeviation , revenue_product, percentageDviation ,Expect_revenue, Exp_profit_pereach, Exp_Net_profit, Net_profit, Profit_deviation}
+      data:{ Revenue, deviationFromMeanPercent,Expect_revenue, Exp_profit_pereach, Exp_Net_profit, Net_profit, Profit_deviation}
     }
     }else{
-  const discount = Number(input.percentageDisc);
-  const Exp_profit_pereach = (actualseling_price - bought_price) / discount;
-  const Expect_profit = input.pnum * Exp_profit_pereach;
-  const Expect_revenue = (actualseling_price * input.pnum) / discount;
-  const actual_revenue = (input.sales * input.pnum) / discount;
-
-  const pereach_actual_profit = (input.sales - bought_price) / discount;
-  const total_profit = pereach_actual_profit * input.pnum;
-  const per_profitdeviation = Exp_profit_pereach - pereach_actual_profit;
-  const total_productdeviation = Expect_profit - total_profit;
-  const revenue_product = Expect_revenue - actual_revenue;
-
-  // ✅ Corrected percentage deviation:
-  const percentageDviation =
-    ((actual_revenue - Expect_revenue) / Expect_revenue) * 100;
+    if(input.CashDiscount !== null){
+    const Act_sales = actualseling_price - input.CashDiscount
+    const RequestSales_price  = input.sales - input.CashDiscount
+    const Exp_profit_pereach = (actualseling_price - bought_price)- input.CashDiscount
+    const Exp_Net_profit = (Exp_profit_pereach * input.pnum)
+    const Net_profit = (input.sales - bought_price -input.CashDiscount )*input.pnum;
+    const Profit_deviation = Exp_Net_profit - Net_profit
+    const Expect_revenue = (actualseling_price - input.CashDiscount) * input.pnum
+    const  Revenue =  (input.sales - input.CashDiscount) * input.pnum 
+    const deviationFromMeanPercent = ((Act_sales - RequestSales_price )/Exp_profit_pereach) * 100
     return{
-      message:"",
+      message:"yes",
       success:true,
-      data:{per_profitdeviation, total_productdeviation , revenue_product, percentageDviation, actual_revenue}
+      data:{ Revenue, deviationFromMeanPercent,Expect_revenue, Exp_profit_pereach, Exp_Net_profit, Net_profit, Profit_deviation}
+    }
+    }
+    const Exp_profit_pereach = (actualseling_price - bought_price)
+    const Exp_Net_profit = Exp_profit_pereach * input.pnum
+    const Net_profit = (input.sales - bought_price)*input.pnum;
+    const Profit_deviation = Exp_Net_profit -Net_profit
+    const Expect_revenue = actualseling_price * input.pnum
+    const  Revenue =  input.sales * input.pnum 
+    const deviationFromMeanPercent = ((actualseling_price-input.sales))/Exp_profit_pereach * 100
+    return{
+      message:"yes",
+      success:true,
+      data:{ Revenue, deviationFromMeanPercent,Expect_revenue, Exp_profit_pereach, Exp_Net_profit, Net_profit, Profit_deviation}
     }
     } 
  }
@@ -188,6 +190,7 @@ export class SalesService {
 
 const CalculateDeviation = await this.CalculateDeviation({  
   percentageDisc: DiscontResult.data.filter_discont?.[0]?.percentageDiscaunt ?? null,
+  CashDiscount:DiscontResult.data.filter_discont?.[0].CashDiscount ?? null,
   id: dto.ProductId,
   sales: dto.Selling_price,
   pnum: dto.Total_product})

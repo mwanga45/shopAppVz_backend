@@ -21,5 +21,6 @@ export interface DeviationInput< T = any>{
   percentageDisc:number |null
   sales:number
   id:number
-  pnum:number
+  pnum:number,
+  CashDiscount:number | null
 }
