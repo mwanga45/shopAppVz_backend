@@ -129,19 +129,22 @@ export class SalesService {
     const bought_price = findSale_price.wpurchase_price ?? findSale_price.rpurchase_price
     if(input.percentageDisc == null){
     const Exp_profit_pereach = actualseling_price - bought_price
+    const Exp_Net_profit = Exp_profit_pereach * input.pnum
+    const Net_profit = (input.sales - bought_price)*input.pnum;
+    const Profit_deviation = Exp_Net_profit -Net_profit
     const Expect_profit = input.pnum * Exp_profit_pereach
     const Expect_revenue = actualseling_price * input.pnum
     const actual_revenue = input.sales * input.pnum
     const pereach_actual_profit = input.sales - bought_price
-    const total_profit = pereach_actual_profit * input.pnum
     const per_profitdeviation  = Exp_profit_pereach - pereach_actual_profit
+    const total_profit = pereach_actual_profit * input.pnum
     const  total_productdeviation = Expect_profit - total_profit
     const  revenue_product =  input.sales * input.pnum 
      const percentageDviation = 100 -((revenue_product * 100  )/Expect_revenue)
     return{
       message:"y",
       success:true,
-      data:{per_profitdeviation, total_productdeviation , revenue_product, percentageDviation ,Expect_revenue}
+      data:{per_profitdeviation, total_productdeviation , revenue_product, percentageDviation ,Expect_revenue, Exp_profit_pereach, Exp_Net_profit, Net_profit, Profit_deviation}
     }
     }else{
   const discount = Number(input.percentageDisc);
