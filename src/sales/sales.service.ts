@@ -255,7 +255,18 @@ export class SalesService {
    .getRawOne()
 
     if(findProduct_cat.product_category === category.wholesales){
-      
+      // 
+      const saveSale = this.WholesalesRepository.create({
+        product:{id:product_id},
+        Revenue:dto.Revenue,
+        Total_pc_pkg_litre:dto.Total_pc_pkg_litre,
+        Net_profit:dto.Net_profit,
+        paymentstatus:dto.paymentstatus,
+        Expected_Profit:dto.Expecte_profit,
+        profit_deviation:dto.profit_deviation,
+        percentage_deviation:dto.Percentage_deviation,
+        percentage_discount:dto.Discount_percentage
+      })
     }
     return{
       message:"Successfuly  return data",

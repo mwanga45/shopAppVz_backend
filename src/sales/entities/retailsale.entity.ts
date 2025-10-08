@@ -1,6 +1,6 @@
 import { Entity, Column } from 'typeorm';
 import { baseEntity } from 'src/common/base.entity';
-import { IsString } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 import { Product } from 'src/product/entities/product.entity';
 import { ManyToOne, JoinColumn } from 'typeorm';
 import { User } from 'src/entities/user.entity';
@@ -8,8 +8,8 @@ import { paymentstatus } from 'src/type/type.interface';
 @Entity()
 export class RetailSales extends baseEntity {
   @Column()
-  @IsString()
-  Total_pc_pkg_litre: string;
+  @IsNumber()
+  Total_pc_pkg_litre: number;
 
   @Column()
   @IsString()
