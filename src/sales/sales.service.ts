@@ -139,14 +139,16 @@ export class SalesService {
     }
 
     const actualseling_price = Number(
-      findSale_price.retailsales_price != null && findSale_price.retailsales_price !== ''
+      findSale_price.retailsales_price != null &&
+        findSale_price.retailsales_price !== ''
         ? findSale_price.retailsales_price
-        : findSale_price.wholesales_price
+        : findSale_price.wholesales_price,
     );
     const bought_price = Number(
-      findSale_price.wpurchase_price != null && findSale_price.wpurchase_price !== ''
+      findSale_price.wpurchase_price != null &&
+        findSale_price.wpurchase_price !== ''
         ? findSale_price.wpurchase_price
-        : findSale_price.rpurchase_price
+        : findSale_price.rpurchase_price,
     );
     if (input.percentageDisc == null) {
       const Exp_profit_pereach = actualseling_price - bought_price;
@@ -222,7 +224,7 @@ export class SalesService {
       };
     }
   };
-
+  
   async SaleResponse(dto: SalesResponseDto): Promise<ResponseType<any>> {
     const stock_check = await this.StockCheck(dto.ProductId, dto.Total_product);
 
@@ -230,11 +232,12 @@ export class SalesService {
       dto.ProductId,
       dto.Total_product,
     );
- 
+
     const CalculateDeviation = await this.CalculateDeviation({
       percentageDisc:
         DiscontResult?.data?.filter_discont?.[0]?.percentageDiscaunt ?? null,
-      CashDiscount: DiscontResult?.data?.filter_discont?.[0]?.CashDiscount ?? null,
+      CashDiscount:
+        DiscontResult?.data?.filter_discont?.[0]?.CashDiscount ?? null,
       id: dto.ProductId,
       sales: dto.Selling_price,
       pnum: dto.Total_product,
@@ -246,76 +249,79 @@ export class SalesService {
       data: { stock_check, DiscontResult, CalculateDeviation },
     };
   }
-  
-  async SaleRecord (dto:CreateSaleDto):Promise<ResponseType<any>>{
-   const product_id =  dto.ProductId
-   const findProduct_cat = await this.ProductRepository.createQueryBuilder('p')
-   .select('p. product_category', ' product_category')
-   .where('p.id = :product_id', {product_id})
-   .getRawOne()
 
-    if(findProduct_cat.product_category === category.wholesales){
-      if(dto.Stock_status === StockStatus.NotEnough && dto.override === undefined){
-        return{
-          message:"Stock is not Enough  please Add first",
-          success:false
-        }
+  async SaleRecord(dto: CreateSaleDto): Promise<ResponseType<any>> {
+
+    const product_id = dto.ProductId;
+    const findProduct_cat = await this.ProductRepository.createQueryBuilder('p')
+      .select('p. product_category', ' product_category')
+      .where('p.id = :product_id', { product_id })
+      .getRawOne();
+
+    if (findProduct_cat.product_category === category.wholesales) {
+
+      if (
+        dto.Stock_status === StockStatus.NotEnough &&
+        dto.override === undefined
+      ) {
+        return {
+          message: 'Stock is not Enough  please Add first',
+          success: false,
+        };
       }
       const saveSale = this.WholesalesRepository.create({
-        product:{id:product_id},
-        Revenue:dto.Revenue,
-        Total_pc_pkg_litre:dto.Total_pc_pkg_litre,
-        Net_profit:dto.Net_profit,
-        paymentstatus:dto.paymentstatus,
-        Expected_Profit:dto.Expecte_profit,
-        profit_deviation:dto.profit_deviation,
-        percentage_deviation:dto.Percentage_deviation,
-        percentage_discount:dto.Discount_percentage
-      })
-      await this.WholesalesRepository.save(saveSale)
+        product: { id: product_id },
+        Revenue: dto.Revenue,
+        Total_pc_pkg_litre: dto.Total_pc_pkg_litre,
+        Net_profit: dto.Net_profit,
+        paymentstatus: dto.paymentstatus,
+        Expected_Profit: dto.Expecte_profit,
+        profit_deviation: dto.profit_deviation,
+        percentage_deviation: dto.Percentage_deviation,
+        percentage_discount: dto.Discount_percentage,
+      });
+      await this.WholesalesRepository.save(saveSale);
 
-      if(!saveSale){
-        return{
-          message:"failed  to create new sales",
-          success:false
-        }
+      if (!saveSale) {
+        return {
+          message: 'failed  to create new sales',
+          success: false,
+        };
       }
-      const  fetchlastRec =  await this.WholesalesRepository
-      .createQueryBuilder('w')
-      .leftJoin('w.product', 'p')
-      .select([
-        'w.Revenue', 
-        'w.Total_pc_pkg_litre',
-        'w.Net_profit',
-        'w.paymentstatus',
-        'w.Expected_Profit',
-        'w.profit_deviation',
-        'w.percentage_deviation',
-        'w.percentage_discount',
-        'p.product_name'
-      ])
-      .orderBy('w.id', 'DESC')
-      .limit(1)
-      .getOne()
+      const fetchlastRec = await this.WholesalesRepository.createQueryBuilder(
+        'w',
+      )
+        .leftJoin('w.product', 'p')
+        .select([
+          'w.Revenue',
+          'w.Total_pc_pkg_litre',
+          'w.Net_profit',
+          'w.paymentstatus',
+          'w.Expected_Profit',
+          'w.profit_deviation',
+          'w.percentage_deviation',
+          'w.percentage_discount',
+          'p.product_name',
+        ])
+        .orderBy('w.id', 'DESC')
+        .limit(1)
+        .getOne();
 
-      if(!fetchlastRec){
-        return{
-          message:"failed fetched last record",
-          success:false
-        }
+      if (!fetchlastRec) {
+        return {
+          message: 'failed fetched last record',
+          success: false,
+        };
       }
-
-      return{
-      message:"Successfuly  return data",
-      success:true,
-      data:fetchlastRec
+      return {
+        message: 'Successfuly  return data',
+        success: true,
+        data: fetchlastRec,
+      };
     }
-    }
-    return{
-      message:"Successfuly  return data",
-      success:true,
-      
-    }
+    return {
+      message: 'Successfuly  return data',
+      success: true,
+    };
   }
 }
-
