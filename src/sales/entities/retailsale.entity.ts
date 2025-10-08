@@ -28,8 +28,8 @@ export class RetailSales extends baseEntity {
   @Column()
   percentage_deviation: number;
 
-  @Column('decimal', { precision: 10, scale: 4, default: 0 })
-  percentage_discount: number;
+  @Column()
+  percentage_discount: string;
 
   @Column({ default: paymentstatus.Paid })
   paymentstatus: paymentstatus;

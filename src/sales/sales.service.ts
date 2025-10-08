@@ -341,7 +341,6 @@ export class SalesService {
         data: fetchlastRec,
       };
     }
-
     if (
       dto.Stock_status === StockStatus.NotEnough &&
       dto.override === undefined

@@ -9,7 +9,8 @@ export interface ResponseType<T = any>{
 export enum paymentstatus{
     Paid = 'paid',
     Pending = 'pending',
-    Parctial = 'partialpaid' 
+    Parctial = 'partialpaid' ,
+    Dept = 'dept'
 }  
 
 export enum StockStatus{

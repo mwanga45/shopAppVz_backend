@@ -20,7 +20,7 @@ export class CreateSaleDto {
 
   @IsNumber()
   @IsOptional()
-  Discount_percentage:number
+  Discount_percentage:string
 
   @IsNumber()
   @IsOptional()
