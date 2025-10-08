@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/product/entities/product.entity';
 import { RetailSales } from './entities/retailsale.entity';
 import { Product_discount } from 'src/product/entities/discount.entity';
-import { override, ResponseType } from 'src/type/type.interface';
+import { ChangeType, override, ResponseType } from 'src/type/type.interface';
 import { StockStatus } from 'src/type/type.interface';
 import { DeviationInput } from 'src/type/type.interface';
 import { category } from 'src/type/type.interface';
@@ -316,6 +316,14 @@ export class SalesService {
           success: false,
         };
       }
+      const UpdateStockDto:any ={
+        product_id:dto.ProductId,
+        total_stock:dto.Total_pc_pkg_litre,
+        Method:ChangeType.REMOVE,
+        Reasons:'Sold',
+        product_category:findProduct_cat.product_category
+      }
+      
       return {
         message: 'Successfuly  return data',
         success: true,

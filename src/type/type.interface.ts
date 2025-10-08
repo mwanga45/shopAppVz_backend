@@ -37,3 +37,12 @@ export enum override{
   override = 'Override'
   
 }
+export enum StockType {
+    IN = "IN",
+    OUT = "OUT"
+}
+export enum ChangeType {
+    ADD = "add",
+    REMOVE = "Removed",
+    DELETE = "Delete"
+}

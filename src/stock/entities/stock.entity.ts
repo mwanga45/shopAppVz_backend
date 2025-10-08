@@ -2,15 +2,7 @@ import { baseEntity } from "src/common/base.entity";
 import { User } from "src/entities/user.entity";
 import { Product } from "src/product/entities/product.entity";
 import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, OneToMany, OneToOne } from "typeorm";
-export enum StockType {
-    IN = "IN",
-    OUT = "OUT"
-}
-export enum ChangeType {
-    ADD = "add",
-    REMOVE = "Removed",
-    DELETE = "Delete"
-}
+import { ChangeType, StockType } from "src/type/type.interface";
 @Entity()
 export class Stock extends baseEntity {
     @Column()
