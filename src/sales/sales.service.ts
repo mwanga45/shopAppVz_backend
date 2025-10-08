@@ -298,6 +298,13 @@ export class SalesService {
       .limit(1)
       .getOne()
 
+      if(!fetchlastRec){
+        return{
+          message:"failed fetched last record",
+          success:false
+        }
+      }
+
       return{
       message:"Successfuly  return data",
       success:true,
