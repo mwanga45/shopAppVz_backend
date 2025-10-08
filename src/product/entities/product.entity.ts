@@ -6,6 +6,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColu
 import { Product_discount } from "./discount.entity";
 import { product_type } from "src/type/type.interface";
 import { category } from "src/type/type.interface";
+
 @Entity()
 export class Product extends baseEntity{
      @Column()
@@ -46,6 +47,9 @@ export class Product extends baseEntity{
      @OneToMany(()=> Product_discount, disc => disc.product)
      @JoinColumn({name:'product_id'})
      disc:Product_discount[]
+
+     // @ManyToOne(()=> Debt, (debt)=> debt.product)
+     // debt:Debt[]
      
 }
 

@@ -4,7 +4,7 @@ import { Product } from 'src/product/entities/product.entity';
 import { Stock, Stock_transaction } from 'src/stock/entities/stock.entity';
 import { WholeSales } from 'src/sales/entities/wholesale.entity';
 import { Product_discount } from 'src/product/entities/discount.entity';
-import { Debt } from 'src/debt/entities/debt.entity';
+
 export enum UserType {
   Admin ="admin",
   User="user" 
@@ -47,11 +47,6 @@ export class User extends baseEntity {
   @OneToMany(()=> Product_discount, (disc)=> disc.product)
   @JoinColumn({name:"user_id"})
   disc:Product_discount[]
-
-  // @OneToMany(()=> Debt, (debt) => debt.user)
-  // dept:Debt[]
-@OneToMany(() => Debt, (debt) => debt.user)
-debts: Debt[];
 
 
 }
