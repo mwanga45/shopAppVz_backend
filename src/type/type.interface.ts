@@ -24,3 +24,12 @@ export interface DeviationInput< T = any>{
   pnum:number,
   CashDiscount:number | null
 }
+export enum product_type{
+    Liquid= "Liquid",
+    Solid = "Solid"
+}
+export enum  category {
+  wholesales ="wholesales",
+  retailsales= "retailsales"
+
+}

@@ -4,11 +4,11 @@ import { UpdateStockDto } from './dto/update-stock.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChangeType, Stock } from './entities/stock.entity';
 import { Stock_transaction } from './entities/stock.entity';
-import { category, Product } from 'src/product/entities/product.entity';
+import { product_type,category } from 'src/type/type.interface';
 import { Repository } from 'typeorm';
 import { ResponseType } from 'src/type/type.interface';
 import { StockType } from './entities/stock.entity';
-import { from } from 'rxjs';
+import { Product } from 'src/product/entities/product.entity';
 // import { StockUpdateHelper } from 'src/common/helper/stockUpdate,helper';
 // import { WebSocketSubjectConfig } from 'rxjs/webSocket';
 @Injectable()

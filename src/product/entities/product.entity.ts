@@ -4,15 +4,8 @@ import { WholeSales } from "src/sales/entities/wholesale.entity";
 import { Stock, Stock_transaction } from "src/stock/entities/stock.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { Product_discount } from "./discount.entity";
-export enum product_type{
-    Liquid= "Liquid",
-    Solid = "Solid"
-}
-export enum  category {
-  wholesales ="wholesales",
-  retailsales= "retailsales"
-
-}
+import { product_type } from "src/type/type.interface";
+import { category } from "src/type/type.interface";
 @Entity()
 export class Product extends baseEntity{
      @Column()

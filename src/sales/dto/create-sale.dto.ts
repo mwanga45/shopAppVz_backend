@@ -1,7 +1,7 @@
 import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 import { StockStatus } from 'src/type/type.interface';
 export class CreateSaleDto {
-  @IsString()
+  @IsNumber()
   @IsNotEmpty()
   Total_pc_pkg_litre: number; 
 

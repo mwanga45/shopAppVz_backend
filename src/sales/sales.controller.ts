@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Req, HttpCode } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { AuthGuard } from '@nestjs/passport';
-import { SalesResponseDto } from './dto/create-sale.dto';
+import { CreateSaleDto, SalesResponseDto } from './dto/create-sale.dto';
 
 @Controller('sales')
 export class SalesController {
@@ -18,7 +18,11 @@ async Getproduct(@Param('id')productId:string){
  async SaleInfoResponse(@Body() Dto:SalesResponseDto){
   return await this.salesService.SaleResponse(Dto)
  }
-
+ 
+@Post('createProduct')
+async Addsales(@Body () dto:CreateSaleDto){
+  return await this.salesService.SaleRecord(dto)
+}
 
 
 }

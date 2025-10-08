@@ -1,7 +1,8 @@
 import { IsBoolean, IsNumber, IsString } from "class-validator";
-import { product_type } from "../entities/product.entity";
-import { category } from "../entities/product.entity";
+import { product_type } from "src/type/type.interface";
+import { category } from "src/type/type.interface";
 import { IsOptional, IsNotEmpty, IsNumberString } from 'class-validator';
+
 
 export class CreateProductDto {
     @IsString()

@@ -11,6 +11,7 @@ import { Product_discount } from 'src/product/entities/discount.entity';
 import { ResponseType } from 'src/type/type.interface';
 import { StockStatus } from 'src/type/type.interface';
 import { DeviationInput } from 'src/type/type.interface';
+import { category } from 'src/type/type.interface';
 
 @Injectable()
 export class SalesService {
@@ -247,10 +248,19 @@ export class SalesService {
   }
 
   async SaleRecord (dto:CreateSaleDto):Promise<ResponseType<any>>{
-   
+   const product_id =  dto.ProductId
+   const findProduct_cat = await this.ProductRepository.createQueryBuilder('p')
+   .select('p. product_category', ' product_category')
+   .where('p.id = :product_id', {product_id})
+   .getRawOne()
+
+    if(findProduct_cat.product_category === category.wholesales){
+      
+    }
     return{
       message:"Successfuly  return data",
-      success:true
+      success:true,
+      data:findProduct_cat
     }
   }
 }

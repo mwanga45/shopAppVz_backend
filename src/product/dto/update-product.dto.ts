@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsNumber, IsNumberString, IsOptional, IsString } from "class-validator"
-import { category, product_type } from "../entities/product.entity"
+import { product_type, category } from "src/type/type.interface"
 
 
 export class UpdateProductDto{
