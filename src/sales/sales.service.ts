@@ -8,7 +8,7 @@ import { Product } from 'src/product/entities/product.entity';
 import { Stock } from 'src/stock/entities/stock.entity';
 import { RetailSales } from './entities/retailsale.entity';
 import { Product_discount } from 'src/product/entities/discount.entity';
-import { ResponseType } from 'src/type/type.interface';
+import { override, ResponseType } from 'src/type/type.interface';
 import { StockStatus } from 'src/type/type.interface';
 import { DeviationInput } from 'src/type/type.interface';
 import { category } from 'src/type/type.interface';
@@ -255,7 +255,7 @@ export class SalesService {
    .getRawOne()
 
     if(findProduct_cat.product_category === category.wholesales){
-      if(dto.Stock_status === StockStatus.NotEnough){
+      if(dto.Stock_status === StockStatus.NotEnough && dto.override === undefined){
         return{
           message:"Stock is not Enough  please Add first",
           success:false
