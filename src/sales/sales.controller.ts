@@ -18,10 +18,11 @@ async Getproduct(@Param('id')productId:string){
  async SaleInfoResponse(@Body() Dto:SalesResponseDto){
   return await this.salesService.SaleResponse(Dto)
  }
- 
+@UseGuards(AuthGuard('jwt'))
 @Post('createProduct')
-async Addsales(@Body () dto:CreateSaleDto){
-  return await this.salesService.SaleRecord(dto)
+async Addsales(@Request() req,  @Body () dto:CreateSaleDto){
+  const userId  = req.user.userId
+  return await this.salesService.SaleRecord(dto, userId)
 }
 
 

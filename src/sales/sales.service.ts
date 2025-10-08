@@ -28,6 +28,7 @@ export class SalesService {
     @InjectRepository(Stock) private readonly Stockrepo: Repository<Stock>,
     @InjectRepository(Product_discount)
     private readonly ProductDiscrepo: Repository<Product_discount>,
+    private  Stockserv:StockService
   ) {}
 
   StockCheck = async (
@@ -253,7 +254,7 @@ export class SalesService {
     };
   }
 
-  async SaleRecord(dto: CreateSaleDto): Promise<ResponseType<any>> {
+  async SaleRecord(dto: CreateSaleDto, userId:any): Promise<ResponseType<any>> {
 
     const product_id = dto.ProductId;
     const findProduct_cat = await this.ProductRepository.createQueryBuilder('p')
@@ -282,9 +283,9 @@ export class SalesService {
         profit_deviation: dto.profit_deviation,
         percentage_deviation: dto.Percentage_deviation,
         percentage_discount: dto.Discount_percentage,
+        user:{id:userId}
       });
       await this.WholesalesRepository.save(saveSale);
-
       if (!saveSale) {
         return {
           message: 'failed  to create new sales',
@@ -323,7 +324,14 @@ export class SalesService {
         Reasons:'Sold',
         product_category:findProduct_cat.product_category
       }
-      
+      const stockupdate =   await this.Stockserv.updateStock(UpdateStockDto, userId)
+
+      if(! stockupdate.data.success){
+        return{
+          message:"failed to update  stock",
+          success:false
+        }
+      }
       return {
         message: 'Successfuly  return data',
         success: true,
