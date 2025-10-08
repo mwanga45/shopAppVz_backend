@@ -272,6 +272,20 @@ export class SalesService {
         percentage_deviation:dto.Percentage_deviation,
         percentage_discount:dto.Discount_percentage
       })
+      await this.WholesalesRepository.save(saveSale)
+      const  fetchlastRec =  await this.WholesalesRepository
+      .createQueryBuilder('w')
+      .leftJoin('w.product', 'p')
+      .select([
+        'w.Revenue', 
+        'w.Total_pc_pkg_litre',
+        'w.Net_profit',
+        'w.paymentstatus',
+        'w.Expected_Profit',
+        'w.profit_deviation',
+        'w.percentage_deviation',
+        'w.percentage_discount'
+      ])
     }
     return{
       message:"Successfuly  return data",
