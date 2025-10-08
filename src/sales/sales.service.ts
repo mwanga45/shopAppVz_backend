@@ -246,7 +246,7 @@ export class SalesService {
       data: { stock_check, DiscontResult, CalculateDeviation },
     };
   }
-
+  
   async SaleRecord (dto:CreateSaleDto):Promise<ResponseType<any>>{
    const product_id =  dto.ProductId
    const findProduct_cat = await this.ProductRepository.createQueryBuilder('p')
@@ -255,7 +255,12 @@ export class SalesService {
    .getRawOne()
 
     if(findProduct_cat.product_category === category.wholesales){
-      // 
+      if(dto.Stock_status === StockStatus.NotEnough){
+        return{
+          message:"Stock is not Enough  please Add first",
+          success:false
+        }
+      }
       const saveSale = this.WholesalesRepository.create({
         product:{id:product_id},
         Revenue:dto.Revenue,

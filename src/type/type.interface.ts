@@ -33,3 +33,7 @@ export enum  category {
   retailsales= "retailsales"
 
 }
+export enum override{
+  override = 'Override'
+  
+}
