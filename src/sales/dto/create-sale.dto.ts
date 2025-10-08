@@ -5,13 +5,6 @@ export class CreateSaleDto {
   @IsNotEmpty()
   Total_pc_pkg_litre: number; 
 
-  @IsString()
-  @IsOptional()
-  Product_type:string;
-
-  @IsString()
-  Product_category:string;
-
   @IsNumber()
   @IsNotEmpty()
   ProductId: number;

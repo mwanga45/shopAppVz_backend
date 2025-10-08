@@ -125,7 +125,7 @@ export class SalesService {
     const findSale_price = await this.ProductRepository.createQueryBuilder('p')
       .select('p.wholesales_price', 'wholesales_price')
       .addSelect('p.retailsales_price', 'retailsales_price')
-      .addSelect('p,rpurchase_price', 'rpurchase_price')
+      .addSelect('p.rpurchase_price', 'rpurchase_price')
       .addSelect('p.wpurchase_price', 'wpurchase_price')
       .where('p.id = :id', { id })
       .getRawOne();
@@ -137,11 +137,16 @@ export class SalesService {
       };
     }
 
-    const actualseling_price =
-      Number(findSale_price.wholesales_price) ??
-      Number(findSale_price.retailsales_price);
-    const bought_price =
-      findSale_price.wpurchase_price ?? findSale_price.rpurchase_price;
+    const actualseling_price = Number(
+      findSale_price.retailsales_price != null && findSale_price.retailsales_price !== ''
+        ? findSale_price.retailsales_price
+        : findSale_price.wholesales_price
+    );
+    const bought_price = Number(
+      findSale_price.wpurchase_price != null && findSale_price.wpurchase_price !== ''
+        ? findSale_price.wpurchase_price
+        : findSale_price.rpurchase_price
+    );
     if (input.percentageDisc == null) {
       const Exp_profit_pereach = actualseling_price - bought_price;
       const Exp_Net_profit = Exp_profit_pereach * input.pnum;
@@ -227,8 +232,8 @@ export class SalesService {
  
     const CalculateDeviation = await this.CalculateDeviation({
       percentageDisc:
-        DiscontResult.data.filter_discont?.[0]?.percentageDiscaunt ?? null,
-      CashDiscount: DiscontResult.data.filter_discont?.[0].CashDiscount ?? null,
+        DiscontResult?.data?.filter_discont?.[0]?.percentageDiscaunt ?? null,
+      CashDiscount: DiscontResult?.data?.filter_discont?.[0]?.CashDiscount ?? null,
       id: dto.ProductId,
       sales: dto.Selling_price,
       pnum: dto.Total_product,
@@ -240,4 +245,12 @@ export class SalesService {
       data: { stock_check, DiscontResult, CalculateDeviation },
     };
   }
+
+  async SaleRecord ():Promise<ResponseType<any>>{
+    return{
+      message:"Successfuly  return data",
+      success:true
+    }
+  }
 }
+
