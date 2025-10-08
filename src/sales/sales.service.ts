@@ -5,13 +5,16 @@ import { WholeSales } from './entities/wholesale.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/product/entities/product.entity';
-import { Stock } from 'src/stock/entities/stock.entity';
 import { RetailSales } from './entities/retailsale.entity';
 import { Product_discount } from 'src/product/entities/discount.entity';
 import { override, ResponseType } from 'src/type/type.interface';
 import { StockStatus } from 'src/type/type.interface';
 import { DeviationInput } from 'src/type/type.interface';
 import { category } from 'src/type/type.interface';
+import { StockService } from 'src/stock/stock.service';
+import { Stock } from 'src/stock/entities/stock.entity';
+import { Stock_transaction } from 'src/stock/entities/stock.entity';
+
 
 @Injectable()
 export class SalesService {
