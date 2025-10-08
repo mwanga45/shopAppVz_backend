@@ -28,7 +28,7 @@ export class SalesService {
     @InjectRepository(Stock) private readonly Stockrepo: Repository<Stock>,
     @InjectRepository(Product_discount)
     private readonly ProductDiscrepo: Repository<Product_discount>,
-    private  Stockserv:StockService
+    private   readonly Stockserv:StockService
   ) {}
 
   StockCheck = async (
@@ -263,7 +263,6 @@ export class SalesService {
       .getRawOne();
 
     if (findProduct_cat.product_category === category.wholesales) {
-
       if (
         dto.Stock_status === StockStatus.NotEnough &&
         dto.override === undefined
@@ -338,6 +337,7 @@ export class SalesService {
         data: fetchlastRec,
       };
     }
+    
     return {
       message: 'Successfuly  return data',
       success: true,
