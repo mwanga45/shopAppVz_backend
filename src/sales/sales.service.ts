@@ -273,6 +273,13 @@ export class SalesService {
         percentage_discount:dto.Discount_percentage
       })
       await this.WholesalesRepository.save(saveSale)
+
+      if(!saveSale){
+        return{
+          message:"failed  to create new sales",
+          success:false
+        }
+      }
       const  fetchlastRec =  await this.WholesalesRepository
       .createQueryBuilder('w')
       .leftJoin('w.product', 'p')
@@ -284,13 +291,23 @@ export class SalesService {
         'w.Expected_Profit',
         'w.profit_deviation',
         'w.percentage_deviation',
-        'w.percentage_discount'
+        'w.percentage_discount',
+        'p.product_name'
       ])
+      .orderBy('w.id', 'DESC')
+      .limit(1)
+      .getOne()
+
+      return{
+      message:"Successfuly  return data",
+      success:true,
+      data:fetchlastRec
+    }
     }
     return{
       message:"Successfuly  return data",
       success:true,
-      data:findProduct_cat
+      
     }
   }
 }
