@@ -246,7 +246,8 @@ export class SalesService {
     };
   }
 
-  async SaleRecord ():Promise<ResponseType<any>>{
+  async SaleRecord (dto:CreateSaleDto):Promise<ResponseType<any>>{
+   
     return{
       message:"Successfuly  return data",
       success:true
