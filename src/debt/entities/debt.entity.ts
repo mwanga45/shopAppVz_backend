@@ -1,7 +1,7 @@
 import { IsNumber, IsString } from "class-validator"
 import { User } from "src/entities/user.entity"
 import { Product } from "src/product/entities/product.entity"
-import { category, paymentstatus } from "src/type/type.interface"
+import { paymentstatus } from "src/type/type.interface"
 import { Column, JoinColumn, ManyToOne } from "typeorm"
 
 export class Debt {
@@ -31,12 +31,14 @@ export class Debt {
     
       @Column({default:paymentstatus.Paid})
       paymentstatus:paymentstatus
+
+      
     
-      @ManyToOne(()=> User,(user)=>user.wholesales)
-      @JoinColumn({name:'userId'})
-      user:User;
+    //   @ManyToOne(()=> User,(user)=>user.wholesales)
+    //   @JoinColumn({name:'userId'})
+    //   user:User;
     
-      @ManyToOne(() => Product, (product)=> product.wholesales)
-      @JoinColumn({ name: 'productId' })
-      product: Product;
+    //   @ManyToOne(() => Product, (product)=> product.wholesales)
+    //   @JoinColumn({ name: 'productId' })
+    //   product: Product;
 }

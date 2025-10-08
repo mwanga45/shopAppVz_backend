@@ -46,5 +46,6 @@ export class User extends baseEntity {
   @OneToMany(()=> Product_discount, (disc)=> disc.product)
   @JoinColumn({name:"user_id"})
   disc:Product_discount[]
+  
 
 }

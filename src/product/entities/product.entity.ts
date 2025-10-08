@@ -46,5 +46,6 @@ export class Product extends baseEntity{
      @OneToMany(()=> Product_discount, disc => disc.product)
      @JoinColumn({name:'product_id'})
      disc:Product_discount[]
+     
 }
 
