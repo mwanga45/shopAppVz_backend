@@ -64,6 +64,7 @@ export class DebtService {
       Total_pc_pkg_litre: dto.Total_pc_pkg_litre,
       percentage_discount: dto.Discount_percentage,
       paymentstatus: dto.paymentstatus,
+      PaymentDateAt:dto.PaymentDateAt,
       user: { id: userId },
     });
     const saveDebt = await this.DebtRepo.save(AddDebt);
