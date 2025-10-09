@@ -23,6 +23,12 @@ async CreateDept (dto:CreateDebtDto):Promise<ResponseType<any>>{
     where:{id:dto.ProductId}
   })
   const isValidPh_number = this.dialservecheck.CheckDialformat(dto.Phone_number)
+  if(!isValidPh_number.success){
+    return{
+      message:isValidPh_number.message,
+      success:false
+    }
+  }
   if(!findproduct){
     return{
       message:"Product is not exist",

@@ -19,11 +19,12 @@ export class OrderService {
   private ordertype:Ordertype[] = [] 
   async createOrder(dto:CreateOrderDto) :Promise<Ordertype>{
      const dial_number = this.validator.CheckDialformat(dto.client_phone)
+     
     const create =  this.orderRepo.create({
       product_name:dto.product_name,
       userId:dto.user_id,
       client_name:dto.client_name,
-      client_phone:dial_number,
+      client_phone:dial_number.data,
       OrderDate:dto.OrderDate
     })
     return this.orderRepo.save(create)
