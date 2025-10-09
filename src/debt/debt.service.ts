@@ -58,8 +58,8 @@ async CreateDept (dto:CreateDebtDto,userId:any):Promise<ResponseType<any>>{
     paymentstatus:dto.paymentstatus,
     user:{id:userId}
   })
-  await this.DebtRepo.save(AddDebt)
-  if(!AddDebt || !AddDebt.id){
+ const saveDebt = await this.DebtRepo.save(AddDebt)
+  if(!saveDebt || !saveDebt.id){
     return{
       message:"FailED to add record please try again",
       success:false
@@ -67,20 +67,19 @@ async CreateDept (dto:CreateDebtDto,userId:any):Promise<ResponseType<any>>{
   }
   const Addtrack  =  this.DebtTrackRepo.create({
     paidmoney:dto.Paid,
-    debt:{id:AddDebt.id},
+    debt:{id:saveDebt.id},
     user:{id:userId}
   })
 
-  await this.DebtTrackRepo.save(Addtrack)
+  const savedTrack = await this.DebtTrackRepo.save(Addtrack)
 
-  if(!Addtrack || !Addtrack.id){
+  if(!savedTrack || !savedTrack.id){
     return{
       message:"failed to add debt track",
       success:false
 
     }
   }
-
   if(!findproduct){
     return{
       message:"Product is not exist",
