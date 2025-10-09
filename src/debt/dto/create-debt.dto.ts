@@ -1,4 +1,4 @@
-import { IsNumber, IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import { IsNumber, IsNotEmpty, IsString, IsOptional, IsDate } from 'class-validator';
 import { StockStatus, paymentstatus, override } from 'src/type/type.interface';
 
 export class CreateDebtDto {
@@ -57,4 +57,14 @@ export class CreateDebtDto {
   @IsString()
   @IsOptional()
   location:string
+
+  @IsOptional()
+  @Type(() => Date) 
+  @IsDate()
+  PaymentDateAt: Date;
+
 }
+function Type(arg0: () => DateConstructor): (target: CreateDebtDto, propertyKey: "PaymentDateAt") => void {
+    throw new Error('Function not implemented.');
+}
+

@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsDate, IsNumber, IsString } from 'class-validator';
 import { baseEntity } from 'src/common/base.entity';
 import { User } from 'src/entities/user.entity';
 import { Product } from 'src/product/entities/product.entity';
@@ -42,6 +42,9 @@ export class Debt extends baseEntity {
 
   @Column()
   phone_number: string;
+
+  @Column({type:'timestamp'})
+  PaymentDateAt: Date;
 
   @ManyToOne(() => Product, (product) => product.debt)
   @JoinColumn({ name: 'product_id' })
