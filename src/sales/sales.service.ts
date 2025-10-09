@@ -53,6 +53,7 @@ export class SalesService {
         data: { ...FindStock, product_status },
       };
     }
+
     const product_status = StockStatus.Enough;
     return {
       message: 'sucessfuly  return',

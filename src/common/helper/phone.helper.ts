@@ -1,23 +1,37 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { ResponseType } from "src/type/type.interface";
 
 @Injectable()
 export class dialValidate{
-  CheckDialformat(phone_number:string):string{
+  CheckDialformat(phone_number:string):ResponseType<any>{
       const dial_number = phone_number.trim()
       const regex = /^255\d{9}$/;
 
     if(phone_number.length < 10){
-      throw new UnauthorizedException("Phone number is to short")
+      return{
+        message:"Phone number is to short",
+        success:false
+      }
     }
     if (dial_number.startsWith('0')){
        const number =  phone_number.replace(/^0/,"255")
-       return number
+       return {
+        message:"valid phone number",
+        success:true,
+        data:number
+       }
     }
    
     if(!regex.test(dial_number)){
-        throw new UnauthorizedException("Invalid Phone nuber format")
+        return{
+          message:"Invalid Phone nuber format",
+          success:false
+        }
     }
     
-    return dial_number
+    return{
+      message:"Valid phone number",
+      success:true
+    } 
   }
 }
