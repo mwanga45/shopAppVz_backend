@@ -6,10 +6,16 @@ import { UpdateDebtDto } from './dto/update-debt.dto';
 @Controller('debt')
 export class DebtController {
   constructor(private readonly debtService: DebtService) {}
+
   @Post('create_Debt')
   CreateDebt(@Request()  req, @Body()dto:CreateDebtDto){
     const  userId = req.user.userId
     return  this.debtService.CreateDept(dto, userId)
   }
+  @Patch(':id')
+  UpdateDebt(@Request() req , @Body() dto:UpdateDebtDto){
+    
+  }
+  
   
 }

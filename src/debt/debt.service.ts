@@ -86,9 +86,18 @@ async CreateDept (dto:CreateDebtDto,userId:any):Promise<ResponseType<any>>{
     }
   }
   return{
-    message:"succ",
+    message:"successfuly Add and make followup data",
     success:true
 
   }
 }
+async UpdateDebt(dto:UpdateDebtDto, userId:any, id:any):Promise<ResponseType<any>>{
+  return{
+    message:'successfuly  update debt',
+    success:false
+
+  }
+
 }
+}
+
