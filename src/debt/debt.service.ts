@@ -1,26 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDebtDto } from './dto/create-debt.dto';
 import { UpdateDebtDto } from './dto/update-debt.dto';
+import { ResponseType } from 'src/type/type.interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Debt } from './entities/debt.entity';
+import { Debt_track } from './entities/debt.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class DebtService {
-  create(createDebtDto: CreateDebtDto) {
-    return 'This action adds a new debt';
-  }
+  constructor(
+   @InjectRepository(Debt) private readonly DebtRepo:Repository<Debt>,
+   @InjectRepository(Debt_track) private readonly DebtTrackRepo:Repository<Debt_track>
 
-  findAll() {
-    return `This action returns all debt`;
-  }
+  ){}
 
-  findOne(id: number) {
-    return `This action returns a #${id} debt`;
-  }
+async CreateDept ():Promise<ResponseType<any>>{
+  
+  return{
+    message:"succ",
+    success:true
 
-  update(id: number, updateDebtDto: UpdateDebtDto) {
-    return `This action updates a #${id} debt`;
   }
-
-  remove(id: number) {
-    return `This action removes a #${id} debt`;
-  }
+}
 }
