@@ -1,7 +1,16 @@
+import { IsString } from "class-validator";
 import { baseEntity } from "src/common/base.entity";
-import { Entity } from "typeorm";
+import { Column, Entity } from "typeorm";
 
 @Entity()
 export class Customer extends baseEntity{
+  @Column()
+  @IsString()
+  customer_name: string
+
+  @Column()
+  @IsString()
+  phone_number:string
+
 
 }
