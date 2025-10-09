@@ -20,7 +20,7 @@ export class DebtService {
    private readonly dialservecheck:dialValidate
   ){}
 
-async CreateDept (dto:CreateDebtDto):Promise<ResponseType<any>>{
+async CreateDept (dto:CreateDebtDto,userId:any):Promise<ResponseType<any>>{
   const findproduct  = await this.ProductRepo.findOne({
     where:{id:dto.ProductId}
   })
@@ -54,6 +54,10 @@ async CreateDept (dto:CreateDebtDto):Promise<ResponseType<any>>{
     percentage_deviation:dto.Percentage_deviation,
     profit_deviation:dto.profit_deviation,
     Total_pc_pkg_litre:dto.Total_pc_pkg_litre,
+    percentage_discount:dto.Discount_percentage,
+    paymentstatus:dto.paymentstatus,
+    
+    user:{id:userId}
     
   })
   
