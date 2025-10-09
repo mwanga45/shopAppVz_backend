@@ -12,14 +12,15 @@ export class RetailSales extends baseEntity {
   Total_pc_pkg_litre: number;
 
   @Column()
-  @IsString()
+  @IsNumber()
   Revenue: number;
 
   @Column()
-  @IsString()
+  @IsNumber()
   Net_profit: number;
 
   @Column()
+  @IsNumber()
   Expected_Profit: number;
 
   @Column('decimal', { precision: 10, scale: 4 })

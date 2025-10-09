@@ -13,11 +13,11 @@ export class WholeSales extends baseEntity{
   Total_pc_pkg_litre:number
 
   @Column()
-  @IsString()
+  @IsNumber()
   Revenue:number
 
   @Column()
-  @IsString()
+  @IsNumber()
   Net_profit:number
 
   @Column()
@@ -27,6 +27,7 @@ export class WholeSales extends baseEntity{
   profit_deviation:number
 
   @Column()
+  @IsNumber()
   percentage_deviation:number
 
   @Column()

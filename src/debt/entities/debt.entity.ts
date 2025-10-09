@@ -12,7 +12,7 @@ export class Debt extends baseEntity {
       Total_pc_pkg_litre:number
     
       @Column()
-      @IsString()
+      @IsNumber()
       Revenue:number
     
       @Column()
@@ -50,4 +50,8 @@ export class Debt extends baseEntity {
       @ManyToOne(()=> User, (user) => user.debt)
       @JoinColumn({name:"userId"})
       user:User
+}
+
+export class Debt_track extends baseEntity {
+
 }
