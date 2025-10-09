@@ -6,12 +6,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Debt } from './entities/debt.entity';
 import { Debt_track } from './entities/debt.entity';
 import { Repository } from 'typeorm';
+import { Product } from 'src/product/entities/product.entity';
 
 @Injectable()
 export class DebtService {
   constructor(
    @InjectRepository(Debt) private readonly DebtRepo:Repository<Debt>,
-   @InjectRepository(Debt_track) private readonly DebtTrackRepo:Repository<Debt_track>
+   @InjectRepository(Debt_track) private readonly DebtTrackRepo:Repository<Debt_track>,
+   @InjectRepository(Product) private readonly ProductRepo:Repository<Product>
 
   ){}
 
