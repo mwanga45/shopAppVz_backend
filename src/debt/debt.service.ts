@@ -17,8 +17,10 @@ export class DebtService {
 
   ){}
 
-async CreateDept ():Promise<ResponseType<any>>{
-  
+async CreateDept (dto:CreateDebtDto):Promise<ResponseType<any>>{
+  const findproduct  = await this.ProductRepo.findOne({
+    where:{}
+  })
   return{
     message:"succ",
     success:true

@@ -50,6 +50,7 @@ export class Product extends baseEntity{
      disc:Product_discount[]
 
      @ManyToOne(()=> Debt, (debt)=> debt.product)
+     @JoinColumn({ name: 'product_id' })
      debt:Debt[]
      
 }
