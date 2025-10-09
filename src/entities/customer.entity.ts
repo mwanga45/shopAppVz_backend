@@ -11,6 +11,9 @@ export class Customer extends baseEntity{
   @Column()
   @IsString()
   phone_number:string
-
+  
+  @Column()
+  @IsString()
+  Location:string 
 
 }

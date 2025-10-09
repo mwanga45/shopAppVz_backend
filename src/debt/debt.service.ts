@@ -8,6 +8,7 @@ import { Debt_track } from './entities/debt.entity';
 import { Repository } from 'typeorm';
 import { Product } from 'src/product/entities/product.entity';
 import { dialValidate } from 'src/common/helper/phone.helper';
+import { Customer } from 'src/entities/customer.entity';
 
 @Injectable()
 export class DebtService {
@@ -15,6 +16,7 @@ export class DebtService {
    @InjectRepository(Debt) private readonly DebtRepo:Repository<Debt>,
    @InjectRepository(Debt_track) private readonly DebtTrackRepo:Repository<Debt_track>,
    @InjectRepository(Product) private readonly ProductRepo:Repository<Product>,
+   @InjectRepository(Customer) private readonly CustomerRepo:Repository<Customer>,
    private readonly dialservecheck:dialValidate
   ){}
 
@@ -28,6 +30,12 @@ async CreateDept (dto:CreateDebtDto):Promise<ResponseType<any>>{
       message:isValidPh_number.message,
       success:false
     }
+  }
+  const checkUserphone_exist =  await this.CustomerRepo.findOne({
+    where:{phone_number:isValidPh_number.data}
+  })
+  if(!checkUserphone_exist){
+    const addCustomer = this.CustomerRepo.create()
   }
   if(!findproduct){
     return{
