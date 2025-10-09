@@ -56,11 +56,30 @@ async CreateDept (dto:CreateDebtDto,userId:any):Promise<ResponseType<any>>{
     Total_pc_pkg_litre:dto.Total_pc_pkg_litre,
     percentage_discount:dto.Discount_percentage,
     paymentstatus:dto.paymentstatus,
-    
     user:{id:userId}
-    
   })
-  
+  await this.DebtRepo.save(AddDebt)
+  if(!AddDebt || !AddDebt.id){
+    return{
+      message:"FailED to add record please try again",
+      success:false
+    }
+  }
+  const Addtrack  =  this.DebtTrackRepo.create({
+    paidmoney:dto.Paid,
+    debt:{id:AddDebt.id},
+    user:{id:userId}
+  })
+
+  await this.DebtTrackRepo.save(Addtrack)
+
+  if(!Addtrack || !Addtrack.id){
+    return{
+      message:"failed to add debt track",
+      success:false
+
+    }
+  }
 
   if(!findproduct){
     return{
