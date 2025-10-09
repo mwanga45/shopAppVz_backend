@@ -101,7 +101,12 @@ async UpdateDebt(dto:UpdateDebtDto, userId:any, id:any):Promise<ResponseType<any
       success:false
     }
   }
-  
+  if(findDebt.paidmoney === findDebt.Revenue){
+    return{
+      message:"The debt is already  been completed paid",
+      success:false
+    }
+  }
   return{
     message:'successfuly  update debt',
     success:false
