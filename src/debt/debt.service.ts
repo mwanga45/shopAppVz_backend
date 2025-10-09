@@ -92,12 +92,21 @@ async CreateDept (dto:CreateDebtDto,userId:any):Promise<ResponseType<any>>{
   }
 }
 async UpdateDebt(dto:UpdateDebtDto, userId:any, id:any):Promise<ResponseType<any>>{
+  const findDebt = await this.DebtRepo.findOne({
+    where:{id:dto.DebtId}
+  })
+  if (!findDebt){
+    return{
+      message:"The Debt is not exist",
+      success:false
+    }
+  }
+  
   return{
     message:'successfuly  update debt',
     success:false
 
   }
-
 }
 }
 

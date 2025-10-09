@@ -13,8 +13,9 @@ export class DebtController {
     return  this.debtService.CreateDept(dto, userId)
   }
   @Patch(':id')
-  UpdateDebt(@Request() req , @Body() dto:UpdateDebtDto){
-    
+  UpdateDebt(@Param('id') id:number , @Request() req , @Body() dto:UpdateDebtDto){
+    const userId =  req.user.userId
+    return this.debtService.UpdateDebt(dto, userId, +id)
   }
   
   
