@@ -51,17 +51,20 @@ export class Debt extends baseEntity {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @OneToMany(()=> Debt_track, (track)=> track.debt)
-  track:Debt_track[]
+  @OneToMany(() => Debt_track, (track) => track.debt)
+  track: Debt_track[];
 }
 
 export class Debt_track extends baseEntity {
-
   @Column()
   paidmoney: number;
 
-  @ManyToOne(()=> Debt, (debt)=> debt.track)
-  @JoinColumn({name:"debt_id"})
-  debt:Debt
 
+  @ManyToOne(() => Debt, (debt) => debt.track)
+  @JoinColumn({ name: 'debt_id' })
+  debt: Debt;
+
+  @ManyToOne(()=> User, (user)=> user.track)
+  @JoinColumn({name:'user_id'})
+  user:User
 }
