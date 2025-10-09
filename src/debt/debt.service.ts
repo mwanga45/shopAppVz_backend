@@ -103,7 +103,7 @@ export class DebtService {
     id: any,
   ): Promise<ResponseType<any>> {
     const findDebt = await this.DebtRepo.findOne({
-      where: { id: dto.DebtId },
+      where: { id:id },
     });
     if (!findDebt) {
       return {
@@ -118,7 +118,7 @@ export class DebtService {
     ) {
       if (findDebt.paymentstatus !== paymentstatus.Paid) {
         const checkpayementstatus = await this.DebtRepo.update(
-          { id: id },
+          { id:id},
           { paymentstatus: paymentstatus.Paid },
         );
         if (
@@ -150,7 +150,6 @@ export class DebtService {
       user: { id: userId },
     });
     const savedTrack = await this.DebtTrackRepo.save(AddDebtTrack);
-
     if (!savedTrack || !savedTrack.id) {
       return {
         message: 'Failed to addtrack',
@@ -159,7 +158,7 @@ export class DebtService {
     }
     return {
       message: 'successfuly  update debt',
-      success: false,
+      success: true,
     };
   }
 }

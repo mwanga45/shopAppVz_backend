@@ -11,10 +11,6 @@ export class CreateDebtDto {
   ProductId: number;
 
   @IsNumber()
-  @IsOptional()
-  DebtId:number
-
-  @IsNumber()
   @IsNotEmpty()
   Expecte_profit: number;
 
