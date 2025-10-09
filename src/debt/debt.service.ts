@@ -35,7 +35,11 @@ async CreateDept (dto:CreateDebtDto):Promise<ResponseType<any>>{
     where:{phone_number:isValidPh_number.data}
   })
   if(!checkUserphone_exist){
-    const addCustomer = this.CustomerRepo.create()
+    const addCustomer = this.CustomerRepo.create({
+      customer_name:dto.Debtor_name,
+      phone_number:isValidPh_number.data,
+      Location:dto.location || "none"
+    })
   }
   if(!findproduct){
     return{

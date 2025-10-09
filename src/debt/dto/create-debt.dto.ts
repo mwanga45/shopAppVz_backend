@@ -53,4 +53,7 @@ export class CreateDebtDto {
   @IsNotEmpty()
   @IsNumber()
   Paid: number;
+  @IsString()
+  @IsOptional()
+  location:string
 }
