@@ -18,7 +18,7 @@ export class CreateSaleDto {
   @IsNotEmpty()
   Net_profit:number;
 
-  @IsNumber()
+  @IsString()
   @IsOptional()
   Discount_percentage:string
 

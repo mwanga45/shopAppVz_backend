@@ -259,10 +259,15 @@ export class SalesService {
   ): Promise<ResponseType<any>> {
     const product_id = dto.ProductId;
     const findProduct_cat = await this.ProductRepository.createQueryBuilder('p')
-      .select('p. product_category', ' product_category')
+      .select('p. product_category', 'product_category')
       .where('p.id = :product_id', { product_id })
       .getRawOne();
-
+    if(!findProduct_cat){
+      return{
+        message:"Product is not exist",
+        success:false
+      }
+    }
     if (findProduct_cat.product_category === category.wholesales) {
       if (
         dto.Stock_status === StockStatus.NotEnough &&
@@ -329,9 +334,9 @@ export class SalesService {
         userId,
       );
 
-      if (!stockupdate.data.success) {
+      if (!stockupdate.success) {
         return {
-          message: 'failed to update  stock',
+          message: stockupdate.message,
           success: false,
         };
       }
@@ -341,6 +346,7 @@ export class SalesService {
         data: fetchlastRec,
       };
     }
+  if(findProduct_cat.product_category === category.retailsales){
     if (
       dto.Stock_status === StockStatus.NotEnough &&
       dto.override === undefined
@@ -399,6 +405,7 @@ export class SalesService {
       Reasons: 'Sold',
       product_category: findProduct_cat.product_category,
     };
+    console.log(UpdateStockDto)
     const stockupdate = await this.Stockserv.updateStock(
       UpdateStockDto,
       userId,
@@ -416,4 +423,10 @@ export class SalesService {
       data: fetchlastRec,
     };
   }
+  return{
+      message:"Failed",
+      success:false
+  }
+}
+
 }

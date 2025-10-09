@@ -189,7 +189,7 @@ export class StockService {
       this.recstockRepo.save(newstocktrancrec)
       return{
         message:"Succesfuly Updatw Stock (reduce number stock)",
-        success:false
+        success:true
       }
     }
     return{

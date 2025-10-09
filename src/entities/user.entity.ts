@@ -58,6 +58,7 @@ export class User extends baseEntity {
 
   @OneToMany(() => Debt, (debt) => debt.user)
   debt: Debt[];
+  
   @OneToMany(()=> Debt_track, (track)=> track.user)
   track:Debt_track
 }

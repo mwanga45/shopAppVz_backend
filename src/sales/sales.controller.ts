@@ -7,23 +7,27 @@ import { CreateSaleDto, SalesResponseDto } from './dto/create-sale.dto';
 export class SalesController {
   constructor(private readonly salesService: SalesService) {}
 
+@UseGuards(AuthGuard('jwt'))
+@Post('createsales')
+async Addsales(@Request() req,  @Body () dto:CreateSaleDto){
+  const userId  = req.user.userId
+  return await this.salesService.SaleRecord(dto, userId)
+}
+
+@Post('salesInfo')
+@HttpCode(200)
+ async SaleInfoResponse(@Body() Dto:SalesResponseDto){
+  return await this.salesService.SaleResponse(Dto)
+ }
+
 @Get(':id')
 async Getproduct(@Param('id')productId:string){
   const id = Number(productId)
   
   return this.salesService.CheckDiscountCalculate(id,20)
 }
-@Post('salesInfo')
-@HttpCode(200)
- async SaleInfoResponse(@Body() Dto:SalesResponseDto){
-  return await this.salesService.SaleResponse(Dto)
- }
-@UseGuards(AuthGuard('jwt'))
-@Post('createProduct')
-async Addsales(@Request() req,  @Body () dto:CreateSaleDto){
-  const userId  = req.user.userId
-  return await this.salesService.SaleRecord(dto, userId)
-}
+
+
 
 
 }

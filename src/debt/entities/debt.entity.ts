@@ -55,16 +55,16 @@ export class Debt extends baseEntity {
   track: Debt_track[];
 }
 
+@Entity()
 export class Debt_track extends baseEntity {
   @Column()
   paidmoney: number;
-
 
   @ManyToOne(() => Debt, (debt) => debt.track)
   @JoinColumn({ name: 'debt_id' })
   debt: Debt;
 
-  @ManyToOne(()=> User, (user)=> user.track)
-  @JoinColumn({name:'user_id'})
-  user:User
+  @ManyToOne(() => User, (user) => user.track)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 }
