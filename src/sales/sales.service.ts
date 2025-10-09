@@ -270,8 +270,7 @@ export class SalesService {
     }
     if (findProduct_cat.product_category === category.wholesales) {
       if (
-        dto.Stock_status === StockStatus.NotEnough &&
-        dto.override === undefined
+        dto.Stock_status === StockStatus.NotEnough
       ) {
         return {
           message: 'Stock is not Enough  please Add first',
@@ -411,9 +410,9 @@ export class SalesService {
       userId,
     );
 
-    if (!stockupdate.data.success) {
+    if (!stockupdate.success) {
       return {
-        message: 'failed to update  stock',
+        message: stockupdate.message,
         success: false,
       };
     }
