@@ -11,6 +11,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { SalesModule } from './sales/sales.module';
 import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
+import { DebtModule } from './debt/debt.module';
 
 
 @Module({
@@ -31,6 +32,7 @@ import { OrderModule } from './order/order.module';
     SalesModule,
     ProductModule,
     OrderModule,
+    DebtModule,
   ],
   controllers: [AppController],
   providers: [AppService],
