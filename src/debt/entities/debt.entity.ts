@@ -33,8 +33,11 @@ export class Debt extends baseEntity {
       paymentstatus:paymentstatus
 
       @Column()
+      paidmoney:number
+
+      @Column()
       debtname:string
-      
+
       @Column()
       phone_number:string
 }
