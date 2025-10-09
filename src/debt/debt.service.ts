@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDebtDto } from './dto/create-debt.dto';
 import { UpdateDebtDto } from './dto/update-debt.dto';
-import { ResponseType } from 'src/type/type.interface';
+import { paymentstatus, ResponseType } from 'src/type/type.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Debt } from './entities/debt.entity';
 import { Debt_track } from './entities/debt.entity';
@@ -101,12 +101,25 @@ async UpdateDebt(dto:UpdateDebtDto, userId:any, id:any):Promise<ResponseType<any
       success:false
     }
   }
-  if(findDebt.paidmoney === findDebt.Revenue){
+
+  if(findDebt.paidmoney === findDebt.Revenue || findDebt.paymentstatus === paymentstatus.Paid){
+     if(findDebt.paymentstatus !== paymentstatus.Paid){
+       const checkpayementstatus = await this.DebtRepo.update({id:id}, {paymentstatus:paymentstatus.Paid})
+       if(!checkpayementstatus.affected || checkpayementstatus.affected === 0){
+           return{
+            message:"failed to update  paymentstatus",
+            success:false
+           }
+       }
+     }
+   
     return{
       message:"The debt is already  been completed paid",
       success:false
     }
   }
+
+
   return{
     message:'successfuly  update debt',
     success:false
