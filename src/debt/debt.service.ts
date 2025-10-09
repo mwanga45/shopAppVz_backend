@@ -34,13 +34,30 @@ async CreateDept (dto:CreateDebtDto):Promise<ResponseType<any>>{
   const checkUserphone_exist =  await this.CustomerRepo.findOne({
     where:{phone_number:isValidPh_number.data}
   })
+
   if(!checkUserphone_exist){
     const addCustomer = this.CustomerRepo.create({
       customer_name:dto.Debtor_name,
       phone_number:isValidPh_number.data,
       Location:dto.location || "none"
     })
+    await this.CustomerRepo.save(addCustomer)
   }
+  const AddDebt  = this.DebtRepo.create({
+    product:{id:dto.ProductId},
+    paidmoney:dto.Paid,
+    debtname:dto.Debtor_name,
+    Net_profit:dto.Net_profit,
+    Expected_Profit:dto.Expecte_profit,
+    phone_number:dto.Phone_number,
+    Revenue:dto.Revenue,
+    percentage_deviation:dto.Percentage_deviation,
+    profit_deviation:dto.profit_deviation,
+    Total_pc_pkg_litre:dto.Total_pc_pkg_litre,
+    
+  })
+  
+
   if(!findproduct){
     return{
       message:"Product is not exist",
