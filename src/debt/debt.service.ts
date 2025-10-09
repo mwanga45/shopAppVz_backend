@@ -136,26 +136,26 @@ export class DebtService {
         success: false,
       };
     }
-    const UpdateDebt = await this.DebtRepo.update({id:id},dto) 
+    const UpdateDebt = await this.DebtRepo.update({ id: id }, dto);
 
-    if(!UpdateDebt.affected || UpdateDebt.affected === 0){
-      return{
-        message:"failed to make update",
-        success:false
-      }
+    if (!UpdateDebt.affected || UpdateDebt.affected === 0) {
+      return {
+        message: 'failed to make update',
+        success: false,
+      };
     }
-    const AddDebtTrack =  this.DebtTrackRepo.create({
-        debt:{id:id},
-        paidmoney:dto.Paid,
-        user:{id:userId}
-    })
-    const savedTrack = await this.DebtTrackRepo.save(AddDebtTrack)
+    const AddDebtTrack = this.DebtTrackRepo.create({
+      debt: { id: id },
+      paidmoney: dto.Paid,
+      user: { id: userId },
+    });
+    const savedTrack = await this.DebtTrackRepo.save(AddDebtTrack);
 
-    if(!savedTrack || !savedTrack.id){
-      return{
-        message:"Failed to addtrack",
-        success:false
-      }
+    if (!savedTrack || !savedTrack.id) {
+      return {
+        message: 'Failed to addtrack',
+        success: false,
+      };
     }
     return {
       message: 'successfuly  update debt',
