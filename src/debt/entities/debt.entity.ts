@@ -1,7 +1,9 @@
 import { IsNumber, IsString } from "class-validator";
 import { baseEntity } from "src/common/base.entity";
+import { User } from "src/entities/user.entity";
+import { Product } from "src/product/entities/product.entity";
 import { paymentstatus } from "src/type/type.interface";
-import { Column, Entity } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
 
 @Entity()
 export class Debt extends baseEntity {
@@ -40,4 +42,12 @@ export class Debt extends baseEntity {
 
       @Column()
       phone_number:string
+
+      @ManyToOne(()=> Product, (product)=> product.debt)
+      @JoinColumn({name:'product_id'})
+      product:Product
+
+      @ManyToOne(()=> User, (user) => user.debt)
+      @JoinColumn({name:"userId"})
+      user:User
 }
