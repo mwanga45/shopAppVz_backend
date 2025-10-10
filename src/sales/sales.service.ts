@@ -328,11 +328,10 @@ export class SalesService {
           };
         }
         if (findProduct_cat.product_category === category.retailsales) {
-          if (
-            dto.Stock_status === StockStatus.NotEnough 
-          ) throw new Error('Stock is not Enough for  sale')
-          
-          const saveSale = manager.create(RetailSales,{
+          if (dto.Stock_status === StockStatus.NotEnough)
+            throw new Error('Stock is not Enough for  sale');
+
+          const saveSale = manager.create(RetailSales, {
             product: { id: product_id },
             Revenue: dto.Revenue,
             Total_pc_pkg_litre: dto.Total_pc_pkg_litre,
@@ -345,26 +344,27 @@ export class SalesService {
             user: { id: userId },
           });
           await manager.save(saveSale);
-          if (!saveSale) throw new Error('failed to add sales please try again')
-          const fetchlastRec =
-            await manager.createQueryBuilder(RetailSales,'w')
-              .leftJoin('w.product', 'p')
-              .select([
-                'w.Revenue',
-                'w.Total_pc_pkg_litre',
-                'w.Net_profit',
-                'w.paymentstatus',
-                'w.Expected_Profit',
-                'w.profit_deviation',
-                'w.percentage_deviation',
-                'w.percentage_discount',
-                'p.product_name',
-              ])
-              .orderBy('w.id', 'DESC')
-              .limit(1)
-              .getOne();
+          if (!saveSale)
+            throw new Error('failed to add sales please try again');
+          const fetchlastRec = await manager
+            .createQueryBuilder(RetailSales, 'w')
+            .leftJoin('w.product', 'p')
+            .select([
+              'w.Revenue',
+              'w.Total_pc_pkg_litre',
+              'w.Net_profit',
+              'w.paymentstatus',
+              'w.Expected_Profit',
+              'w.profit_deviation',
+              'w.percentage_deviation',
+              'w.percentage_discount',
+              'p.product_name',
+            ])
+            .orderBy('w.id', 'DESC')
+            .limit(1)
+            .getOne();
 
-          if (!fetchlastRec) throw new Error ('failed to return  sales')
+          if (!fetchlastRec) throw new Error('failed to return  sales');
 
           const UpdateStockDto: any = {
             product_id: dto.ProductId,
@@ -373,10 +373,15 @@ export class SalesService {
             Reasons: 'Sold',
             product_category: findProduct_cat.product_category,
           };
-          
-          const stockupdate = await this.Stockserv.updateStockTransactional(manager, UpdateStockDto,userId)
 
-          if (!stockupdate.success) throw new Error(String(stockupdate.message))
+          const stockupdate = await this.Stockserv.updateStockTransactional(
+            manager,
+            UpdateStockDto,
+            userId,
+          );
+
+          if (!stockupdate.success)
+            throw new Error(String(stockupdate.message));
           return {
             message: 'Successfuly  return data',
             success: true,
@@ -395,50 +400,63 @@ export class SalesService {
       }
     });
   }
-  async TodaySaleAnalysis ():Promise<ResponseType<any>>{
-    return await this.Datasource.transaction(async(manager)=>{
-      try{
-      // return sales record 
-      const date = new Date()
-      const Eachsales = await manager.createQueryBuilder(WholeSales, 'w')
-      .leftJoin('w.product', 'p')
-      .leftJoin('w.user', 'u')
-      .select([
-        'p.product_name','p.id', 'p.product_category', 'w.Total_pc_pkg_litre', 'u.fullname','w.Net_profit', 'w.Revenue'
-      ])
-      .where('DATE(w.CreatedAt) = CURRENT_DATE')
-      .getRawMany()
+  async TodaySaleAnalysis(): Promise<ResponseType<any>> {
+    return await this.Datasource.transaction(async (manager) => {
+      try {
+        // return sales record
+        const date = new Date();
+        const Eachsales = await manager
+          .createQueryBuilder(WholeSales, 'w')
+          .leftJoin('w.product', 'p')
+          .leftJoin('w.user', 'u')
+          .select([
+            'p.product_name',
+            'p.id',
+            'p.product_category',
+            'w.Total_pc_pkg_litre',
+            'u.fullname',
+            'w.Net_profit',
+            'w.Revenue',
+          ])
+          .where('DATE(w.CreatedAt) = CURRENT_DATE')
+          .getRawMany();
 
-      const Salessummary = Object.values(
-        Eachsales.reduce((acc,curr)=> {
-          if(!acc[curr.p_id]){
-            acc[curr.p_id] = {p_id:curr.p_id,w_Revenue:0,w_Net_profit:0,w_Total_pc_pkg_litre:0   }
-          }
-          acc[curr.p_id].w_Revenue += curr.w_Revenue
-          acc[curr.p_id].w_Net_profit += curr.w_Net_profit
-          acc[curr.p_id].w_Total_pc_pkg_litre += curr.w_Total_pc_pkg_litre
-          return acc
-        }, {})
-      )
-      return{
-        message:"successfuly returned",
-        success:true,
-        data:Eachsales,Salessummary
-
+        const Salessummary = Object.values(
+          Eachsales.reduce((acc, curr) => {
+            if (!acc[curr.p_id]) {
+              acc[curr.p_id] = {
+                p_id: curr.p_id,
+                w_Revenue: 0,
+                w_Net_profit: 0,
+                w_Total_pc_pkg_litre: 0,
+                p_product_name: curr.p_product_name,
+                product_category: curr.p_product_category,
+              };
+            }
+            acc[curr.p_id].w_Revenue += curr.w_Revenue;
+            acc[curr.p_id].w_Net_profit += curr.w_Net_profit;
+            acc[curr.p_id].w_Total_pc_pkg_litre += curr.w_Total_pc_pkg_litre;
+            return acc;
+          }, {}),
+        );
+        return {
+          message: 'successfuly returned',
+          success: true,
+          data: Eachsales,
+          Salessummary,
+        };
+      } catch (error) {
+        return {
+          message: `Transcation failed: ${error.message}`,
+          success: false,
+        };
       }
-    }catch(error){
-      return{
-        message:`Transcation failed: ${error.message}`,
-        success:false
-      }
-    }
-    })
+    });
   }
-  async SalesRecordToday ():Promise<ResponseType<any>>{
-    return{
-      message:"successfully ",
-      success:true
-    }
-
+  async SalesRecordToday(): Promise<ResponseType<any>> {
+    return {
+      message: 'successfully ',
+      success: true,
+    };
   }
 }
