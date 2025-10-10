@@ -26,7 +26,7 @@ export class RetailSales extends baseEntity {
   @Column('decimal', { precision: 10, scale: 4 })
   profit_deviation: number;
 
-  @Column()
+  @Column('decimal', {precision:10, scale:5, default:0})
   percentage_deviation: number;
 
   @Column()
