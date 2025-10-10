@@ -59,3 +59,12 @@ export interface MostProfit {
   product_name:string,
   Profit:number
 }
+interface ProductSummary {
+  product_id: number;
+  product_name: string;
+  product_category: string;
+  seller: string;
+  total_quantity: string; 
+  total_revenue: string;  
+  total_profit: string;   
+}
