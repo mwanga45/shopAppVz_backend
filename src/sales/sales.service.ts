@@ -13,7 +13,8 @@ import { DeviationInput } from 'src/type/type.interface';
 import { category } from 'src/type/type.interface';
 import { StockService } from 'src/stock/stock.service';
 import { Stock } from 'src/stock/entities/stock.entity';
-import { Stock_transaction } from 'src/stock/entities/stock.entity';
+import { DataSource } from 'typeorm';
+import { error } from 'console';
 
 @Injectable()
 export class SalesService {
@@ -28,6 +29,7 @@ export class SalesService {
     @InjectRepository(Product_discount)
     private readonly ProductDiscrepo: Repository<Product_discount>,
     private readonly Stockserv: StockService,
+    private readonly Datasource: DataSource,
   ) {}
 
   StockCheck = async (
@@ -258,175 +260,165 @@ export class SalesService {
     dto: CreateSaleDto,
     userId: any,
   ): Promise<ResponseType<any>> {
-    const product_id = dto.ProductId;
-    const findProduct_cat = await this.ProductRepository.createQueryBuilder('p')
-      .select('p. product_category', 'product_category')
-      .where('p.id = :product_id', { product_id })
-      .getRawOne();
-    if(!findProduct_cat){
-      return{
-        message:"Product is not exist",
-        success:false
-      }
-    }
-    if (findProduct_cat.product_category === category.wholesales) {
-      if (
-        dto.Stock_status === StockStatus.NotEnough
-      ) {
-        return {
-          message: 'Stock is not Enough  please Add first',
-          success: false,
-        };
-      }
-      const saveSale = this.WholesalesRepository.create({
-        product: { id: product_id },
-        Revenue: dto.Revenue,
-        Total_pc_pkg_litre: dto.Total_pc_pkg_litre,
-        Net_profit: dto.Net_profit,
-        paymentstatus: dto.paymentstatus,
-        Expected_Profit: dto.Expecte_profit,
-        profit_deviation: dto.profit_deviation,
-        percentage_deviation: dto.Percentage_deviation,
-        percentage_discount: dto.Discount_percentage,
-        user: { id: userId },
-      });
-      await this.WholesalesRepository.save(saveSale);
-      if (!saveSale) {
-        return {
-          message: 'failed  to create new sales',
-          success: false,
-        };
-      }
-      const fetchlastRec = await this.WholesalesRepository.createQueryBuilder(
-        'w',
-      )
-        .leftJoin('w.product', 'p')
-        .select([
-          'w.Revenue',
-          'w.Total_pc_pkg_litre',
-          'w.Net_profit',
-          'w.paymentstatus',
-          'w.Expected_Profit',
-          'w.profit_deviation',
-          'w.percentage_deviation',
-          'w.percentage_discount',
-          'p.product_name',
-        ])
-        .orderBy('w.id', 'DESC')
-        .limit(1)
-        .getOne();
+    return await this.Datasource.transaction(async (manager) => {
+      try {
+        const product_id = dto.ProductId;
+        const findProduct_cat = await manager.createQueryBuilder(Product,
+          'p',
+        )
+          .select('p. product_category', 'product_category')
+          .where('p.id = :product_id', { product_id })
+          .getRawOne();
+        if (!findProduct_cat) throw new Error(findProduct_cat.message)
+        
+        if (findProduct_cat.product_category === category.wholesales) {
+          if (dto.Stock_status === StockStatus.NotEnough) throw new Error('stock is not enough')
+          const saveSale = manager.create(WholeSales,{
+            product: { id: product_id },
+            Revenue: dto.Revenue,
+            Total_pc_pkg_litre: dto.Total_pc_pkg_litre,
+            Net_profit: dto.Net_profit,
+            paymentstatus: dto.paymentstatus,
+            Expected_Profit: dto.Expecte_profit,
+            profit_deviation: dto.profit_deviation,
+            percentage_deviation: dto.Percentage_deviation,
+            percentage_discount: dto.Discount_percentage,
+            user: { id: userId },
+          });
+          await manager.save(saveSale);
+          if (!saveSale) throw  new Error('failed to save wholesales data')
+          const fetchlastRec =
+            await manager.createQueryBuilder(WholeSales,'w')
+              .leftJoin('w.product', 'p')
+              .select([
+                'w.Revenue',
+                'w.Total_pc_pkg_litre',
+                'w.Net_profit',
+                'w.paymentstatus',
+                'w.Expected_Profit',
+                'w.profit_deviation',
+                'w.percentage_deviation',
+                'w.percentage_discount',
+                'p.product_name',
+              ])
+              .orderBy('w.id', 'DESC')
+              .limit(1)
+              .getOne();
 
-      if (!fetchlastRec) {
-        return {
-          message: 'failed fetched last record',
-          success: false,
-        };
-      }
-      const UpdateStockDto: any = {
-        product_id: dto.ProductId,
-        total_stock: dto.Total_pc_pkg_litre,
-        Method: ChangeType.REMOVE,
-        Reasons: 'Sold',
-        product_category: findProduct_cat.product_category,
-      };
-      const stockupdate = await this.Stockserv.updateStock(
-        UpdateStockDto,
-        userId,
-      );
+          if (!fetchlastRec) throw new Error('failed to return data')
+          const UpdateStockDto: any = {
+            product_id: dto.ProductId,
+            total_stock: dto.Total_pc_pkg_litre,
+            Method: ChangeType.REMOVE,
+            Reasons: 'Sold',
+            product_category: findProduct_cat.product_category,
+          };
+          const stockupdate = await this.Stockserv.updateStock(
+            manager,
+            UpdateStockDto,
+            userId,
+          );
 
-      if (!stockupdate.success) {
+          if (!stockupdate.success) {
+            return {
+              message: stockupdate.message,
+              success: false,
+            };
+          }
+          return {
+            message: 'Successfuly  return data',
+            success: true,
+            data: fetchlastRec,
+          };
+        }
+        if (findProduct_cat.product_category === category.retailsales) {
+          if (
+            dto.Stock_status === StockStatus.NotEnough &&
+            dto.override === undefined
+          ) {
+            return {
+              message: 'Stock is not Enough  please Add first',
+              success: false,
+            };
+          }
+          const saveSale = this.RetailsalesRepository.create({
+            product: { id: product_id },
+            Revenue: dto.Revenue,
+            Total_pc_pkg_litre: dto.Total_pc_pkg_litre,
+            Net_profit: dto.Net_profit,
+            paymentstatus: dto.paymentstatus,
+            Expected_Profit: dto.Expecte_profit,
+            profit_deviation: dto.profit_deviation,
+            percentage_deviation: dto.Percentage_deviation,
+            percentage_discount: dto.Discount_percentage,
+            user: { id: userId },
+          });
+          await this.RetailsalesRepository.save(saveSale);
+          if (!saveSale) {
+            return {
+              message: 'failed  to create new sales',
+              success: false,
+            };
+          }
+          const fetchlastRec =
+            await this.RetailsalesRepository.createQueryBuilder('w')
+              .leftJoin('w.product', 'p')
+              .select([
+                'w.Revenue',
+                'w.Total_pc_pkg_litre',
+                'w.Net_profit',
+                'w.paymentstatus',
+                'w.Expected_Profit',
+                'w.profit_deviation',
+                'w.percentage_deviation',
+                'w.percentage_discount',
+                'p.product_name',
+              ])
+              .orderBy('w.id', 'DESC')
+              .limit(1)
+              .getOne();
+
+          if (!fetchlastRec) {
+            return {
+              message: 'failed fetched last record',
+              success: false,
+            };
+          }
+          const UpdateStockDto: any = {
+            product_id: dto.ProductId,
+            total_stock: dto.Total_pc_pkg_litre,
+            Method: ChangeType.REMOVE,
+            Reasons: 'Sold',
+            product_category: findProduct_cat.product_category,
+          };
+          console.log(UpdateStockDto);
+          const stockupdate = await this.Stockserv.updateStock(
+            UpdateStockDto,
+            userId,
+          );
+
+          if (!stockupdate.success) {
+            return {
+              message: stockupdate.message,
+              success: false,
+            };
+          }
+          return {
+            message: 'Successfuly  return data',
+            success: true,
+            data: fetchlastRec,
+          };
+        }
         return {
-          message: stockupdate.message,
+          message: 'Failed',
           success: false,
         };
+      } catch (error) {
+        return {
+          message: `transaction failed ${error.message}`,
+          success:false
+        };
       }
-      return {
-        message: 'Successfuly  return data',
-        success: true,
-        data: fetchlastRec,
-      };
-    }
-  if(findProduct_cat.product_category === category.retailsales){
-    if (
-      dto.Stock_status === StockStatus.NotEnough &&
-      dto.override === undefined
-    ) {
-      return {
-        message: 'Stock is not Enough  please Add first',
-        success: false,
-      };
-    }
-    const saveSale = this.RetailsalesRepository.create({
-      product: { id: product_id },
-      Revenue: dto.Revenue,
-      Total_pc_pkg_litre: dto.Total_pc_pkg_litre,
-      Net_profit: dto.Net_profit,
-      paymentstatus: dto.paymentstatus,
-      Expected_Profit: dto.Expecte_profit,
-      profit_deviation: dto.profit_deviation,
-      percentage_deviation: dto.Percentage_deviation,
-      percentage_discount: dto.Discount_percentage,
-      user: { id: userId },
     });
-    await this.RetailsalesRepository.save(saveSale);
-    if (!saveSale) {
-      return {
-        message: 'failed  to create new sales',
-        success: false,
-      };
-    }
-    const fetchlastRec = await this.RetailsalesRepository.createQueryBuilder('w')
-      .leftJoin('w.product', 'p')
-      .select([
-        'w.Revenue',
-        'w.Total_pc_pkg_litre',
-        'w.Net_profit',
-        'w.paymentstatus',
-        'w.Expected_Profit',
-        'w.profit_deviation',
-        'w.percentage_deviation',
-        'w.percentage_discount',
-        'p.product_name',
-      ])
-      .orderBy('w.id', 'DESC')
-      .limit(1)
-      .getOne();
-
-    if (!fetchlastRec) {
-      return {
-        message: 'failed fetched last record',
-        success: false,
-      };
-    }
-    const UpdateStockDto: any = {
-      product_id: dto.ProductId,
-      total_stock: dto.Total_pc_pkg_litre,
-      Method: ChangeType.REMOVE,
-      Reasons: 'Sold',
-      product_category: findProduct_cat.product_category,
-    };
-    console.log(UpdateStockDto)
-    const stockupdate = await this.Stockserv.updateStock(
-      UpdateStockDto,
-      userId,
-    );
-
-    if (!stockupdate.success) {
-      return {
-        message: stockupdate.message,
-        success: false,
-      };
-    }
-    return {
-      message: 'Successfuly  return data',
-      success: true,
-      data: fetchlastRec,
-    };
   }
-  return{
-      message:"Failed",
-      success:false
-  }
-}
-
 }
