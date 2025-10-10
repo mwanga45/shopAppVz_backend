@@ -313,11 +313,7 @@ export class SalesService {
             Reasons: 'Sold',
             product_category: findProduct_cat.product_category,
           };
-          const stockupdate = await this.Stockserv.updateStock(
-            manager,
-            UpdateStockDto,
-            userId,
-          );
+          const stockupdate  = await this.Stockserv.updateStockTransactional(manager, UpdateStockDto, userId)
 
           if (!stockupdate.success) {
             return {

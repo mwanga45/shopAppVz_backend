@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Stock } from './entities/stock.entity';
 import { Stock_transaction } from './entities/stock.entity';
 import { product_type,category } from 'src/type/type.interface';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { ResponseType } from 'src/type/type.interface';
 import { StockType,ChangeType } from 'src/type/type.interface';
 import { Product } from 'src/product/entities/product.entity';
@@ -197,6 +197,107 @@ export class StockService {
       success:false
     }
   }
+  async updateStockTransactional(
+  manager: EntityManager,
+  updateStockDto: UpdateStockDto,
+  userId: any,
+): Promise<ResponseType<any>> {
+  // Get repository instances from manager (transaction-bound)
+  const stockRepo = manager.getRepository(this.stockRepo.target);
+  const recStockRepo = manager.getRepository(this.recstockRepo.target);
+
+  try {
+    if (updateStockDto.Method === ChangeType.ADD) {
+      const findTotal = await stockRepo.createQueryBuilder('s')
+        .select('s.Total_stock', 'total')
+        .where('s.product_id = :product_id', { product_id: updateStockDto.product_id })
+        .getRawOne<{ total: number }>();
+
+      if (!findTotal) {
+        return { success: false, message: 'Failed to find the targeted product' };
+      }
+
+      const newStock = findTotal.total + updateStockDto.total_stock;
+
+      await stockRepo.update(
+        { product: { id: updateStockDto.product_id } },
+        { Total_stock: newStock, user: { id: userId } },
+      );
+
+      const lastStockTransaction = await recStockRepo.createQueryBuilder('st')
+        .select('st.new_stock', 'newStock')
+        .where('st.product.id = :productId', { productId: updateStockDto.product_id })
+        .orderBy('st.CreatedAt', 'DESC')
+        .getRawOne<{ newStock: number }>();
+
+      const prevStockForNewTransaction = lastStockTransaction ? lastStockTransaction.newStock : 0;
+
+      const updatestocktrans = recStockRepo.create({
+        product: { id: updateStockDto.product_id },
+        product_category: updateStockDto.product_category,
+        type_Enum: StockType.IN,
+        new_stock: newStock,
+        prev_stock: prevStockForNewTransaction,
+        Quantity: updateStockDto.total_stock,
+        Change_type: updateStockDto.Method,
+        user: { id: userId },
+        Reasons: updateStockDto.Reasons,
+      });
+
+      await recStockRepo.save(updatestocktrans);
+
+      return { message: `Successfully updated stock to ${newStock}`, success: true };
+    } else if (updateStockDto.Method === ChangeType.REMOVE) {
+      const findTotal = await stockRepo.createQueryBuilder('s')
+        .select('s.Total_stock', 'total')
+        .where('s.product_id = :product_id', { product_id: updateStockDto.product_id })
+        .getRawOne<{ total: number }>();
+
+      if (!findTotal) {
+        return { message: 'Failed to return total stock', success: false };
+      }
+
+      const updatedStock = findTotal.total - updateStockDto.total_stock;
+
+      await stockRepo.update(
+        { product: { id: updateStockDto.product_id } },
+        { Total_stock: updatedStock, user: { id: userId } },
+      );
+
+      const queryStockTrans = await recStockRepo.createQueryBuilder('S')
+        .select(['S.new_stock', 'S.prev_stock'])
+        .where('S.product_id = :product_id', { product_id: updateStockDto.product_id })
+        .orderBy('S.CreatedAt', 'DESC')
+        .getOne();
+
+      if (!queryStockTrans) {
+        return { message: 'No record of the product in Stock_trans table', success: false };
+      }
+
+      const newStockTrans = queryStockTrans.new_stock - updateStockDto.total_stock;
+
+      const newStockTranRec = recStockRepo.create({
+        user: { id: userId },
+        Quantity: updateStockDto.total_stock,
+        prev_stock: queryStockTrans.new_stock,
+        new_stock: newStockTrans,
+        product: { id: updateStockDto.product_id },
+        type_Enum: StockType.OUT,
+        product_category: updateStockDto.product_category,
+        Change_type: ChangeType.REMOVE,
+        Reasons: updateStockDto.Reasons,
+      });
+
+      await recStockRepo.save(newStockTranRec);
+
+      return { message: 'Successfully updated stock (reduced)', success: true };
+    }
+
+    return { message: 'Failed to update stock, please try again', success: false };
+  } catch (error) {
+    return { message: `Transaction failed: ${error.message}`, success: false };
+  }
+}
 
   async returnStockInfo ():Promise<ResponseType<any>> {
     const getStockInfo = await this.recstockRepo
