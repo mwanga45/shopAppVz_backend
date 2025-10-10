@@ -25,6 +25,10 @@ async Addsales(@Request() req,  @Body () dto:CreateSaleDto){
 async SalesAnalys(){
   return await  this.salesService.TodaySaleAnalysis()
 }
+@Get('salesToday')
+async SaleToday(){
+  return await this.salesService.SalesRecordToday()
+}
 
 @Get(':id')
 async Getproduct(@Param('id')productId:string){

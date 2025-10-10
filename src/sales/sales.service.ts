@@ -485,12 +485,13 @@ export class SalesService {
     'SUM(w.Revenue) AS total_revenue',
     'SUM(w.Net_profit) AS total_profit',
   ])
-  .where('DATE(w."createdAt") = CURRENT_DATE')
+  .where('DATE(w."CreatedAt") = CURRENT_DATE')
    .groupBy('p.id, p.product_name, p.product_category, u.fullname')
   .getRawMany()
      return{
       message: 'successfully ',
       success: true,
+      data:Normalsalesreturn
     };
   }
 }
