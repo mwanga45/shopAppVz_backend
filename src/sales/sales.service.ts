@@ -398,9 +398,18 @@ export class SalesService {
   async TodaySaleAnalysis ():Promise<ResponseType<any>>{
     return await this.Datasource.transaction(async(manager)=>{
       try{
+      // return sales record 
+      const Eachsales = await manager.createQueryBuilder(WholeSales, 'w')
+      .leftJoin('w.product', 'p')
+      .leftJoin('w.user', 'u')
+      .select([
+        'p.product_name','p.id', 'p.product_category', 'w.Total_pc_pkg_litre', 'u.fullname','w.Net_profit', 'w.Revenue'
+      ])
+      .getRawMany()
       return{
         message:"successfuly returned",
-        success:true
+        success:true,
+        data:Eachsales
       }
     }catch(error){
       return{

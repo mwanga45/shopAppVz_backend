@@ -20,6 +20,12 @@ async Addsales(@Request() req,  @Body () dto:CreateSaleDto){
   return await this.salesService.SaleResponse(Dto)
  }
 
+
+@Get('salesAnalysis')
+async SalesAnalys(){
+  return await  this.salesService.TodaySaleAnalysis()
+}
+
 @Get(':id')
 async Getproduct(@Param('id')productId:string){
   const id = Number(productId)
