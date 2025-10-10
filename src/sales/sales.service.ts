@@ -454,7 +454,6 @@ export class SalesService {
             }
            }
         }
-
         return {
           message: 'successfuly returned',
           success: true,
@@ -473,7 +472,23 @@ export class SalesService {
     });
   }
   async SalesRecordToday(): Promise<ResponseType<any>> {
-    return {
+    const Normalsalesreturn  = await this.WholesalesRepository
+    .createQueryBuilder('w')
+    .leftJoin('w.product', 'p')
+    .leftJoin('w.user', 'u')
+   .select([
+    'p.id AS product_id',
+    'p.product_name AS product_name',
+    'p.product_category AS product_category',
+    'u.fullname AS seller',
+    'SUM(w.Total_pc_pkg_litre) AS total_quantity',
+    'SUM(w.Revenue) AS total_revenue',
+    'SUM(w.Net_profit) AS total_profit',
+  ])
+  .where('DATE(w."createdAt") = CURRENT_DATE')
+   .groupBy('p.id, p.product_name, p.product_category, u.fullname')
+  .getRawMany()
+     return{
       message: 'successfully ',
       success: true,
     };
