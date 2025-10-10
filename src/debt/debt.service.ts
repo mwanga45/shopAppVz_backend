@@ -5,7 +5,7 @@ import { paymentstatus, ResponseType } from 'src/type/type.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Debt } from './entities/debt.entity';
 import { Debt_track } from './entities/debt.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Product } from 'src/product/entities/product.entity';
 import { dialValidate } from 'src/common/helper/phone.helper';
 import { Customer } from 'src/entities/customer.entity';
@@ -21,12 +21,15 @@ export class DebtService {
     @InjectRepository(Customer)
     private readonly CustomerRepo: Repository<Customer>,
     private readonly dialservecheck: dialValidate,
+    private readonly DataSource:DataSource
   ) {}
 
   async CreateDept(
     dto: CreateDebtDto,
     userId: any,
   ): Promise<ResponseType<any>> {
+    return await this.DataSource.transaction(async (manager)=>{
+    try{
     const findproduct = await this.ProductRepo.findOne({
       where: { id: dto.ProductId },
     });
@@ -97,7 +100,15 @@ export class DebtService {
       message: 'successfuly Add and make followup data',
       success: true,
     };
+  }catch(error){
+    return{
+      message:`Transaction failed: ${error.message}`,
+      success:false
+    }
   }
+       })
+  }
+
   async UpdateDebt(
     dto: UpdateDebtDto,
     userId: any,
