@@ -30,31 +30,28 @@ export class DebtService {
   ): Promise<ResponseType<any>> {
     return await this.DataSource.transaction(async (manager)=>{
     try{
-    const findproduct = await this.ProductRepo.findOne({
+    const findproduct = await manager.findOne(Product,{
       where: { id: dto.ProductId },
     });
+    if(!findproduct) throw new Error('Product is not Eixts')
+
     const isValidPh_number = this.dialservecheck.CheckDialformat(
       dto.Phone_number,
     );
-    if (!isValidPh_number.success) {
-      return {
-        message: isValidPh_number.message,
-        success: false,
-      };
-    }
-    const checkUserphone_exist = await this.CustomerRepo.findOne({
+    if (!isValidPh_number.success) throw new Error(String(isValidPh_number.message))
+    const checkUserphone_exist = await manager.findOne(Customer,{
       where: { phone_number: isValidPh_number.data },
     });
 
     if (!checkUserphone_exist) {
-      const addCustomer = this.CustomerRepo.create({
+      const addCustomer = manager.create(Customer,{
         customer_name: dto.Debtor_name,
         phone_number: isValidPh_number.data,
         Location: dto.location || 'none',
       });
-      await this.CustomerRepo.save(addCustomer);
+      await manager.save(addCustomer);
     }
-    const AddDebt = this.DebtRepo.create({
+    const AddDebt = manager.create(Debt,{
       product: { id: dto.ProductId },
       paidmoney: dto.Paid,
       debtname: dto.Debtor_name,
@@ -70,14 +67,9 @@ export class DebtService {
       PaymentDateAt:dto.PaymentDateAt,
       user: { id: userId },
     });
-    const saveDebt = await this.DebtRepo.save(AddDebt);
-    if (!saveDebt || !saveDebt.id) {
-      return {
-        message: 'FailED to add record please try again',
-        success: false,
-      };
-    }
-    const Addtrack = this.DebtTrackRepo.create({
+    const saveDebt = await manager.save(AddDebt);
+    if (!saveDebt || !saveDebt.id) throw new Error('Failed to add record please try again')
+    const Addtrack = manager.create(Debt_track,{
       paidmoney: dto.Paid,
       debt: { id: saveDebt.id },
       user: { id: userId },
