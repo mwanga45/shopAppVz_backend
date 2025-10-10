@@ -399,17 +399,20 @@ export class SalesService {
     return await this.Datasource.transaction(async(manager)=>{
       try{
       // return sales record 
+      const date = new Date()
       const Eachsales = await manager.createQueryBuilder(WholeSales, 'w')
       .leftJoin('w.product', 'p')
       .leftJoin('w.user', 'u')
       .select([
         'p.product_name','p.id', 'p.product_category', 'w.Total_pc_pkg_litre', 'u.fullname','w.Net_profit', 'w.Revenue'
       ])
+      .where('DATE(w.CreatedAt) = CURRENT_DATE')
       .getRawMany()
       return{
         message:"successfuly returned",
         success:true,
-        data:Eachsales
+        data:Eachsales,
+
       }
     }catch(error){
       return{
