@@ -408,10 +408,22 @@ export class SalesService {
       ])
       .where('DATE(w.CreatedAt) = CURRENT_DATE')
       .getRawMany()
+
+      const Salessummary = Object.values(
+        Eachsales.reduce((acc,curr)=> {
+          if(!acc[curr.p_id]){
+            acc[curr.p_id] = {p_id:curr.p_id,w_Revenue:0,w_Net_profit:0,w_Total_pc_pkg_litre:0   }
+          }
+          acc[curr.p_id].w_Revenue += curr.w_Revenue
+          acc[curr.p_id].w_Net_profit += curr.w_Net_profit
+          acc[curr.p_id].w_Total_pc_pkg_litre += curr.w_Total_pc_pkg_litre
+          return acc
+        }, {})
+      )
       return{
         message:"successfuly returned",
         success:true,
-        data:Eachsales,
+        data:Eachsales,Salessummary
 
       }
     }catch(error){
