@@ -26,8 +26,8 @@ export class WholeSales extends baseEntity{
   @Column('decimal', {precision:10, scale:4})
   profit_deviation:number
 
-  @Column()
-  @IsNumber()
+
+  @Column('decimal', {precision:10, scale:4})
   percentage_deviation:number
 
   @Column()
