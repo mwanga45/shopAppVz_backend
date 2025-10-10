@@ -55,3 +55,7 @@ export interface SaleSummary {
   p_product_name: string;
   product_category: string;
 }
+export interface MostProfit {
+  product_name:string,
+  Profit:number
+}

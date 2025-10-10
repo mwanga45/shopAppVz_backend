@@ -14,7 +14,7 @@ import { category } from 'src/type/type.interface';
 import { StockService } from 'src/stock/stock.service';
 import { Stock } from 'src/stock/entities/stock.entity';
 import { DataSource } from 'typeorm';
-import { SaleSummary } from 'src/type/type.interface';
+import { SaleSummary , MostProfit} from 'src/type/type.interface';
 
 @Injectable()
 export class SalesService {
@@ -441,13 +441,28 @@ export class SalesService {
         );
         const totalProfit = Salessummary.reduce((acc, curr)=> acc + curr.w_Net_profit , 0)
         const totalRevenue = Salessummary.reduce((acc, curr)=> acc + curr.w_Revenue, 0)
+        let ProductMostProfit:MostProfit ={
+          product_name:"",
+          Profit:0
+        }
+        for (let i = 0; i < Salessummary.length; i++ ){
+           let curr = Salessummary[i].w_Net_profit
+           if(curr > ProductMostProfit.Profit){
+            ProductMostProfit = {
+              product_name:Salessummary[i].p_product_name,
+              Profit:Salessummary[i].w_Net_profit
+            }
+           }
+        }
+
         return {
           message: 'successfuly returned',
           success: true,
           data: Eachsales,
           Salessummary,
           totalProfit,
-          totalRevenue
+          totalRevenue,
+          ProductMostProfit
         };
       } catch (error) {
         return {
