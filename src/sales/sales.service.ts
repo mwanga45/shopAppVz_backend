@@ -263,17 +263,17 @@ export class SalesService {
     return await this.Datasource.transaction(async (manager) => {
       try {
         const product_id = dto.ProductId;
-        const findProduct_cat = await manager.createQueryBuilder(Product,
-          'p',
-        )
+        const findProduct_cat = await manager
+          .createQueryBuilder(Product, 'p')
           .select('p. product_category', 'product_category')
           .where('p.id = :product_id', { product_id })
           .getRawOne();
-        if (!findProduct_cat) throw new Error(findProduct_cat.message)
-        
+        if (!findProduct_cat) throw new Error(findProduct_cat.message);
+
         if (findProduct_cat.product_category === category.wholesales) {
-          if (dto.Stock_status === StockStatus.NotEnough) throw new Error('stock is not enough')
-          const saveSale = manager.create(WholeSales,{
+          if (dto.Stock_status === StockStatus.NotEnough)
+            throw new Error('Stock is not Enough for  sale');
+          const saveSale = manager.create(WholeSales, {
             product: { id: product_id },
             Revenue: dto.Revenue,
             Total_pc_pkg_litre: dto.Total_pc_pkg_litre,
@@ -286,26 +286,26 @@ export class SalesService {
             user: { id: userId },
           });
           await manager.save(saveSale);
-          if (!saveSale) throw  new Error('failed to save wholesales data')
-          const fetchlastRec =
-            await manager.createQueryBuilder(WholeSales,'w')
-              .leftJoin('w.product', 'p')
-              .select([
-                'w.Revenue',
-                'w.Total_pc_pkg_litre',
-                'w.Net_profit',
-                'w.paymentstatus',
-                'w.Expected_Profit',
-                'w.profit_deviation',
-                'w.percentage_deviation',
-                'w.percentage_discount',
-                'p.product_name',
-              ])
-              .orderBy('w.id', 'DESC')
-              .limit(1)
-              .getOne();
+          if (!saveSale) throw new Error('failed to save wholesales data');
+          const fetchlastRec = await manager
+            .createQueryBuilder(WholeSales, 'w')
+            .leftJoin('w.product', 'p')
+            .select([
+              'w.Revenue',
+              'w.Total_pc_pkg_litre',
+              'w.Net_profit',
+              'w.paymentstatus',
+              'w.Expected_Profit',
+              'w.profit_deviation',
+              'w.percentage_deviation',
+              'w.percentage_discount',
+              'p.product_name',
+            ])
+            .orderBy('w.id', 'DESC')
+            .limit(1)
+            .getOne();
 
-          if (!fetchlastRec) throw new Error('failed to return data')
+          if (!fetchlastRec) throw new Error('failed to return data');
           const UpdateStockDto: any = {
             product_id: dto.ProductId,
             total_stock: dto.Total_pc_pkg_litre,
@@ -313,14 +313,14 @@ export class SalesService {
             Reasons: 'Sold',
             product_category: findProduct_cat.product_category,
           };
-          const stockupdate  = await this.Stockserv.updateStockTransactional(manager, UpdateStockDto, userId)
+          const stockupdate = await this.Stockserv.updateStockTransactional(
+            manager,
+            UpdateStockDto,
+            userId,
+          );
+          if (!stockupdate.success)
+            throw new Error(String(stockupdate.message) || 'Unknown Error');
 
-          if (!stockupdate.success) {
-            return {
-              message: stockupdate.message,
-              success: false,
-            };
-          }
           return {
             message: 'Successfuly  return data',
             success: true,
@@ -329,15 +329,10 @@ export class SalesService {
         }
         if (findProduct_cat.product_category === category.retailsales) {
           if (
-            dto.Stock_status === StockStatus.NotEnough &&
-            dto.override === undefined
-          ) {
-            return {
-              message: 'Stock is not Enough  please Add first',
-              success: false,
-            };
-          }
-          const saveSale = this.RetailsalesRepository.create({
+            dto.Stock_status === StockStatus.NotEnough 
+          ) throw new Error('Stock is not Enough for  sale')
+          
+          const saveSale = manager.create(RetailSales,{
             product: { id: product_id },
             Revenue: dto.Revenue,
             Total_pc_pkg_litre: dto.Total_pc_pkg_litre,
@@ -349,15 +344,10 @@ export class SalesService {
             percentage_discount: dto.Discount_percentage,
             user: { id: userId },
           });
-          await this.RetailsalesRepository.save(saveSale);
-          if (!saveSale) {
-            return {
-              message: 'failed  to create new sales',
-              success: false,
-            };
-          }
+          await manager.save(saveSale);
+          if (!saveSale) throw new Error('failed to add sales please try again')
           const fetchlastRec =
-            await this.RetailsalesRepository.createQueryBuilder('w')
+            await manager.createQueryBuilder(RetailSales,'w')
               .leftJoin('w.product', 'p')
               .select([
                 'w.Revenue',
@@ -374,12 +364,8 @@ export class SalesService {
               .limit(1)
               .getOne();
 
-          if (!fetchlastRec) {
-            return {
-              message: 'failed fetched last record',
-              success: false,
-            };
-          }
+          if (!fetchlastRec) throw new Error ('failed to return  sales')
+
           const UpdateStockDto: any = {
             product_id: dto.ProductId,
             total_stock: dto.Total_pc_pkg_litre,
@@ -388,17 +374,9 @@ export class SalesService {
             product_category: findProduct_cat.product_category,
           };
           console.log(UpdateStockDto);
-          const stockupdate = await this.Stockserv.updateStock(
-            UpdateStockDto,
-            userId,
-          );
+          const stockupdate = await this.Stockserv.updateStockTransactional(manager, UpdateStockDto,userId)
 
-          if (!stockupdate.success) {
-            return {
-              message: stockupdate.message,
-              success: false,
-            };
-          }
+          if (!stockupdate.success) throw new Error(String(stockupdate.message))
           return {
             message: 'Successfuly  return data',
             success: true,
@@ -412,7 +390,7 @@ export class SalesService {
       } catch (error) {
         return {
           message: `transaction failed ${error.message}`,
-          success:false
+          success: false,
         };
       }
     });
