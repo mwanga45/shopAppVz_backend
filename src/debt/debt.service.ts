@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDebtDto } from './dto/create-debt.dto';
 import { UpdateDebtDto } from './dto/update-debt.dto';
-import { ChangeType, paymentstatus, ResponseType } from 'src/type/type.interface';
+import {
+  ChangeType,
+  paymentstatus,
+  ResponseType,
+} from 'src/type/type.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Debt } from './entities/debt.entity';
 import { Debt_track } from './entities/debt.entity';
@@ -10,7 +14,6 @@ import { Product } from 'src/product/entities/product.entity';
 import { dialValidate } from 'src/common/helper/phone.helper';
 import { Customer } from 'src/entities/customer.entity';
 import { StockService } from 'src/stock/stock.service';
-
 
 @Injectable()
 export class DebtService {
@@ -24,7 +27,7 @@ export class DebtService {
     private readonly CustomerRepo: Repository<Customer>,
     private readonly dialservecheck: dialValidate,
     private readonly DataSource: DataSource,
-    private readonly Stockserve:StockService
+    private readonly Stockserve: StockService,
   ) {}
 
   async CreateDept(
@@ -84,19 +87,23 @@ export class DebtService {
         if (!savedTrack || !savedTrack.id)
           throw new Error('failed to add track');
 
-             const UpdateStockDto: any = {
-                    product_id: dto.ProductId,
-                    total_stock: dto.Total_pc_pkg_litre,
-                    Method: ChangeType.REMOVE,
-                    Reasons: 'Sold',
-                    product_category: findproduct.product_category,
-                  };
-        
-        const stockupdate =  await this.Stockserve.updateStockTransactional(manager,UpdateStockDto, userId)
-        if(!stockupdate.success) throw new Error(String(stockupdate.message))
+        const UpdateStockDto: any = {
+          product_id: dto.ProductId,
+          total_stock: dto.Total_pc_pkg_litre,
+          Method: ChangeType.REMOVE,
+          Reasons: 'Sold',
+          product_category: findproduct.product_category,
+        };
+
+        const stockupdate = await this.Stockserve.updateStockTransactional(
+          manager,
+          UpdateStockDto,
+          userId,
+        );
+        if (!stockupdate.success) throw new Error(String(stockupdate.message));
         return {
           message: 'successfuly Add and make followup data',
-          success: true,
+          success: true, 
         };
       } catch (error) {
         return {
@@ -149,7 +156,7 @@ export class DebtService {
         const savedTrack = await manager.save(AddDebtTrack);
         if (!savedTrack || !savedTrack.id)
           throw new Error('Failed to addtrack');
-        
+
         return {
           message: 'successfuly  update debt',
           success: true,
