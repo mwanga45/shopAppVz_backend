@@ -75,19 +75,8 @@ export class DebtService {
       user: { id: userId },
     });
 
-    const savedTrack = await this.DebtTrackRepo.save(Addtrack);
-    if (!savedTrack || !savedTrack.id) {
-      return {
-        message: 'failed to add debt track',
-        success: false,
-      };
-    }
-    if (!findproduct) {
-      return {
-        message: 'Product is not exist',
-        success: false,
-      };
-    }
+    const savedTrack = await manager.save(Addtrack);
+    if (!savedTrack || !savedTrack.id) throw new Error('failed to add track')
     return {
       message: 'successfuly Add and make followup data',
       success: true,
@@ -106,39 +95,28 @@ export class DebtService {
     userId: any,
     id: any,
   ): Promise<ResponseType<any>> {
-    const findDebt = await this.DebtRepo.findOne({
+    return this.DataSource.transaction(async(manager)=>{
+    try{
+    const findDebt = await manager.findOne(Debt,{
       where: { id:id },
     });
-    if (!findDebt) {
-      return {
-        message: 'The Debt is not exist',
-        success: false,
-      };
-    }
-
+    if (!findDebt) throw  new Error('Debt data is not exist')
+  
     if (
       findDebt.paidmoney === findDebt.Revenue ||
       findDebt.paymentstatus === paymentstatus.Paid
     ) {
       if (findDebt.paymentstatus !== paymentstatus.Paid) {
-        const checkpayementstatus = await this.DebtRepo.update(
+        const checkpayementstatus = await manager.update(Debt,
           { id:id},
           { paymentstatus: paymentstatus.Paid },
         );
         if (
           !checkpayementstatus.affected ||
           checkpayementstatus.affected === 0
-        ) {
-          return {
-            message: 'failed to update  paymentstatus',
-            success: false,
-          };
-        }
+        ) throw new Error( 'failed to update  paymentstatus')
       }
-      return {
-        message: 'The debt is already  been completed paid',
-        success: false,
-      };
+      throw new Error('The debt is already  been completed paid')
     }
     const UpdateDebt = await this.DebtRepo.update({ id: id }, dto);
 
@@ -164,5 +142,12 @@ export class DebtService {
       message: 'successfuly  update debt',
       success: true,
     };
+        }catch(error){
+          return{
+            message:`Transaction failed: ${error.message}`,
+            success:false
+          }
+        }
+  })
   }
 }
