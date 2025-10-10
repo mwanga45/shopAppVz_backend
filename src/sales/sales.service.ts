@@ -395,4 +395,26 @@ export class SalesService {
       }
     });
   }
+  async TodaySaleAnalysis ():Promise<ResponseType<any>>{
+    return await this.Datasource.transaction(async(manager)=>{
+      try{
+      return{
+        message:"successfuly returned",
+        success:true
+      }
+    }catch(error){
+      return{
+        message:`Transcation failed: ${error.message}`,
+        success:false
+      }
+    }
+    })
+  }
+  async SalesRecordToday ():Promise<ResponseType<any>>{
+    return{
+      message:"successfully ",
+      success:true
+    }
+
+  }
 }
