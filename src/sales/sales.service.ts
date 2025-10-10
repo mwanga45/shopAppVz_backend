@@ -373,7 +373,7 @@ export class SalesService {
             Reasons: 'Sold',
             product_category: findProduct_cat.product_category,
           };
-          console.log(UpdateStockDto);
+          
           const stockupdate = await this.Stockserv.updateStockTransactional(manager, UpdateStockDto,userId)
 
           if (!stockupdate.success) throw new Error(String(stockupdate.message))

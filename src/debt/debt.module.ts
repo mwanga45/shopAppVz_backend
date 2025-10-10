@@ -7,10 +7,12 @@ import { Debt, Debt_track } from './entities/debt.entity';
 import { Product } from 'src/product/entities/product.entity';
 import { Customer } from 'src/entities/customer.entity';
 import { User } from 'src/entities/user.entity';
+import { StockModule } from 'src/stock/stock.module';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([Debt, Debt_track, Product, Customer, User])
+    TypeOrmModule.forFeature([Debt, Debt_track, Product, Customer, User]),
+    StockModule
   ],
   controllers: [DebtController],
   providers: [DebtService, dialValidate],
