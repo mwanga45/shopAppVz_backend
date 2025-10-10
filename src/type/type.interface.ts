@@ -47,3 +47,11 @@ export enum ChangeType {
     REMOVE = "Removed",
     DELETE = "Delete"
 }
+export interface SaleSummary {
+  p_id: number;
+  w_Revenue: number;
+  w_Net_profit: number;
+  w_Total_pc_pkg_litre: number;
+  p_product_name: string;
+  product_category: string;
+}

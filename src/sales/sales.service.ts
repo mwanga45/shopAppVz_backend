@@ -14,7 +14,7 @@ import { category } from 'src/type/type.interface';
 import { StockService } from 'src/stock/stock.service';
 import { Stock } from 'src/stock/entities/stock.entity';
 import { DataSource } from 'typeorm';
-import { error } from 'console';
+import { SaleSummary } from 'src/type/type.interface';
 
 @Injectable()
 export class SalesService {
@@ -421,7 +421,7 @@ export class SalesService {
           .where('DATE(w.CreatedAt) = CURRENT_DATE')
           .getRawMany();
 
-        const Salessummary = Object.values(
+        const Salessummary:SaleSummary[] = Object.values(
           Eachsales.reduce((acc, curr) => {
             if (!acc[curr.p_id]) {
               acc[curr.p_id] = {
@@ -439,11 +439,15 @@ export class SalesService {
             return acc;
           }, {}),
         );
+        const totalProfit = Salessummary.reduce((acc, curr)=> acc + curr.w_Net_profit , 0)
+        const totalRevenue = Salessummary.reduce((acc, curr)=> acc + curr.w_Revenue, 0)
         return {
           message: 'successfuly returned',
           success: true,
           data: Eachsales,
           Salessummary,
+          totalProfit,
+          totalRevenue
         };
       } catch (error) {
         return {
