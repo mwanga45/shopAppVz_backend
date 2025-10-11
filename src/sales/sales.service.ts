@@ -532,10 +532,12 @@ export class SalesService {
         .getRawMany();
      const Allcombined = [...Normalsalesretailreturn,...Normalsaleswholereturn]
      const totalRevenue = Allcombined.reduce((acc, curr)=> acc + Number(curr.total_revenue), 0)
+     const totolRetailRevenue  = Normalsalesretailreturn.reduce((acc, curr)=> acc + Number(curr.total_revenue), 0)
+     const totalWholeRevenue  = Normalsaleswholereturn.reduce((acc, curr)=> acc + Number(curr.total_revenue),0)
     return {
       message: 'successfully ',
       success: true,
-      data: {Normalsaleswholereturn,Normalsalesretailreturn, Allcombined, totalRevenue}
+      data: {Normalsaleswholereturn,Normalsalesretailreturn, Allcombined, totalRevenue, totalWholeRevenue, totolRetailRevenue}
 
     };
   }
