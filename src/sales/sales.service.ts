@@ -530,11 +530,12 @@ export class SalesService {
         .where('DATE(w."CreatedAt") = CURRENT_DATE')
         .groupBy('p.id, p.product_name, p.product_category, u.fullname')
         .getRawMany();
-    
+     const Allcombined = [...Normalsalesretailreturn,...Normalsaleswholereturn]
+     const totalRevenue = Allcombined.reduce((acc, curr)=> acc + Number(curr.total_revenue), 0)
     return {
       message: 'successfully ',
       success: true,
-      data: {Normalsaleswholereturn,Normalsalesretailreturn}
+      data: {Normalsaleswholereturn,Normalsalesretailreturn, Allcombined, totalRevenue}
 
     };
   }
