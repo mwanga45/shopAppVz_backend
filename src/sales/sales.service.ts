@@ -14,7 +14,7 @@ import { category } from 'src/type/type.interface';
 import { StockService } from 'src/stock/stock.service';
 import { Stock } from 'src/stock/entities/stock.entity';
 import { DataSource } from 'typeorm';
-import { SaleSummary , MostProfit} from 'src/type/type.interface';
+import { SaleSummary, MostProfit } from 'src/type/type.interface';
 
 @Injectable()
 export class SalesService {
@@ -421,7 +421,7 @@ export class SalesService {
           .where('DATE(w.CreatedAt) = CURRENT_DATE')
           .getRawMany();
 
-        const Salessummary:SaleSummary[] = Object.values(
+        const Salessummary: SaleSummary[] = Object.values(
           Eachsales.reduce((acc, curr) => {
             if (!acc[curr.p_id]) {
               acc[curr.p_id] = {
@@ -439,21 +439,44 @@ export class SalesService {
             return acc;
           }, {}),
         );
-        const totalProfit = Salessummary.reduce((acc, curr)=> acc + curr.w_Net_profit , 0)
-        const totalRevenue = Salessummary.reduce((acc, curr)=> acc + curr.w_Revenue, 0)
-        let ProductMostProfit:MostProfit ={
-          product_name:"",
-          Profit:0
-        }
-        for (let i = 0; i < Salessummary.length; i++ ){
-           let curr = Salessummary[i].w_Net_profit
-           if(curr > ProductMostProfit.Profit){
+        const totalProfit = Salessummary.reduce(
+          (acc, curr) => acc + curr.w_Net_profit,
+          0,
+        );
+        const totalRevenue = Salessummary.reduce(
+          (acc, curr) => acc + curr.w_Revenue,
+          0,
+        );
+        let ProductMostProfit: MostProfit = {
+          product_name: '',
+          Profit: 0,
+        };
+        for (let i = 0; i < Salessummary.length; i++) {
+          let curr = Salessummary[i].w_Net_profit;
+          if (curr > ProductMostProfit.Profit) {
             ProductMostProfit = {
-              product_name:Salessummary[i].p_product_name,
-              Profit:Salessummary[i].w_Net_profit
-            }
-           }
+              product_name: Salessummary[i].p_product_name,
+              Profit: Salessummary[i].w_Net_profit,
+            };
+          }
         }
+        const fetchlastRec = await manager
+          .createQueryBuilder(RetailSales, 'w')
+          .leftJoin('w.product', 'p')
+          .select([
+            'w.Revenue',
+            'w.Total_pc_pkg_litre',
+            'w.Net_profit',
+            'w.paymentstatus',
+            'w.Expected_Profit',
+            'w.profit_deviation',
+            'w.percentage_deviation',
+            'w.percentage_discount',
+            'p.product_name',
+          ])
+          .orderBy('w.id', 'DESC')
+          .limit(1)
+          .getOne();
         return {
           message: 'successfuly returned',
           success: true,
@@ -461,7 +484,8 @@ export class SalesService {
           Salessummary,
           totalProfit,
           totalRevenue,
-          ProductMostProfit
+          ProductMostProfit,
+          fetchlastRec,
         };
       } catch (error) {
         return {
@@ -471,27 +495,47 @@ export class SalesService {
       }
     });
   }
+
   async SalesRecordToday(): Promise<ResponseType<any>> {
-    const Normalsalesreturn  = await this.WholesalesRepository
-    .createQueryBuilder('w')
-    .leftJoin('w.product', 'p')
-    .leftJoin('w.user', 'u')
-   .select([
-    'p.id AS product_id',
-    'p.product_name AS product_name',
-    'p.product_category AS product_category',
-    'u.fullname AS seller',
-    'SUM(w.Total_pc_pkg_litre) AS total_quantity',
-    'SUM(w.Revenue) AS total_revenue',
-    'SUM(w.Net_profit) AS total_profit',
-  ])
-  .where('DATE(w."CreatedAt") = CURRENT_DATE')
-   .groupBy('p.id, p.product_name, p.product_category, u.fullname')
-  .getRawMany()
-     return{
+    const Normalsalesretailreturn =
+      await this.RetailsalesRepository.createQueryBuilder('r')
+        .leftJoin('r.product', 'p')
+        .leftJoin('r.user', 'u')
+        .select([
+          'p.id AS product_id',
+          'p.product_name AS product_name',
+          'p.product_category AS product_category',
+          'u.fullname AS seller',
+          'SUM(r.Total_pc_pkg_litre) AS total_quantity',
+          'SUM(r.Revenue) AS total_revenue',
+          'SUM(r.Net_profit) AS total_profit',
+        ])
+        .where('DATE(r."CreatedAt") = CURRENT_DATE')
+        .groupBy('p.id, p.product_name, p.product_category, u.fullname')
+        .getRawMany();
+
+    const Normalsaleswholereturn =
+      await this.WholesalesRepository.createQueryBuilder('w')
+        .leftJoin('w.product', 'p')
+        .leftJoin('w.user', 'u')
+        .select([
+          'p.id AS product_id',
+          'p.product_name AS product_name',
+          'p.product_category AS product_category',
+          'u.fullname AS seller',
+          'SUM(w.Total_pc_pkg_litre) AS total_quantity',
+          'SUM(w.Revenue) AS total_revenue',
+          'SUM(w.Net_profit) AS total_profit',
+        ])
+        .where('DATE(w."CreatedAt") = CURRENT_DATE')
+        .groupBy('p.id, p.product_name, p.product_category, u.fullname')
+        .getRawMany();
+    
+    return {
       message: 'successfully ',
       success: true,
-      data:Normalsalesreturn
+      data: {Normalsaleswholereturn,Normalsalesretailreturn}
+
     };
   }
 }

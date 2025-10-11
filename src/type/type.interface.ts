@@ -59,7 +59,7 @@ export interface MostProfit {
   product_name:string,
   Profit:number
 }
-interface ProductSummary {
+interface NormalsaleSummary {
   product_id: number;
   product_name: string;
   product_category: string;
