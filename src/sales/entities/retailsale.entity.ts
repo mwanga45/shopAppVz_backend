@@ -7,9 +7,8 @@ import { User } from 'src/entities/user.entity';
 import { paymentstatus } from 'src/type/type.interface';
 @Entity()
 export class RetailSales extends baseEntity {
-  @Column()
-  @IsNumber()
-  Total_pc_pkg_litre: number;
+  @Column('decimal', {precision:10, scale:4, nullable:true})
+  Total_pc_pkg_litre: number | null;
 
   @Column()
   @IsNumber()

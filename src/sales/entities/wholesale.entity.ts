@@ -8,9 +8,8 @@ import { paymentstatus } from "src/type/type.interface";
 
 @Entity()
 export class WholeSales extends baseEntity{
-  @Column()
-  @IsNumber()
-  Total_pc_pkg_litre:number
+  @Column('decimal', {precision:10, scale:4, nullable:true})
+  Total_pc_pkg_litre:number | null
 
   @Column()
   @IsNumber()

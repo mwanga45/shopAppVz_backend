@@ -8,7 +8,7 @@ export class Stock extends baseEntity {
     @Column()
     product_category:String
 
-    @Column()
+    @Column('decimal', {precision:10, scale:5, nullable:true})
     Total_stock:number
 
   @OneToOne(()=> Product , (product)=>product.stock)
@@ -31,13 +31,13 @@ export class Stock_transaction extends baseEntity{
     type:"enum"
     type_Enum:StockType
 
-    @Column({default:0})
+    @Column('decimal',{precision:10, scale:5, nullable:true, default:0})
     prev_stock:number
 
-    @Column()
+    @Column('decimal',{precision:10, scale:5, nullable:true})
     new_stock:number
 
-    @Column()
+    @Column('decimal',{precision:10, scale:5, nullable:true, default:0})
     Quantity:number
 
     @Column()
