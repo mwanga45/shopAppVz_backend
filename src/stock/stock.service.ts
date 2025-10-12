@@ -92,14 +92,28 @@ export class StockService {
     }
 
   } 
+async Test(): Promise<any> {
+  const findTotal = await this.stockRepo
+    .createQueryBuilder('s')
+    .leftJoin('s.product', 'product')
+    .select('s.Total_stock', 'total')
+    .addSelect('p.product_name', 'product_name')
+    .getRawMany()
 
-  findAll() {
-    return `This action returns all stock`;
+  if (!findTotal) {
+    return {
+      success: false,
+      message: 'Failed to find the targeted product',
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} stock`;
-  }
+  return {
+    message: "test",
+    success: true,
+    data: findTotal,
+  };
+}
+
 
    async updateStock(updateStockDto: UpdateStockDto,userId:any):Promise<ResponseType<any>> {
     if(updateStockDto.Method === ChangeType.ADD){
@@ -120,7 +134,7 @@ export class StockService {
           user:{id:userId},
         });
 
-        // Get the last stock transaction to determine the previous stock
+       
         const lastStockTransaction = await this.recstockRepo.createQueryBuilder('st')
             .select('st.new_stock', 'newStock')
             .where('st.product.id = :productId', { productId: updateStockDto.product_id })
