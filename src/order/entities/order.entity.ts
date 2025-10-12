@@ -13,6 +13,9 @@ export class Order extends baseEntity {
     client_name:string
 
     @Column()
+    Order_Description:string
+    
+    @Column()
     client_phone:string
 
     @Column({type:"date"})

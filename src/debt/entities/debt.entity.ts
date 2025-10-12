@@ -7,25 +7,22 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity()
 export class Debt extends baseEntity {
-  @Column()
-  @IsNumber()
+  @Column('decimal', { precision: 10, scale: 4 })
   Total_pc_pkg_litre: number;
 
-  @Column()
-  @IsNumber()
+  @Column('decimal', { precision: 10, scale: 4 })
   Revenue: number;
 
-  @Column()
-  @IsString()
+  @Column('decimal', { precision: 10, scale: 4 })
   Net_profit: number;
 
-  @Column()
+  @Column('decimal', { precision: 10, scale: 4 })
   Expected_Profit: number;
 
   @Column('decimal', { precision: 10, scale: 4 })
   profit_deviation: number;
 
-  @Column()
+  @Column('decimal', { precision: 10, scale: 4 })
   percentage_deviation: number;
 
   @Column()

@@ -9,20 +9,18 @@ import { paymentstatus } from "src/type/type.interface";
 @Entity()
 export class WholeSales extends baseEntity{
   @Column('decimal', {precision:10, scale:4, nullable:true})
-  Total_pc_pkg_litre:number | null
+  Total_pc_pkg_litre:number|null
 
-  @Column()
-  @IsNumber()
+  @Column('decimal', { precision: 10, scale: 4, default:0 })
   Revenue:number
 
-  @Column()
-  @IsNumber()
+  @Column('decimal', { precision: 10, scale: 4 , default:0})
   Net_profit:number
 
-  @Column()
+  @Column('decimal', { precision: 10, scale: 4 , default:0})
   Expected_Profit:number
 
-  @Column('decimal', {precision:10, scale:4})
+  @Column('decimal', {precision:10, scale:4, default:0})
   profit_deviation:number
 
 
