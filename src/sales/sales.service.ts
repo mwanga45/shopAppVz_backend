@@ -530,6 +530,40 @@ export class SalesService {
         .where('DATE(w."CreatedAt") = CURRENT_DATE')
         .groupBy('p.id, p.product_name, p.product_category, u.fullname')
         .getRawMany();
+    const Retailpending = await this.RetailsalesRepository.createQueryBuilder('r')
+        .leftJoin('r.product', 'p')
+        .leftJoin('r.user', 'u')
+        .select([
+          'p.id AS product_id',
+          'p.product_name AS product_name',
+          'p.product_category AS product_category',
+          'u.fullname AS seller',
+          'w.paymentstatus AS status',
+          'r.Total_pc_pkg_litre AS total_quantity',
+          'r.Revenue AS total_revenue',
+          'r.Net_profit AS total_profit',
+        ])
+        .where('DATE(r."CreatedAt") = CURRENT_DATE AND  w.paymentstatus = pending')
+        .groupBy('p.id, p.product_name, p.product_category, u.fullname')
+        .getRawMany();
+
+        const Wholepending = await this.WholesalesRepository.createQueryBuilder('w')
+        .leftJoin('w.product', 'p')
+        .leftJoin('w.user', 'u')
+        .select([
+          'p.id AS product_id',
+          'p.product_name AS product_name',
+          'p.product_category AS product_category',
+          'u.fullname AS seller',
+          'w.Total_pc_pkg_litre AS total_quantity',
+          'w.paymentstatus AS status',
+          'w.Revenue AS total_revenue',
+          'w.Net_profit AS total_profit',
+        ])
+        .where('DATE(r."CreatedAt") = CURRENT_DATE AND w.paymentstatus = pending ')
+        .groupBy('p.id, p.product_name, p.product_category, u.fullname')
+        .getRawMany();
+     const AllcombinedPending = [...Retailpending, ... Wholepending]
      const Allcombined = [...Normalsalesretailreturn,...Normalsaleswholereturn]
      const totalRevenue = Allcombined.reduce((acc, curr)=> acc + Number(curr.total_revenue), 0)
      const totolRetailRevenue  = Normalsalesretailreturn.reduce((acc, curr)=> acc + Number(curr.total_revenue), 0)
@@ -537,7 +571,7 @@ export class SalesService {
     return {
       message: 'successfully ',
       success: true,
-      data: {Normalsaleswholereturn,Normalsalesretailreturn, Allcombined, totalRevenue, totalWholeRevenue, totolRetailRevenue}
+      data: {Normalsaleswholereturn,Normalsalesretailreturn, Allcombined, totalRevenue, totalWholeRevenue, totolRetailRevenue, AllcombinedPending}
 
     };
   }
