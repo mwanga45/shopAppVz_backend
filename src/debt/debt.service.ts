@@ -29,7 +29,7 @@ export class DebtService {
     private readonly dialservecheck: dialValidate,
     private readonly DataSource: DataSource,
     private readonly Stockserve: StockService,
-  ) {}
+  ) { }
 
   async CreateDept(
     dto: CreateDebtDto,
@@ -37,8 +37,6 @@ export class DebtService {
   ): Promise<ResponseType<any>> {
     return await this.DataSource.transaction(async (manager) => {
       try {
-        if(dto.Stock_status ===StockStatus.NotEnough)throw new Error(String('stock is not enough'))
-          
         const findproduct = await manager.findOne(Product, {
           where: { id: dto.ProductId },
         });
@@ -61,52 +59,60 @@ export class DebtService {
           });
           await manager.save(addCustomer);
         }
-        const AddDebt = manager.create(Debt, {
-          product: { id: dto.ProductId },
-          paidmoney: dto.paidmoney,
-          debtname: dto.Debtor_name,
-          Net_profit: dto.Net_profit,
-          Expected_Profit: dto.Expected_profit,
-          phone_number: dto.Phone_number,
-          Revenue: dto.Revenue,
-          percentage_deviation: dto.Percentage_deviation,
-          profit_deviation: dto.profit_deviation,
-          Total_pc_pkg_litre: dto.Total_pc_pkg_litre,
-          percentage_discount: dto.Discount_percentage,
-          paymentstatus: dto.paymentstatus,
-          PaymentDateAt: dto.PaymentDateAt,
-          user: { id: userId },
-        });
-        const saveDebt = await manager.save(AddDebt);
-        if (!saveDebt || !saveDebt.id)
-          throw new Error('Failed to add record please try again');
-        const Addtrack = manager.create(Debt_track, {
-          paidmoney: dto.paidmoney,
-          debt: { id: saveDebt.id },
-          user: { id: userId },
-        });
+        if (dto.Stock_status === StockStatus.Enough) {
+          const AddDebt = manager.create(Debt, {
+            product: { id: dto.ProductId },
+            paidmoney: dto.paidmoney,
+            Debtor_name: dto.Debtor_name,
+            Net_profit: dto.Net_profit,
+            Expected_profit: dto.Expected_profit,
+            Phone_number: dto.Phone_number,
+            Revenue: dto.Revenue,
+            Percentage_deviation: dto.Percentage_deviation,
+            profit_deviation: dto.profit_deviation,
+            Total_pc_pkg_litre: dto.Total_pc_pkg_litre,
+            Discount_percentage: dto.Discount_percentage,
+            paymentstatus: dto.paymentstatus,
+            PaymentDateAt: dto.PaymentDateAt,
+            location:dto.location,
+            user: { id: userId },
+          });
+          const saveDebt = await manager.save(AddDebt);
+          if (!saveDebt || !saveDebt.id)
+            throw new Error('Failed to add record please try again');
+          const Addtrack = manager.create(Debt_track, {
+            paidmoney: dto.paidmoney,
+            debt: { id: saveDebt.id },
+            user: { id: userId },
+          });
 
-        const savedTrack = await manager.save(Addtrack);
-        if (!savedTrack || !savedTrack.id)
-          throw new Error('failed to add track');
+          const savedTrack = await manager.save(Addtrack);
+          if (!savedTrack || !savedTrack.id)
+            throw new Error('failed to add track');
 
-        const UpdateStockDto: any = {
-          product_id: dto.ProductId,
-          total_stock: dto.Total_pc_pkg_litre,
-          Method: ChangeType.REMOVE,
-          Reasons: 'Sold',
-          product_category: findproduct.product_category,
-        };
+          const UpdateStockDto: any = {
+            product_id: dto.ProductId,
+            total_stock: dto.Total_pc_pkg_litre,
+            Method: ChangeType.REMOVE,
+            Reasons: 'Sold',
+            product_category: findproduct.product_category,
+          };
 
-        const stockupdate = await this.Stockserve.updateStockTransactional(
-          manager,
-          UpdateStockDto,
-          userId,
-        );
-        if (!stockupdate.success) throw new Error(String(stockupdate.message));
+          const stockupdate = await this.Stockserve.updateStockTransactional(
+            manager,
+            UpdateStockDto,
+            userId,
+          );
+          if (!stockupdate.success)
+            throw new Error(String(stockupdate.message));
+          return {
+            message: 'successfuly Add and make followup data',
+            success: true,
+          };
+        }
         return {
-          message: 'successfuly Add and make followup data',
-          success: true, 
+          message: 'failed to make transaction stock is not Enough',
+          success: false,
         };
       } catch (error) {
         return {
@@ -147,13 +153,13 @@ export class DebtService {
           }
           throw new Error('The debt is already  been completed paid');
         }
-        const {ProductId,Stock_status,paidmoney, ...restdto} = dto
-        const newpaidsum = findDebt.paidmoney + (Number(dto.paidmoney)?? 0)
-        const updateDto :any ={
-         ...restdto,
-         product:{id:dto.ProductId},
-         paidmoney:newpaidsum
-        }
+        const { ProductId, Stock_status, paidmoney, ...restdto } = dto;
+        const newpaidsum = findDebt.paidmoney + (Number(dto.paidmoney) ?? 0);
+        const updateDto: any = {
+          ...restdto,
+          product: { id: dto.ProductId },
+          paidmoney: newpaidsum,
+        };
 
         const UpdateDebt = await manager.update(Debt, { id: id }, updateDto);
 
