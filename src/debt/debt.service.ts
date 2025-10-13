@@ -14,6 +14,7 @@ import { Product } from 'src/product/entities/product.entity';
 import { dialValidate } from 'src/common/helper/phone.helper';
 import { Customer } from 'src/entities/customer.entity';
 import { StockService } from 'src/stock/stock.service';
+import { StockStatus } from 'src/type/type.interface';
 
 @Injectable()
 export class DebtService {
@@ -36,6 +37,8 @@ export class DebtService {
   ): Promise<ResponseType<any>> {
     return await this.DataSource.transaction(async (manager) => {
       try {
+        if(dto.Stock_status ===StockStatus.NotEnough)throw new Error(String('stock is not enough'))
+          
         const findproduct = await manager.findOne(Product, {
           where: { id: dto.ProductId },
         });
