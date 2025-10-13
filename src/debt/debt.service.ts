@@ -60,7 +60,7 @@ export class DebtService {
         }
         const AddDebt = manager.create(Debt, {
           product: { id: dto.ProductId },
-          paidmoney: dto.Paid,
+          paidmoney: dto.paidmoney,
           debtname: dto.Debtor_name,
           Net_profit: dto.Net_profit,
           Expected_Profit: dto.Expected_profit,
@@ -78,7 +78,7 @@ export class DebtService {
         if (!saveDebt || !saveDebt.id)
           throw new Error('Failed to add record please try again');
         const Addtrack = manager.create(Debt_track, {
-          paidmoney: dto.Paid,
+          paidmoney: dto.paidmoney,
           debt: { id: saveDebt.id },
           user: { id: userId },
         });
@@ -144,17 +144,19 @@ export class DebtService {
           }
           throw new Error('The debt is already  been completed paid');
         }
+        const {ProductId,Stock_status, ...restdto} = dto
         const updateDto :any ={
-         ...dto,
+         ...restdto,
          product:{id:dto.ProductId}
         }
+
         const UpdateDebt = await manager.update(Debt, { id: id }, updateDto);
         
         if (!UpdateDebt.affected || UpdateDebt.affected === 0)
           throw new Error('failed to make update');
         const AddDebtTrack = manager.create(Debt_track, {
           debt: { id: id },
-          paidmoney: dto.Paid,
+          paidmoney: dto.paidmoney,
           user: { id: userId },
         });
         const savedTrack = await manager.save(AddDebtTrack);

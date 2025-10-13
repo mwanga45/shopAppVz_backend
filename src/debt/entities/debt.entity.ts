@@ -17,16 +17,16 @@ export class Debt extends baseEntity {
   Net_profit: number;
 
   @Column('decimal', { precision: 10, scale: 4 })
-  Expected_Profit: number;
+  Expected_profit: number;
 
   @Column('decimal', { precision: 10, scale: 4 })
   profit_deviation: number;
 
   @Column('decimal', { precision: 10, scale: 4 })
-  percentage_deviation: number;
-
+  Percentage_deviation: number;
+  
   @Column()
-  percentage_discount: string;
+  Discount_percentage: string;
 
   @Column({ default: paymentstatus.Paid })
   paymentstatus: paymentstatus;
@@ -35,10 +35,13 @@ export class Debt extends baseEntity {
   paidmoney: number;
 
   @Column()
-  debtname: string;
+  Debtor_name: string;
 
   @Column()
-  phone_number: string;
+  Phone_number: string;
+
+  @Column({type:'varchar', default:"none"})
+  location:string 
 
   @Column({type:'timestamp'})
   PaymentDateAt: Date;
