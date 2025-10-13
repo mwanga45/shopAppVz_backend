@@ -144,14 +144,16 @@ export class DebtService {
           }
           throw new Error('The debt is already  been completed paid');
         }
-        const {ProductId,Stock_status, ...restdto} = dto
+        const {ProductId,Stock_status,paidmoney, ...restdto} = dto
+        const newpaidsum = findDebt.paidmoney + (Number(dto.paidmoney)?? 0)
         const updateDto :any ={
          ...restdto,
-         product:{id:dto.ProductId}
+         product:{id:dto.ProductId},
+         paidmoney:newpaidsum
         }
 
         const UpdateDebt = await manager.update(Debt, { id: id }, updateDto);
-        
+
         if (!UpdateDebt.affected || UpdateDebt.affected === 0)
           throw new Error('failed to make update');
         const AddDebtTrack = manager.create(Debt_track, {
