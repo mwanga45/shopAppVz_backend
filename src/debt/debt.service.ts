@@ -63,7 +63,7 @@ export class DebtService {
           paidmoney: dto.Paid,
           debtname: dto.Debtor_name,
           Net_profit: dto.Net_profit,
-          Expected_Profit: dto.Expecte_profit,
+          Expected_Profit: dto.Expected_profit,
           phone_number: dto.Phone_number,
           Revenue: dto.Revenue,
           percentage_deviation: dto.Percentage_deviation,
@@ -144,8 +144,12 @@ export class DebtService {
           }
           throw new Error('The debt is already  been completed paid');
         }
-        const UpdateDebt = await manager.update(Debt, { id: id }, dto);
-
+        const updateDto :any ={
+         ...dto,
+         product:{id:dto.ProductId}
+        }
+        const UpdateDebt = await manager.update(Debt, { id: id }, updateDto);
+        
         if (!UpdateDebt.affected || UpdateDebt.affected === 0)
           throw new Error('failed to make update');
         const AddDebtTrack = manager.create(Debt_track, {

@@ -13,7 +13,7 @@ export class CreateDebtDto {
 
   @IsNumber()
   @IsNotEmpty()
-  Expecte_profit: number;
+  Expected_profit: number;
 
   @IsNumber()
   @IsNotEmpty()
