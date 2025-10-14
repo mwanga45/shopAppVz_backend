@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/product/entities/product.entity';
 import { RetailSales } from './entities/retailsale.entity';
 import { Product_discount } from 'src/product/entities/discount.entity';
-import { ChangeType, override, ResponseType } from 'src/type/type.interface';
+import { ChangeType, override, paymentstatus, ResponseType } from 'src/type/type.interface';
 import { StockStatus } from 'src/type/type.interface';
 import { DeviationInput } from 'src/type/type.interface';
 import { category } from 'src/type/type.interface';
@@ -262,6 +262,12 @@ export class SalesService {
   ): Promise<ResponseType<any>> {
     return await this.Datasource.transaction(async (manager) => {
       try {
+        if(dto.paymentstatus !== paymentstatus.Paid && dto.paymentstatus !== paymentstatus.Pending){
+          return{
+            message:`sales failed since the paid status is ${dto.paymentstatus} `,
+            success:false
+          }
+        }
         const product_id = dto.ProductId;
         const findProduct_cat = await manager
           .createQueryBuilder(Product, 'p')
@@ -538,13 +544,13 @@ export class SalesService {
           'p.product_name AS product_name',
           'p.product_category AS product_category',
           'u.fullname AS seller',
-          'w.paymentstatus AS status',
+          'r.paymentstatus AS status',
           'r.Total_pc_pkg_litre AS total_quantity',
           'r.Revenue AS total_revenue',
           'r.Net_profit AS total_profit',
         ])
-        .where('DATE(r."CreatedAt") = CURRENT_DATE AND  w.paymentstatus = pending')
-        .groupBy('p.id, p.product_name, p.product_category, u.fullname')
+        .where('DATE(r."CreatedAt") = CURRENT_DATE AND  r.paymentstatus =:status', {status:'pending'})
+        // .groupBy('p.id, p.product_name, p.product_category, u.fullname, r.paymentstatus')
         .getRawMany();
 
         const Wholepending = await this.WholesalesRepository.createQueryBuilder('w')
@@ -560,8 +566,8 @@ export class SalesService {
           'w.Revenue AS total_revenue',
           'w.Net_profit AS total_profit',
         ])
-        .where('DATE(r."CreatedAt") = CURRENT_DATE AND w.paymentstatus = pending ')
-        .groupBy('p.id, p.product_name, p.product_category, u.fullname')
+        .where('DATE(w."CreatedAt") = CURRENT_DATE AND w.paymentstatus =:status ', {status:'pending'})
+        // .groupBy('p.id, p.product_name, p.product_category, u.fullname, w.paymentstatus')
         .getRawMany();
      const AllcombinedPending = [...Retailpending, ... Wholepending]
      const Allcombined = [...Normalsalesretailreturn,...Normalsaleswholereturn]
@@ -571,7 +577,7 @@ export class SalesService {
     return {
       message: 'successfully ',
       success: true,
-      data: {Normalsaleswholereturn,Normalsalesretailreturn, Allcombined, totalRevenue, totalWholeRevenue, totolRetailRevenue, AllcombinedPending}
+      data: {Normalsaleswholereturn,Normalsalesretailreturn, Allcombined, totalRevenue, totalWholeRevenue, totolRetailRevenue, AllcombinedPending, Retailpending}
 
     };
   }
