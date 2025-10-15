@@ -62,7 +62,7 @@ export class DebtService {
         if (dto.Stock_status === StockStatus.Enough) {
           const AddDebt = manager.create(Debt, {
             product: { id: dto.ProductId },
-            paidmoney: dto.paidmoney,
+            paidmoney: dto.paidmoney | 0,
             Debtor_name: dto.Debtor_name,
             Net_profit: dto.Net_profit,
             Expected_profit: dto.Expected_profit,
@@ -81,7 +81,7 @@ export class DebtService {
           if (!saveDebt || !saveDebt.id)
             throw new Error('Failed to add record please try again');
           const Addtrack = manager.create(Debt_track, {
-            paidmoney: dto.paidmoney,
+            paidmoney: dto.paidmoney | 0,
             debt: { id: saveDebt.id },
             user: { id: userId },
           });

@@ -51,8 +51,9 @@ export class CreateDebtDto {
   @IsString()
   Debtor_name: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
+
   paidmoney: number;
 
   @IsString()
