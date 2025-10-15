@@ -14,6 +14,11 @@ export class DebtController {
     const  userId = req.user.userId
     return  this.debtService.CreateDept(dto, userId)
   }
+
+  @Get('alldebt')
+  ReturnDebt(){
+    return this.debtService.returndebt()
+  }
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
   UpdateDebt(@Param('id') id:number , @Request() req , @Body() dto:UpdateDebtDto){

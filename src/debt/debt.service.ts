@@ -186,4 +186,13 @@ export class DebtService {
       }
     });
   }
+
+  async returndebt():Promise<ResponseType<any>>{
+    const returndebt = await this.DebtRepo.find()
+    return{
+      message:"",
+      success:true,
+      data:returndebt
+    }
+  }
 }
