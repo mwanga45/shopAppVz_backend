@@ -23,6 +23,12 @@ export class DebtController {
   ReturnDebtInfo(){
     return  this .debtService.ReturnDebtInfo()
   }
+   @Get(':id')
+  async UserDebt(
+    @Param('id') id: number, ){
+      return this.debtService.UserDebt(id)
+    }
+  
   @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
   UpdateDebt(@Param('id') id:number , @Request() req , @Body() dto:UpdateDebtDto){

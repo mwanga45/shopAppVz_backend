@@ -181,26 +181,17 @@ export class DebtService {
 .orderBy('d.UpdateAt', 'ASC')
 .getRawMany()
  
-const handlefindtrack = await this.DebtTrackRepo.createQueryBuilder('t')
-.leftJoin('t.track', 'track')
+const findtrack = await this.DebtTrackRepo.createQueryBuilder('t')
+.leftJoinAndSelect('t.debt', 'd')
 .select('t.paidmoney')
 .addSelect('t.paidmoney')
-.where('track.id = id', {id})
+.where('d.id = :id', {id})
 .getRawMany()
-let info: DebtRecord = {
-  debt_id: 0,
-  total_quantity: "",
-  total_revenue: "",
-  payment_status: "",
-  latest_paid_amount: 0,
-  debtor_name: "",
-  phone_number: "",
-  product_name: "",
-  updated_at: "",
-  createdat: "",
-  deadlineDate:""
-};
+
+const customer_name = findUserDebtInfo[0]?.debtor_name;
+
 const PersonDebt = await this.DebtRepo.createQueryBuilder('d')
+.leftJoin('d.product', 'p')
 .select([
     'd.id AS debt_id',
     'd.Total_pc_pkg_litre AS total_quantity',
@@ -212,14 +203,15 @@ const PersonDebt = await this.DebtRepo.createQueryBuilder('d')
     'p.product_name AS product_name',
     'd.UpdateAt AS updated_at',
     'd.CreatedAt AS CreatedAt',
-    'd. PaymentDateAt AS deadlineDate'
-
+    'd.PaymentDateAt AS deadlineDate'
    ])
-   .where('')
+   .where('d.Debtor_name = :customer_name', {customer_name})
+   .getRawMany()
 
     return{
       message:"sucessfuly",
       success:false,
+      data:{findUserDebtInfo,findtrack ,PersonDebt}
       
     }
   }
