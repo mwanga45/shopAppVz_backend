@@ -136,7 +136,7 @@ export class DebtService {
         if (!findDebt) throw new Error('Debt data is not exist');
 
         if (
-          findDebt.paidmoney === findDebt.Revenue ||
+          findDebt.paidmoney >= Number(findDebt.Revenue) ||
           findDebt.paymentstatus === paymentstatus.Paid
         ) {
           if (findDebt.paymentstatus !== paymentstatus.Paid) {
@@ -155,6 +155,9 @@ export class DebtService {
         }
         const { ProductId, Stock_status, paidmoney, ...restdto } = dto;
         const newpaidsum = findDebt.paidmoney + (Number(dto.paidmoney) ?? 0);
+        if(newpaidsum > Number(findDebt.Revenue)){
+          throw new Error('The paid sum  can not be greater than Revenue')
+        }
         const updateDto: any = {
           ...restdto,
           product: { id: dto.ProductId },
@@ -177,6 +180,7 @@ export class DebtService {
         return {
           message: 'successfuly  update debt',
           success: true,
+          data: findDebt
         };
       } catch (error) {
         return {
@@ -192,7 +196,8 @@ export class DebtService {
     return{
       message:"",
       success:true,
-      data:returndebt
+      data:returndebt,
+      
     }
   }
 }
