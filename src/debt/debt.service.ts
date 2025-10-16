@@ -15,6 +15,7 @@ import { Product } from 'src/product/entities/product.entity';
 import { dialValidate } from 'src/common/helper/phone.helper';
 import { Customer } from 'src/entities/customer.entity';
 import { StockService } from 'src/stock/stock.service';
+import { getRawAsset } from 'node:sea';
 
 @Injectable()
 export class DebtService {
@@ -153,6 +154,37 @@ export class DebtService {
       success: true,
       data: ReturnDebtInfo,
     };
+  }
+  async  UserDebt(id:number):Promise<ResponseType<any>>{
+   const findUserDebtInfo = await this.DebtRepo.createQueryBuilder('d')
+   .leftJoin('d.product', 'p')
+   .select([
+    'd.id AS debt_id',
+    'd.Total_pc_pkg_litre AS total_quantity',
+    'd.Revenue AS total_revenue',
+    'd.paymentstatus AS payment_status',
+    'd.paidmoney AS latest_paid_amount',
+    'd.Debtor_name AS debtor_name',
+    'd.Phone_number AS phone_number',
+    'p.product_name AS product_name',
+    'd.UpdateAt AS updated_at',
+    'd.CreatedAt AS CreatedAt',
+
+   ])
+.where('(d.id = :id) AND (d.paymentstatus = :status1 OR d.paymentstatus = :status2)', {
+  id: id,
+  status1: 'partialpaid',
+  status2: 'debt',
+})
+.orderBy('d.UpdateAt', 'ASC')
+.getRawMany()
+const handlefindtrack = await this.DebtTrackRepo.createQueryBuilder('t')
+.select('')
+    return{
+      message:"sucessfuly",
+      success:false,
+      
+    }
   }
   async UpdateDebt(
     dto: UpdateDebtDto,
