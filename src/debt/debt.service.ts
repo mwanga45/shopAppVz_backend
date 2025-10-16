@@ -125,26 +125,32 @@ export class DebtService {
   }
 
   async ReturnDebtInfo():Promise<ResponseType<any>>{
-    const ReturnDebtInfo = await this.DebtTrackRepo.createQueryBuilder('T')
-    .leftJoin('T.debt', 'd')
-    .leftJoin('d.product', 'p')
-    .select('d.Total_pc_pkg_litre')
-    .addSelect('d.Revenue')
-    .addSelect('d.paymentstatus')
-    .addSelect('d.paidmoney')
-    .addSelect('d.Debtor_name')
-    .addSelect('d.Phone_number')
-    .addSelect('p.product_name')
-    .addSelect('T.paidmoney', 'paidtrack')
-    .addSelect('d.UpdateAt','paidDateseries' )
-    .addSelect('T.CreatedAt', 'createdAt')
-    .getRawMany()
+const ReturnDebtInfo = await this.DebtTrackRepo.createQueryBuilder('track')
+  .leftJoinAndSelect('track.debt', 'd')
+  .leftJoinAndSelect('d.product', 'p')
+  .select([
+    'd.id AS debt_id',
+    'd.Total_pc_pkg_litre AS total_quantity',
+    'd.Revenue AS total_revenue',
+    'd.paymentstatus AS payment_status',
+    'd.paidmoney AS latest_paid_amount',
+    'd.Debtor_name AS debtor_name',
+    'd.Phone_number AS phone_number',
+    'p.product_name AS product_name',
+    'track.paidmoney AS paid_track',
+    'track.CreatedAt AS paid_date_series',
+    'd.UpdateAt AS updated_at'
+  ])
+  .where('track.debt IS NOT NULL')
+  .orderBy('track.CreatedAt', 'ASC')
+  .getRawMany();
 
-    return{
-      message:"successfuly",
-      success:true,
-      data:ReturnDebtInfo
-    }
+return {
+  message: "Successfully fetched debt info with payment history",
+  success: true,
+  data: ReturnDebtInfo,
+};
+
   } 
   async UpdateDebt(
     dto: UpdateDebtDto,
@@ -153,6 +159,7 @@ export class DebtService {
   ): Promise<ResponseType<any>> {
     return this.DataSource.transaction(async (manager) => {
       try {
+         if (dto.paidmoney && dto.paidmoney < 0) throw new Error('invalid payment value')
         const findDebt = await manager.findOne(Debt, {
           where: { id: id },
         });
@@ -185,6 +192,7 @@ export class DebtService {
           ...restdto,
           product: { id: dto.ProductId },
           paidmoney: newpaidsum,
+          paymentstatus:newpaidsum === paidmoney ? paymentstatus.Paid:newpaidsum > 0?paymentstatus.Parctial:paymentstatus.Dept
         };
 
         const UpdateDebt = await manager.update(Debt, { id: id }, updateDto);
