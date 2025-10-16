@@ -136,12 +136,16 @@ export class DebtService {
     'd.paidmoney AS latest_paid_amount',
     'd.Debtor_name AS debtor_name',
     'd.Phone_number AS phone_number',
-    'd.UpdatedAt AS updated_at',
     'p.product_name AS product_name',
-    'd.UpdatedAt AS updated_at',
+    'd.UpdateAt AS updated_at',
     'd.CreatedAt AS CreatedAt',
 
    ])
+.where('d.paymentstatus = :status1 OR d.paymentstatus = :status2', { 
+  status1: 'partialpaid', 
+  status2: 'debt' 
+})
+
    .orderBy('d.id')
    .getRawMany()
     return {
