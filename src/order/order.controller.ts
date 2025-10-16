@@ -16,19 +16,11 @@ export class OrderController {
   GetActive() {
     return this.orderService.ProductSummary();
   }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.orderService.findOne(+id);
+  @Get('customerInfo')
+  Getstatus(){
+    return this.orderService.findAllcustomer()
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.orderService.update(+id, updateOrderDto);
-  }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.orderService.remove(+id);
-  }
+
 }

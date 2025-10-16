@@ -7,6 +7,7 @@ import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { Ordertype } from './utils/order.type';
 import { dialValidate } from 'src/common/helper/phone.helper';
 import { Customer } from 'src/entities/customer.entity';
+import { ResponseType } from 'src/type/type.interface';
 
 
 
@@ -91,19 +92,14 @@ export class OrderService {
   // after status stays pending for that time and then send are message  as record of 
   // automatic  cancellation of order(Automatic invoke functu=ion) 
   }
-  findAll() {
-    return `This action returns all order`;
+  async findAllcustomer():Promise<ResponseType<any>>{
+  const customerdetails = await this.CustomerRepo.find()
+    return{
+      message:"successfuly",
+      success:true,
+      data:customerdetails
+    }
+
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
-  }
-
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} order`;
-  }
 }

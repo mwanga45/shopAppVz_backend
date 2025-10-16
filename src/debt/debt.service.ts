@@ -5,6 +5,7 @@ import {
   ChangeType,
   paymentstatus,
   ResponseType,
+  StockStatus 
 } from 'src/type/type.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Debt } from './entities/debt.entity';
@@ -14,7 +15,7 @@ import { Product } from 'src/product/entities/product.entity';
 import { dialValidate } from 'src/common/helper/phone.helper';
 import { Customer } from 'src/entities/customer.entity';
 import { StockService } from 'src/stock/stock.service';
-import { StockStatus } from 'src/type/type.interface';
+
 
 @Injectable()
 export class DebtService {
@@ -123,6 +124,15 @@ export class DebtService {
     });
   }
 
+  async ReturnDebtInfo():Promise<ResponseType<any>>{
+    const ReturnDebtInfo = await this.DebtTrackRepo.createQueryBuilder('T')
+    .leftJoin('T.debt', 'd')
+    .select()
+    return{
+      message:"successfuly",
+      success:true
+    }
+  } 
   async UpdateDebt(
     dto: UpdateDebtDto,
     userId: any,
