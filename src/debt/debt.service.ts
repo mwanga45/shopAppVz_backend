@@ -127,10 +127,21 @@ export class DebtService {
   async ReturnDebtInfo():Promise<ResponseType<any>>{
     const ReturnDebtInfo = await this.DebtTrackRepo.createQueryBuilder('T')
     .leftJoin('T.debt', 'd')
-    .select()
+    .leftJoin('d.product', 'p')
+    .select('d.Total_pc_pkg_litre')
+    .addSelect('d. Revenue')
+    .addSelect('d.paymentstatus')
+    .addSelect('d. paidmoney')
+    .addSelect('d. Debtor_name')
+    .addSelect('d.Phone_number')
+    .addSelect('p.product_name')
+    .addSelect('T.paidmoney', 'paidtrack')
+    .getRawMany()
+
     return{
       message:"successfuly",
-      success:true
+      success:true,
+      data:ReturnDebtInfo
     }
   } 
   async UpdateDebt(

@@ -31,7 +31,7 @@ export class Debt extends baseEntity {
   @Column({ default: paymentstatus.Paid })
   paymentstatus: paymentstatus;
   
-  @Column()
+
 
   @Column()
   paidmoney: number;
