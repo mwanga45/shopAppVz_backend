@@ -129,13 +129,15 @@ export class DebtService {
     .leftJoin('T.debt', 'd')
     .leftJoin('d.product', 'p')
     .select('d.Total_pc_pkg_litre')
-    .addSelect('d. Revenue')
+    .addSelect('d.Revenue')
     .addSelect('d.paymentstatus')
-    .addSelect('d. paidmoney')
-    .addSelect('d. Debtor_name')
+    .addSelect('d.paidmoney')
+    .addSelect('d.Debtor_name')
     .addSelect('d.Phone_number')
     .addSelect('p.product_name')
     .addSelect('T.paidmoney', 'paidtrack')
+    .addSelect('d.UpdateAt','paidDateseries' )
+    .addSelect('T.CreatedAt', 'createdAt')
     .getRawMany()
 
     return{
