@@ -169,6 +169,7 @@ export class DebtService {
     'p.product_name AS product_name',
     'd.UpdateAt AS updated_at',
     'd.CreatedAt AS CreatedAt',
+    'd. PaymentDateAt AS deadlineDate'
 
    ])
 .where('(d.id = :id) AND (d.paymentstatus = :status1 OR d.paymentstatus = :status2)', {
@@ -178,8 +179,11 @@ export class DebtService {
 })
 .orderBy('d.UpdateAt', 'ASC')
 .getRawMany()
+ 
 const handlefindtrack = await this.DebtTrackRepo.createQueryBuilder('t')
-.select('')
+.select('t.paidmoney')
+.addSelect('t.paidmoney')
+.where
     return{
       message:"sucessfuly",
       success:false,
