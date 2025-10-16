@@ -4,10 +4,11 @@ import { OrderController } from './order.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { dialValidate } from 'src/common/helper/phone.helper';
+import { Customer } from 'src/entities/customer.entity';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([Order])
+    TypeOrmModule.forFeature([Order, Customer])
   ],
   controllers: [OrderController],
   providers: [OrderService,dialValidate],

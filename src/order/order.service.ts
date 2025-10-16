@@ -6,6 +6,7 @@ import { Order } from './entities/order.entity';
 import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { Ordertype } from './utils/order.type';
 import { dialValidate } from 'src/common/helper/phone.helper';
+import { Customer } from 'src/entities/customer.entity';
 
 
 
@@ -14,6 +15,7 @@ export class OrderService {
   constructor(
     @InjectRepository(Order) 
     private readonly orderRepo:Repository<Order>,
+    @InjectRepository(Customer) private readonly CustomerRepo: Repository<Customer>,
     private readonly validator:dialValidate
   ){}
   private ordertype:Ordertype[] = [] 
