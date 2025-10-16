@@ -6,6 +6,7 @@ import {
   paymentstatus,
   ResponseType,
   StockStatus,
+  DebtRecord
 } from 'src/type/type.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Debt } from './entities/debt.entity';
@@ -15,7 +16,7 @@ import { Product } from 'src/product/entities/product.entity';
 import { dialValidate } from 'src/common/helper/phone.helper';
 import { Customer } from 'src/entities/customer.entity';
 import { StockService } from 'src/stock/stock.service';
-import { getRawAsset } from 'node:sea';
+
 
 @Injectable()
 export class DebtService {
@@ -169,7 +170,7 @@ export class DebtService {
     'p.product_name AS product_name',
     'd.UpdateAt AS updated_at',
     'd.CreatedAt AS CreatedAt',
-    'd. PaymentDateAt AS deadlineDate'
+    'd.PaymentDateAt AS deadlineDate'
 
    ])
 .where('(d.id = :id) AND (d.paymentstatus = :status1 OR d.paymentstatus = :status2)', {
@@ -181,9 +182,41 @@ export class DebtService {
 .getRawMany()
  
 const handlefindtrack = await this.DebtTrackRepo.createQueryBuilder('t')
+.leftJoin('t.track', 'track')
 .select('t.paidmoney')
 .addSelect('t.paidmoney')
-.where
+.where('track.id = id', {id})
+.getRawMany()
+let info: DebtRecord = {
+  debt_id: 0,
+  total_quantity: "",
+  total_revenue: "",
+  payment_status: "",
+  latest_paid_amount: 0,
+  debtor_name: "",
+  phone_number: "",
+  product_name: "",
+  updated_at: "",
+  createdat: "",
+  deadlineDate:""
+};
+const PersonDebt = await this.DebtRepo.createQueryBuilder('d')
+.select([
+    'd.id AS debt_id',
+    'd.Total_pc_pkg_litre AS total_quantity',
+    'd.Revenue AS total_revenue',
+    'd.paymentstatus AS payment_status',
+    'd.paidmoney AS latest_paid_amount',
+    'd.Debtor_name AS debtor_name',
+    'd.Phone_number AS phone_number',
+    'p.product_name AS product_name',
+    'd.UpdateAt AS updated_at',
+    'd.CreatedAt AS CreatedAt',
+    'd. PaymentDateAt AS deadlineDate'
+
+   ])
+   .where('')
+
     return{
       message:"sucessfuly",
       success:false,
