@@ -5,7 +5,7 @@ import {
   ChangeType,
   paymentstatus,
   ResponseType,
-  StockStatus 
+  StockStatus,
 } from 'src/type/type.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Debt } from './entities/debt.entity';
@@ -15,7 +15,6 @@ import { Product } from 'src/product/entities/product.entity';
 import { dialValidate } from 'src/common/helper/phone.helper';
 import { Customer } from 'src/entities/customer.entity';
 import { StockService } from 'src/stock/stock.service';
-
 
 @Injectable()
 export class DebtService {
@@ -30,7 +29,7 @@ export class DebtService {
     private readonly dialservecheck: dialValidate,
     private readonly DataSource: DataSource,
     private readonly Stockserve: StockService,
-  ) { }
+  ) {}
 
   async CreateDept(
     dto: CreateDebtDto,
@@ -75,7 +74,7 @@ export class DebtService {
             Discount_percentage: dto.Discount_percentage,
             paymentstatus: dto.paymentstatus,
             PaymentDateAt: dto.PaymentDateAt,
-            location:dto.location,
+            location: dto.location,
             user: { id: userId },
           });
           const saveDebt = await manager.save(AddDebt);
@@ -124,11 +123,12 @@ export class DebtService {
     });
   }
 
-  async ReturnDebtInfo():Promise<ResponseType<any>>{
-const ReturnDebtInfo = await this.DebtTrackRepo.createQueryBuilder('track')
-  .leftJoinAndSelect('track.debt', 'd')
-  .leftJoinAndSelect('d.product', 'p')
-  .select([
+  async ReturnDebtInfo(): Promise<ResponseType<any>> {
+
+   const ReturnDebtInfo = await this.DebtRepo
+   .createQueryBuilder('d')
+   .leftJoin('d.product', 'p')
+   .select([
     'd.id AS debt_id',
     'd.Total_pc_pkg_litre AS total_quantity',
     'd.Revenue AS total_revenue',
@@ -136,22 +136,20 @@ const ReturnDebtInfo = await this.DebtTrackRepo.createQueryBuilder('track')
     'd.paidmoney AS latest_paid_amount',
     'd.Debtor_name AS debtor_name',
     'd.Phone_number AS phone_number',
+    'd.UpdatedAt AS updated_at',
     'p.product_name AS product_name',
-    'track.paidmoney AS paid_track',
-    'track.CreatedAt AS paid_date_series',
-    'd.UpdateAt AS updated_at'
-  ])
-  .where('track.debt IS NOT NULL')
-  .orderBy('track.CreatedAt', 'ASC')
-  .getRawMany();
+    'd.UpdatedAt AS updated_at',
+    'd.CreatedAt AS CreatedAt',
 
-return {
-  message: "Successfully fetched debt info with payment history",
-  success: true,
-  data: ReturnDebtInfo,
-};
-
-  } 
+   ])
+   .orderBy('d.id')
+   .getRawMany()
+    return {
+      message: 'Successfully fetched debt info with payment history',
+      success: true,
+      data: ReturnDebtInfo,
+    };
+  }
   async UpdateDebt(
     dto: UpdateDebtDto,
     userId: any,
@@ -159,7 +157,8 @@ return {
   ): Promise<ResponseType<any>> {
     return this.DataSource.transaction(async (manager) => {
       try {
-         if (dto.paidmoney && dto.paidmoney < 0) throw new Error('invalid payment value')
+        if (dto.paidmoney && dto.paidmoney < 0)
+          throw new Error('invalid payment value');
         const findDebt = await manager.findOne(Debt, {
           where: { id: id },
         });
@@ -185,14 +184,19 @@ return {
         }
         const { ProductId, Stock_status, paidmoney, ...restdto } = dto;
         const newpaidsum = findDebt.paidmoney + (Number(dto.paidmoney) ?? 0);
-        if(newpaidsum > Number(findDebt.Revenue)){
-          throw new Error('The paid sum  can not be greater than Revenue')
+        if (newpaidsum > Number(findDebt.Revenue)) {
+          throw new Error('The paid sum  can not be greater than Revenue');
         }
         const updateDto: any = {
           ...restdto,
           product: { id: dto.ProductId },
           paidmoney: newpaidsum,
-          paymentstatus:newpaidsum === paidmoney ? paymentstatus.Paid:newpaidsum > 0?paymentstatus.Parctial:paymentstatus.Dept
+          paymentstatus:
+            newpaidsum === paidmoney
+              ? paymentstatus.Paid
+              : newpaidsum > 0
+                ? paymentstatus.Parctial
+                : paymentstatus.Dept,
         };
 
         const UpdateDebt = await manager.update(Debt, { id: id }, updateDto);
@@ -211,7 +215,7 @@ return {
         return {
           message: 'successfuly  update debt',
           success: true,
-          data: findDebt
+          data: findDebt,
         };
       } catch (error) {
         return {
@@ -222,13 +226,12 @@ return {
     });
   }
 
-  async returndebt():Promise<ResponseType<any>>{
-    const returndebt = await this.DebtRepo.find()
-    return{
-      message:"",
-      success:true,
-      data:returndebt,
-      
-    }
+  async returndebt(): Promise<ResponseType<any>> {
+    const returndebt = await this.DebtRepo.find();
+    return {
+      message: '',
+      success: true,
+      data: returndebt,
+    };
   }
 }
