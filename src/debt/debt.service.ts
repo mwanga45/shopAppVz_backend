@@ -6,7 +6,6 @@ import {
   paymentstatus,
   ResponseType,
   StockStatus,
-  DebtRecord
 } from 'src/type/type.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Debt } from './entities/debt.entity';
@@ -184,7 +183,7 @@ export class DebtService {
 const findtrack = await this.DebtTrackRepo.createQueryBuilder('t')
 .leftJoinAndSelect('t.debt', 'd')
 .select('t.paidmoney')
-.addSelect('t.paidmoney')
+.addSelect('t.UpdateAt AS updated_at')
 .where('d.id = :id', {id})
 .getRawMany()
 
