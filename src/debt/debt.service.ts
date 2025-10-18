@@ -16,7 +16,6 @@ import { dialValidate } from 'src/common/helper/phone.helper';
 import { Customer } from 'src/entities/customer.entity';
 import { StockService } from 'src/stock/stock.service';
 
-
 @Injectable()
 export class DebtService {
   constructor(
@@ -125,94 +124,92 @@ export class DebtService {
   }
 
   async ReturnDebtInfo(): Promise<ResponseType<any>> {
+    const ReturnDebtInfo = await this.DebtRepo.createQueryBuilder('d')
+      .leftJoin('d.product', 'p')
+      .select([
+        'd.id AS debt_id',
+        'd.Total_pc_pkg_litre AS total_quantity',
+        'd.Revenue AS total_revenue',
+        'd.paymentstatus AS payment_status',
+        'd.paidmoney AS latest_paid_amount',
+        'd.Debtor_name AS debtor_name',
+        'd.Phone_number AS phone_number',
+        'p.product_name AS product_name',
+        'd.UpdateAt AS updated_at',
+        'd.CreatedAt AS CreatedAt',
+      ])
+      .where('d.paymentstatus = :status1 OR d.paymentstatus = :status2', {
+        status1: 'partialpaid',
+        status2: 'debt',
+      })
 
-   const ReturnDebtInfo = await this.DebtRepo
-   .createQueryBuilder('d')
-   .leftJoin('d.product', 'p')
-   .select([
-    'd.id AS debt_id',
-    'd.Total_pc_pkg_litre AS total_quantity',
-    'd.Revenue AS total_revenue',
-    'd.paymentstatus AS payment_status',
-    'd.paidmoney AS latest_paid_amount',
-    'd.Debtor_name AS debtor_name',
-    'd.Phone_number AS phone_number',
-    'p.product_name AS product_name',
-    'd.UpdateAt AS updated_at',
-    'd.CreatedAt AS CreatedAt',
-
-   ])
-.where('d.paymentstatus = :status1 OR d.paymentstatus = :status2', { 
-  status1: 'partialpaid', 
-  status2: 'debt' 
-})
-
-   .orderBy('d.id')
-   .getRawMany()
+      .orderBy('d.id')
+      .getRawMany();
     return {
       message: 'Successfully fetched debt info with payment history',
       success: true,
       data: ReturnDebtInfo,
     };
   }
-  async  UserDebt(id:number):Promise<ResponseType<any>>{
-   const findUserDebtInfo = await this.DebtRepo.createQueryBuilder('d')
-   .leftJoin('d.product', 'p')
-   .select([
-    'd.id AS debt_id',
-    'd.Total_pc_pkg_litre AS total_quantity',
-    'd.Revenue AS total_revenue',
-    'd.paymentstatus AS payment_status',
-    'd.paidmoney AS latest_paid_amount',
-    'd.Debtor_name AS debtor_name',
-    'd.Phone_number AS phone_number',
-    'p.product_name AS product_name',
-    'd.UpdateAt AS updated_at',
-    'd.CreatedAt AS CreatedAt',
-    'd.PaymentDateAt AS deadlineDate'
+  async UserDebt(id: number): Promise<ResponseType<any>> {
+    const findUserDebtInfo = await this.DebtRepo.createQueryBuilder('d')
+      .leftJoin('d.product', 'p')
+      .select([
+        'd.id AS debt_id',
+        'd.Total_pc_pkg_litre AS total_quantity',
+        'd.Revenue AS total_revenue',
+        'd.paymentstatus AS payment_status',
+        'd.paidmoney AS latest_paid_amount',
+        'd.Debtor_name AS debtor_name',
+        'd.Phone_number AS phone_number',
+        'p.product_name AS product_name',
+        'd.UpdateAt AS updated_at',
+        'd.CreatedAt AS CreatedAt',
+        'd.PaymentDateAt AS deadlineDate',
+      ])
+      .where(
+        '(d.id = :id) AND (d.paymentstatus = :status1 OR d.paymentstatus = :status2)',
+        {
+          id: id,
+          status1: 'partialpaid',
+          status2: 'debt',
+        },
+      )
+      .orderBy('d.UpdateAt', 'ASC')
+      .getRawMany();
 
-   ])
-.where('(d.id = :id) AND (d.paymentstatus = :status1 OR d.paymentstatus = :status2)', {
-  id: id,
-  status1: 'partialpaid',
-  status2: 'debt',
-})
-.orderBy('d.UpdateAt', 'ASC')
-.getRawMany()
- 
-const findtrack = await this.DebtTrackRepo.createQueryBuilder('t')
-.leftJoinAndSelect('t.debt', 'd')
-.select('t.paidmoney')
-.addSelect('t.UpdateAt AS updated_at')
-.where('d.id = :id', {id})
-.getRawMany()
+    const findtrack = await this.DebtTrackRepo.createQueryBuilder('t')
+      .leftJoinAndSelect('t.debt', 'd')
+      .select('t.paidmoney')
+      .addSelect('t.UpdateAt AS updated_at')
+      .where('d.id = :id', { id })
+      .getRawMany();
 
-const customer_name = findUserDebtInfo[0]?.debtor_name;
+    const customer_name = findUserDebtInfo[0]?.debtor_name;
 
-const PersonDebt = await this.DebtRepo.createQueryBuilder('d')
-.leftJoin('d.product', 'p')
-.select([
-    'd.id AS debt_id',
-    'd.Total_pc_pkg_litre AS total_quantity',
-    'd.Revenue AS total_revenue',
-    'd.paymentstatus AS payment_status',
-    'd.paidmoney AS latest_paid_amount',
-    'd.Debtor_name AS debtor_name',
-    'd.Phone_number AS phone_number',
-    'p.product_name AS product_name',
-    'd.UpdateAt AS updated_at',
-    'd.CreatedAt AS CreatedAt',
-    'd.PaymentDateAt AS deadlineDate'
-   ])
-   .where('d.Debtor_name = :customer_name', {customer_name})
-   .getRawMany()
+    const PersonDebt = await this.DebtRepo.createQueryBuilder('d')
+      .leftJoin('d.product', 'p')
+      .select([
+        'd.id AS debt_id',
+        'd.Total_pc_pkg_litre AS total_quantity',
+        'd.Revenue AS total_revenue',
+        'd.paymentstatus AS payment_status',
+        'd.paidmoney AS latest_paid_amount',
+        'd.Debtor_name AS debtor_name',
+        'd.Phone_number AS phone_number',
+        'p.product_name AS product_name',
+        'd.UpdateAt AS updated_at',
+        'd.CreatedAt AS CreatedAt',
+        'd.PaymentDateAt AS deadlineDate',
+      ])
+      .where('d.Debtor_name = :customer_name', { customer_name })
+      .getRawMany();
 
-    return{
-      message:"sucessfuly",
-      success:false,
-      data:{findUserDebtInfo,findtrack ,PersonDebt}
-      
-    }
+    return {
+      message: 'sucessfuly',
+      success: false,
+      data: { findUserDebtInfo, findtrack, PersonDebt },
+    };
   }
   async UpdateDebt(
     dto: UpdateDebtDto,
