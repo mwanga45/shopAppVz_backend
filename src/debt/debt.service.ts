@@ -152,65 +152,85 @@ export class DebtService {
     };
   }
   async UserDebt(id: number): Promise<ResponseType<any>> {
-    const findUserDebtInfo = await this.DebtRepo.createQueryBuilder('d')
-      .leftJoin('d.product', 'p')
-      .select([
-        'd.id AS debt_id',
-        'd.Total_pc_pkg_litre AS total_quantity',
-        'd.Revenue AS total_revenue',
-        'd.paymentstatus AS payment_status',
-        'd.paidmoney AS latest_paid_amount',
-        'd.Debtor_name AS debtor_name',
-        'd.Phone_number AS phone_number',
-        'p.product_name AS product_name',
-        'd.UpdateAt AS updated_at',
-        'd.CreatedAt AS CreatedAt',
-        'd.PaymentDateAt AS deadlineDate',
-      ])
-      .where(
-        '(d.id = :id) AND (d.paymentstatus = :status1 OR d.paymentstatus = :status2)',
-        {
-          id: id,
-          status1: 'partialpaid',
-          status2: 'debt',
-        },
-      )
-      .orderBy('d.UpdateAt', 'ASC')
-      .getRawMany();
+  // STEP 1: Get the main debt by ID
+  const findUserDebtInfo = await this.DebtRepo.createQueryBuilder('d')
+    .leftJoin('d.product', 'p')
+    .select([
+      'd.id AS debt_id',
+      'd.Total_pc_pkg_litre AS total_quantity',
+      'd.Revenue AS total_revenue',
+      'd.paymentstatus AS payment_status',
+      'd.paidmoney AS latest_paid_amount',
+      'd.Debtor_name AS debtor_name',
+      'd.Phone_number AS phone_number',
+      'p.product_name AS product_name',
+      'd.UpdateAt AS updated_at',
+      'd.CreatedAt AS created_at',
+      'd.PaymentDateAt AS deadline_date',
+    ])
+    .where(
+      '(d.id = :id) AND (d.paymentstatus = :status1 OR d.paymentstatus = :status2)',
+      { id, status1: 'partialpaid', status2: 'debt' },
+    )
+    .orderBy('d.UpdateAt', 'ASC')
+    .getRawMany();
 
-    const findtrack = await this.DebtTrackRepo.createQueryBuilder('t')
-      .leftJoinAndSelect('t.debt', 'd')
-      .select('t.paidmoney')
-      .addSelect('t.UpdateAt AS updated_at')
-      .where('d.id = :id', { id })
-      .getRawMany();
+  // STEP 2: Find all payment track rows for that debt
+  const findtrack = await this.DebtTrackRepo.createQueryBuilder('t')
+    .leftJoin('t.debt', 'd')
+    .select(['t.paidmoney AS paidmoney', 't.UpdateAt AS updated_at'])
+    .where('d.id = :id', { id })
+    .orderBy('t.UpdateAt', 'ASC')
+    .getRawMany();
 
-    const customer_name = findUserDebtInfo[0]?.debtor_name;
+  // STEP 3: Get debtor name
+  const customer_name = findUserDebtInfo[0]?.debtor_name;
 
-    const PersonDebt = await this.DebtRepo.createQueryBuilder('d')
-      .leftJoin('d.product', 'p')
-      .select([
-        'd.id AS debt_id',
-        'd.Total_pc_pkg_litre AS total_quantity',
-        'd.Revenue AS total_revenue',
-        'd.paymentstatus AS payment_status',
-        'd.paidmoney AS latest_paid_amount',
-        'd.Debtor_name AS debtor_name',
-        'd.Phone_number AS phone_number',
-        'p.product_name AS product_name',
-        'd.UpdateAt AS updated_at',
-        'd.CreatedAt AS CreatedAt',
-        'd.PaymentDateAt AS deadlineDate',
-      ])
-      .where('d.Debtor_name = :customer_name', { customer_name })
-      .getRawMany();
+  // STEP 4: Get all debts for this customer
+  const debts = await this.DebtRepo.createQueryBuilder('d')
+    .leftJoin('d.product', 'p')
+    .select([
+      'd.id AS debt_id',
+      'd.Total_pc_pkg_litre AS total_quantity',
+      'd.Revenue AS total_revenue',
+      'd.paymentstatus AS payment_status',
+      'd.paidmoney AS latest_paid_amount',
+      'd.Debtor_name AS debtor_name',
+      'd.Phone_number AS phone_number',
+      'p.product_name AS product_name',
+      'd.UpdateAt AS updated_at',
+      'd.CreatedAt AS created_at',
+      'd.PaymentDateAt AS deadlinedate',
+    ])
+    .where('d.Debtor_name = :customer_name', { customer_name })
+    .orderBy('d.UpdateAt', 'ASC')
+    .getRawMany();
 
-    return {
-      message: 'sucessfuly',
-      success: false,
-      data: { findUserDebtInfo, findtrack, PersonDebt },
-    };
-  }
+  // STEP 5: Attach payment tracks for each debt
+  const PersonDebt = await Promise.all(
+    debts.map(async (debt) => {
+      const tracks = await this.DebtTrackRepo.createQueryBuilder('t')
+        .leftJoin('t.debt', 'd')
+        .select(['t.paidmoney AS paidmoney', 't.UpdateAt AS updated_at'])
+        .where('d.id = :id', { id: debt.debt_id })
+        .orderBy('t.UpdateAt', 'ASC')
+        .getRawMany();
+
+      return {
+        ...debt,
+        tracks, // nested payments
+      };
+    }),
+  );
+
+  // STEP 6: Return everything
+  return {
+    message: 'successfully',
+    success: true,
+    data: { findUserDebtInfo, findtrack, PersonDebt },
+  };
+}
+
   async UpdateDebt(
     dto: UpdateDebtDto,
     userId: any,
