@@ -12,6 +12,7 @@ import { SalesModule } from './sales/sales.module';
 import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
 import { DebtModule } from './debt/debt.module';
+import { SmsModule } from './sms/sms.module';
 
 
 @Module({
@@ -33,6 +34,7 @@ import { DebtModule } from './debt/debt.module';
     ProductModule,
     OrderModule,
     DebtModule,
+    SmsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
