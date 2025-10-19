@@ -93,7 +93,14 @@ export class OrderService {
   // automatic  cancellation of order(Automatic invoke functu=ion) 
   }
   async findAllcustomer():Promise<ResponseType<any>>{
-  const customerdetails = await this.CustomerRepo.find()
+  const customerdetails = await this.CustomerRepo.createQueryBuilder('c')
+  .select([
+      "c.customer_name AS customer_name ",
+      "c.phone_number AS phone_number ",
+      "c.Location AS Location "
+  ])
+  .getRawMany()
+  
     return{
       message:"successfuly",
       success:true,

@@ -152,7 +152,7 @@ export class DebtService {
     };
   }
   async UserDebt(id: number): Promise<ResponseType<any>> {
-  // STEP 1: Get the main debt by ID
+ 
   const findUserDebtInfo = await this.DebtRepo.createQueryBuilder('d')
     .leftJoin('d.product', 'p')
     .select([
@@ -175,7 +175,7 @@ export class DebtService {
     .orderBy('d.UpdateAt', 'ASC')
     .getRawMany();
 
-  // STEP 2: Find all payment track rows for that debt
+ 
   const findtrack = await this.DebtTrackRepo.createQueryBuilder('t')
     .leftJoin('t.debt', 'd')
     .select(['t.paidmoney AS paidmoney', 't.UpdateAt AS updated_at'])
@@ -183,10 +183,9 @@ export class DebtService {
     .orderBy('t.UpdateAt', 'ASC')
     .getRawMany();
 
-  // STEP 3: Get debtor name
+
   const customer_name = findUserDebtInfo[0]?.debtor_name;
 
-  // STEP 4: Get all debts for this customer
   const debts = await this.DebtRepo.createQueryBuilder('d')
     .leftJoin('d.product', 'p')
     .select([
@@ -199,14 +198,14 @@ export class DebtService {
       'd.Phone_number AS phone_number',
       'p.product_name AS product_name',
       'd.UpdateAt AS updated_at',
-      'd.CreatedAt AS created_at',
+      'd.CreatedAt AS createdat',
       'd.PaymentDateAt AS deadlinedate',
     ])
     .where('d.Debtor_name = :customer_name', { customer_name })
     .orderBy('d.UpdateAt', 'ASC')
     .getRawMany();
 
-  // STEP 5: Attach payment tracks for each debt
+  
   const PersonDebt = await Promise.all(
     debts.map(async (debt) => {
       const tracks = await this.DebtTrackRepo.createQueryBuilder('t')
@@ -218,12 +217,11 @@ export class DebtService {
 
       return {
         ...debt,
-        tracks, // nested payments
+        tracks, 
       };
     }),
   );
 
-  // STEP 6: Return everything
   return {
     message: 'successfully',
     success: true,
