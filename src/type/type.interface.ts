@@ -69,3 +69,13 @@ interface NormalsaleSummary {
   total_profit: string;   
 }
 
+
+export interface SmsRecipient {
+  number: number;
+}
+ export interface SmsPayload {
+  sender_id: number;
+  schedule: string;
+  sms: string;
+  recipients: SmsRecipient[];
+}
