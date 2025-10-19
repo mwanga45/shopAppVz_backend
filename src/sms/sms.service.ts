@@ -29,9 +29,16 @@ const response = await fetch(url, {
         'Authorization': `Bearer ${token}`
     },
 })
+if(!response){
+  return{
+    message:"failed to send",
+    success:false
+  }
+}
     return{
       message:"successfuly sent",
-      success:true
+      success:true,
+      data:response
     }
   }
 
