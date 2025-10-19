@@ -45,4 +45,9 @@ export default () => ({
   logging: {
     level: process.env.LOG_LEVEL || 'debug',
   },
+
+  sms_configuration :{
+    sms_token:process.env.SMS_TOKEN,
+    base_url : process.env.BASE_URL
+  }
 });

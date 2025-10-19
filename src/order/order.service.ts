@@ -95,9 +95,10 @@ export class OrderService {
   async findAllcustomer():Promise<ResponseType<any>>{
   const customerdetails = await this.CustomerRepo.createQueryBuilder('c')
   .select([
-      "c.customer_name AS customer_name ",
-      "c.phone_number AS phone_number ",
-      "c.Location AS Location "
+       "c.id As Cid",
+      "c.customer_name AS customer_name",
+      "c.phone_number AS phone_number",
+      "c.Location AS Location"
   ])
   .getRawMany()
   
