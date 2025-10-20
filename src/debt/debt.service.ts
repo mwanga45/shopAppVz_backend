@@ -211,7 +211,9 @@ export class DebtService {
     const countpaid  = filterpaid.length
     const filterupaid = debts.filter(((item)=> item.payment_status !== paymentstatus.Paid))
     const countUnpaid = filterupaid.length
-  
+    const CountPaidMoney = debts.reduce((acc, curr)=> Number(curr.latest_paid_amount) + acc, 0)
+    const countUnpaidMoney  = debts.reduce((acc, curr) => (Number(curr.total_revenue) + acc, 0) - Number(curr.latest_paid_amount) + acc, 0 )
+    
   const PersonDebt = await Promise.all(
     debts.map(async (debt) => {
       const tracks = await this.DebtTrackRepo.createQueryBuilder('t')
@@ -231,7 +233,7 @@ export class DebtService {
   return {
     message: 'successfully',
     success: true,
-    data: { findUserDebtInfo, findtrack, PersonDebt, Debtnumber, countUnpaid, countpaid },
+    data: { findUserDebtInfo, findtrack, PersonDebt, Debtnumber, countUnpaid, countpaid, CountPaidMoney },
   };
 }
 
