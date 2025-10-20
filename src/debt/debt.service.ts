@@ -174,6 +174,7 @@ export class DebtService {
     )
     .orderBy('d.UpdateAt', 'ASC')
     .getRawMany();
+    
 
  
   const findtrack = await this.DebtTrackRepo.createQueryBuilder('t')
@@ -205,6 +206,11 @@ export class DebtService {
     .orderBy('d.UpdateAt', 'ASC')
     .getRawMany();
 
+    const Debtnumber =   debts.length
+    const filterpaid  = debts.filter((item) => item.payment_status === paymentstatus.Paid)
+    const countpaid  = filterpaid.length
+    const filterupaid = debts.filter(((item)=> item.payment_status !== paymentstatus.Paid))
+    const countUnpaid = filterupaid.length
   
   const PersonDebt = await Promise.all(
     debts.map(async (debt) => {
@@ -225,7 +231,7 @@ export class DebtService {
   return {
     message: 'successfully',
     success: true,
-    data: { findUserDebtInfo, findtrack, PersonDebt },
+    data: { findUserDebtInfo, findtrack, PersonDebt, Debtnumber, countUnpaid, countpaid },
   };
 }
 
