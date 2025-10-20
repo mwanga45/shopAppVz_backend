@@ -215,7 +215,15 @@ export class DebtService {
     const total_revenue = debts.reduce((acc,curr)=>Number(curr.total_revenue) + acc, 0)
     const countUnpaidMoney  = total_revenue - CountPaidMoney
 
-    const PersonDebtinfo = {countUnpaidMoney,total_revenue, CountPaidMoney , countUnpaid , Debtnumber}
+    const Location = await  this.CustomerRepo.createQueryBuilder('c')
+    .select('c.Location', 'Location')
+    .where('c.customer_name = :customer_name', {customer_name})
+    .getRawOne()
+
+    co
+    
+
+    const PersonDebtinfo = {countUnpaidMoney,total_revenue, CountPaidMoney , countUnpaid , Debtnumber, customer_name, Location}
   const PersonDebt = await Promise.all(
     debts.map(async (debt) => {
       const tracks = await this.DebtTrackRepo.createQueryBuilder('t')
