@@ -212,7 +212,9 @@ export class DebtService {
     const filterupaid = debts.filter(((item)=> item.payment_status !== paymentstatus.Paid))
     const countUnpaid = filterupaid.length
     const CountPaidMoney = debts.reduce((acc, curr)=> Number(curr.latest_paid_amount) + acc, 0)
-    const countUnpaidMoney  = debts.reduce((acc, curr) => (Number(curr.total_revenue) + acc, 0) - Number(curr.latest_paid_amount) + acc, 0 )
+    const total_revenue = debts.reduce((acc,curr)=>Number(curr.total_revenue) + acc, 0)
+    const countUnpaidMoney  = total_revenue - CountPaidMoney
+
     
   const PersonDebt = await Promise.all(
     debts.map(async (debt) => {
@@ -233,7 +235,7 @@ export class DebtService {
   return {
     message: 'successfully',
     success: true,
-    data: { findUserDebtInfo, findtrack, PersonDebt, Debtnumber, countUnpaid, countpaid, CountPaidMoney },
+    data: { findUserDebtInfo, findtrack, PersonDebt, Debtnumber, countUnpaid, countpaid, CountPaidMoney, countUnpaidMoney, total_revenue },
   };
 }
 
