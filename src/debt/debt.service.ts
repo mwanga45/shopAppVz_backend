@@ -215,7 +215,7 @@ export class DebtService {
     const total_revenue = debts.reduce((acc,curr)=>Number(curr.total_revenue) + acc, 0)
     const countUnpaidMoney  = total_revenue - CountPaidMoney
 
-    
+    const PersonDebtinfo = {countUnpaidMoney,total_revenue, CountPaidMoney , countUnpaid , Debtnumber}
   const PersonDebt = await Promise.all(
     debts.map(async (debt) => {
       const tracks = await this.DebtTrackRepo.createQueryBuilder('t')
@@ -235,7 +235,7 @@ export class DebtService {
   return {
     message: 'successfully',
     success: true,
-    data: { findUserDebtInfo, findtrack, PersonDebt, Debtnumber, countUnpaid, countpaid, CountPaidMoney, countUnpaidMoney, total_revenue },
+    data: { findUserDebtInfo, findtrack, PersonDebt, PersonDebtinfo},
   };
 }
 
