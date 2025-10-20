@@ -8,7 +8,7 @@ export class SmsController {
   constructor(private readonly smsService: SmsService) {}
 
   @Post()
-  create(@Body() createSmDto: CreateSmDto) {
+  Sendsms(@Body() createSmDto: CreateSmDto) {
     return this.smsService.SendSms(createSmDto);
   }
 
