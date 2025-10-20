@@ -220,10 +220,17 @@ export class DebtService {
     .where('c.customer_name = :customer_name', {customer_name})
     .getRawOne()
 
-    co
+const PaidOutDate = await this.DebtRepo.createQueryBuilder('d')
+  .where('d.paymentstatus = :status', { status: paymentstatus.Paid }) 
+  .andWhere('d.PaymentDateAt < d.UpdateAt') 
+  .getCount(); 
+
+console.log('Number of debts paid after return date:', PaidOutDate);
+
+
     
 
-    const PersonDebtinfo = {countUnpaidMoney,total_revenue, CountPaidMoney , countUnpaid , Debtnumber, customer_name, Location}
+    const PersonDebtinfo = {countUnpaidMoney,total_revenue, CountPaidMoney , countUnpaid , Debtnumber, customer_name, Location, countpaid, PaidOutDate}
   const PersonDebt = await Promise.all(
     debts.map(async (debt) => {
       const tracks = await this.DebtTrackRepo.createQueryBuilder('t')
