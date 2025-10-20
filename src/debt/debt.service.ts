@@ -217,6 +217,7 @@ export class DebtService {
 
     const Location = await  this.CustomerRepo.createQueryBuilder('c')
     .select('c.Location', 'Location')
+    .addSelect('c.phone_number', 'Phone_number')
     .where('c.customer_name = :customer_name', {customer_name})
     .getRawOne()
 
