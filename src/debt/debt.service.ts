@@ -152,108 +152,121 @@ export class DebtService {
     };
   }
   async UserDebt(id: number): Promise<ResponseType<any>> {
- 
-  const findUserDebtInfo = await this.DebtRepo.createQueryBuilder('d')
-    .leftJoin('d.product', 'p')
-    .select([
-      'd.id AS debt_id',
-      'd.Total_pc_pkg_litre AS total_quantity',
-      'd.Revenue AS total_revenue',
-      'd.paymentstatus AS payment_status',
-      'd.paidmoney AS latest_paid_amount',
-      'd.Debtor_name AS debtor_name',
-      'd.Phone_number AS phone_number',
-      'p.product_name AS product_name',
-      'd.UpdateAt AS updated_at',
-      'd.CreatedAt AS created_at',
-      'd.PaymentDateAt AS deadline_date',
-    ])
-    .where(
-      '(d.id = :id) AND (d.paymentstatus = :status1 OR d.paymentstatus = :status2)',
-      { id, status1: 'partialpaid', status2: 'debt' },
-    )
-    .orderBy('d.UpdateAt', 'ASC')
-    .getRawMany();
-    
+    const findUserDebtInfo = await this.DebtRepo.createQueryBuilder('d')
+      .leftJoin('d.product', 'p')
+      .select([
+        'd.id AS debt_id',
+        'd.Total_pc_pkg_litre AS total_quantity',
+        'd.Revenue AS total_revenue',
+        'd.paymentstatus AS payment_status',
+        'd.paidmoney AS latest_paid_amount',
+        'd.Debtor_name AS debtor_name',
+        'd.Phone_number AS phone_number',
+        'p.product_name AS product_name',
+        'd.UpdateAt AS updated_at',
+        'd.CreatedAt AS created_at',
+        'd.PaymentDateAt AS deadline_date',
+      ])
+      .where(
+        '(d.id = :id) AND (d.paymentstatus = :status1 OR d.paymentstatus = :status2)',
+        { id, status1: 'partialpaid', status2: 'debt' },
+      )
+      .orderBy('d.UpdateAt', 'ASC')
+      .getRawMany();
 
- 
-  const findtrack = await this.DebtTrackRepo.createQueryBuilder('t')
-    .leftJoin('t.debt', 'd')
-    .select(['t.paidmoney AS paidmoney', 't.UpdateAt AS updated_at'])
-    .where('d.id = :id', { id })
-    .orderBy('t.UpdateAt', 'ASC')
-    .getRawMany();
+    const findtrack = await this.DebtTrackRepo.createQueryBuilder('t')
+      .leftJoin('t.debt', 'd')
+      .select(['t.paidmoney AS paidmoney', 't.UpdateAt AS updated_at'])
+      .where('d.id = :id', { id })
+      .orderBy('t.UpdateAt', 'ASC')
+      .getRawMany();
 
+    const customer_name = findUserDebtInfo[0]?.debtor_name;
 
-  const customer_name = findUserDebtInfo[0]?.debtor_name;
+    const debts = await this.DebtRepo.createQueryBuilder('d')
+      .leftJoin('d.product', 'p')
+      .select([
+        'd.id AS debt_id',
+        'd.Total_pc_pkg_litre AS total_quantity',
+        'd.Revenue AS total_revenue',
+        'd.paymentstatus AS payment_status',
+        'd.paidmoney AS latest_paid_amount',
+        'd.Debtor_name AS debtor_name',
+        'd.Phone_number AS phone_number',
+        'p.product_name AS product_name',
+        'd.UpdateAt AS updated_at',
+        'd.CreatedAt AS createdat',
+        'd.PaymentDateAt AS deadlinedate',
+      ])
+      .where('d.Debtor_name = :customer_name', { customer_name })
+      .orderBy('d.UpdateAt', 'ASC')
+      .getRawMany();
 
-  const debts = await this.DebtRepo.createQueryBuilder('d')
-    .leftJoin('d.product', 'p')
-    .select([
-      'd.id AS debt_id',
-      'd.Total_pc_pkg_litre AS total_quantity',
-      'd.Revenue AS total_revenue',
-      'd.paymentstatus AS payment_status',
-      'd.paidmoney AS latest_paid_amount',
-      'd.Debtor_name AS debtor_name',
-      'd.Phone_number AS phone_number',
-      'p.product_name AS product_name',
-      'd.UpdateAt AS updated_at',
-      'd.CreatedAt AS createdat',
-      'd.PaymentDateAt AS deadlinedate',
-    ])
-    .where('d.Debtor_name = :customer_name', { customer_name })
-    .orderBy('d.UpdateAt', 'ASC')
-    .getRawMany();
+    const Debtnumber = debts.length;
+    const filterpaid = debts.filter(
+      (item) => item.payment_status === paymentstatus.Paid,
+    );
+    const countpaid = filterpaid.length;
+    const filterupaid = debts.filter(
+      (item) => item.payment_status !== paymentstatus.Paid,
+    );
+    const countUnpaid = filterupaid.length;
+    const CountPaidMoney = debts.reduce(
+      (acc, curr) => Number(curr.latest_paid_amount) + acc,
+      0,
+    );
+    const total_revenue = debts.reduce(
+      (acc, curr) => Number(curr.total_revenue) + acc,
+      0,
+    );
+    const countUnpaidMoney = total_revenue - CountPaidMoney;
 
-    const Debtnumber =   debts.length
-    const filterpaid  = debts.filter((item) => item.payment_status === paymentstatus.Paid)
-    const countpaid  = filterpaid.length
-    const filterupaid = debts.filter(((item)=> item.payment_status !== paymentstatus.Paid))
-    const countUnpaid = filterupaid.length
-    const CountPaidMoney = debts.reduce((acc, curr)=> Number(curr.latest_paid_amount) + acc, 0)
-    const total_revenue = debts.reduce((acc,curr)=>Number(curr.total_revenue) + acc, 0)
-    const countUnpaidMoney  = total_revenue - CountPaidMoney
+    const Location = await this.CustomerRepo.createQueryBuilder('c')
+      .select('c.Location', 'Location')
+      .addSelect('c.phone_number', 'Phone_number')
+      .where('c.customer_name = :customer_name', { customer_name })
+      .getRawOne();
 
-    const Location = await  this.CustomerRepo.createQueryBuilder('c')
-    .select('c.Location', 'Location')
-    .addSelect('c.phone_number', 'Phone_number')
-    .where('c.customer_name = :customer_name', {customer_name})
-    .getRawOne()
+    const PaidOutDate = await this.DebtRepo.createQueryBuilder('d')
+      .where('d.paymentstatus = :status', { status: paymentstatus.Paid })
+      .andWhere('d.PaymentDateAt < d.UpdateAt')
+      .getCount();
 
-const PaidOutDate = await this.DebtRepo.createQueryBuilder('d')
-  .where('d.paymentstatus = :status', { status: paymentstatus.Paid }) 
-  .andWhere('d.PaymentDateAt < d.UpdateAt') 
-  .getCount(); 
+    console.log('Number of debts paid after return date:', PaidOutDate);
 
-console.log('Number of debts paid after return date:', PaidOutDate);
+    const PersonDebtinfo = {
+      countUnpaidMoney,
+      total_revenue,
+      CountPaidMoney,
+      countUnpaid,
+      Debtnumber,
+      customer_name,
+      Location,
+      countpaid,
+      PaidOutDate,
+    };
+    const PersonDebt = await Promise.all(
+      debts.map(async (debt) => {
+        const tracks = await this.DebtTrackRepo.createQueryBuilder('t')
+          .leftJoin('t.debt', 'd')
+          .select(['t.paidmoney AS paidmoney', 't.UpdateAt AS updated_at'])
+          .where('d.id = :id', { id: debt.debt_id })
+          .orderBy('t.UpdateAt', 'ASC')
+          .getRawMany();
 
+        return {
+          ...debt,
+          tracks,
+        };
+      }),
+    );
 
-    
-
-    const PersonDebtinfo = {countUnpaidMoney,total_revenue, CountPaidMoney , countUnpaid , Debtnumber, customer_name, Location, countpaid, PaidOutDate}
-  const PersonDebt = await Promise.all(
-    debts.map(async (debt) => {
-      const tracks = await this.DebtTrackRepo.createQueryBuilder('t')
-        .leftJoin('t.debt', 'd')
-        .select(['t.paidmoney AS paidmoney', 't.UpdateAt AS updated_at'])
-        .where('d.id = :id', { id: debt.debt_id })
-        .orderBy('t.UpdateAt', 'ASC')
-        .getRawMany();
-
-      return {
-        ...debt,
-        tracks, 
-      };
-    }),
-  );
-
-  return {
-    message: 'successfully',
-    success: true,
-    data: { findUserDebtInfo, findtrack, PersonDebt, PersonDebtinfo},
-  };
-}
+    return {
+      message: 'successfully',
+      success: true,
+      data: { findUserDebtInfo, findtrack, PersonDebt, PersonDebtinfo },
+    };
+  }
 
   async UpdateDebt(
     dto: UpdateDebtDto,
