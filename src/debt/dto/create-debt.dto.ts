@@ -53,7 +53,6 @@ export class CreateDebtDto {
 
   @IsOptional()
   @IsNumber()
-
   paidmoney: number;
 
   @IsString()
