@@ -7,7 +7,7 @@ import { UpdateSmDto } from './dto/update-sm.dto';
 export class SmsController {
   constructor(private readonly smsService: SmsService) {}
 
-  @Post()
+  @Post('send-sms')
   Sendsms(@Body() createSmDto: CreateSmDto) {
     return this.smsService.SendSms(createSmDto);
   }
