@@ -7,7 +7,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/product/entities/product.entity';
 import { RetailSales } from './entities/retailsale.entity';
 import { Product_discount } from 'src/product/entities/discount.entity';
-import { ChangeType, override, paymentstatus, ResponseType } from 'src/type/type.interface';
+import {
+  ChangeType,
+  override,
+  paymentstatus,
+  ResponseType,
+} from 'src/type/type.interface';
 import { StockStatus } from 'src/type/type.interface';
 import { DeviationInput } from 'src/type/type.interface';
 import { category } from 'src/type/type.interface';
@@ -33,7 +38,6 @@ export class SalesService {
     private readonly ProfitsummaryRepo: Repository<DailyProfitsummary>,
     private readonly Stockserv: StockService,
     private readonly Datasource: DataSource,
-    
   ) {}
 
   StockCheck = async (
@@ -260,45 +264,53 @@ export class SalesService {
     };
   }
 
-  async Profitupdatesummary (manager:EntityManager, total_profit:number):Promise<ResponseType<any>>{
-    const now = new Date()
-    const  dateoftoday = now.toISOString().split('T')[0]
-    const profit = String(total_profit)
+  async Profitupdatesummary(
+    manager: EntityManager,
+    total_profit: number,
+  ): Promise<ResponseType<any>> {
+    const now = new Date();
+    const dateoftoday = now.toISOString().split('T')[0];
+    const profit = String(total_profit);
 
-  const DailyProfitsummaryRepo = manager.getRepository(this.ProfitsummaryRepo.target)
-  try{
-    const checkdate = await DailyProfitsummaryRepo.findOne({
-      where:{ CreatedAt:Raw((alias) => `DATE(${alias}) = '${dateoftoday}'`)}
-    })
-    if(!checkdate){
-      const createProfit  =   DailyProfitsummaryRepo.create({
-        total_profit:profit
-      })
-      await manager.save(createProfit)
-      return{
-        message:"successfuly create profit column",
-        success:true
+    const DailyProfitsummaryRepo = manager.getRepository(
+      this.ProfitsummaryRepo.target,
+    );
+    try {
+      const checkdate = await DailyProfitsummaryRepo.findOne({
+        where: {
+          CreatedAt: Raw((alias) => `DATE(${alias}) = '${dateoftoday}'`),
+        },
+      });
+      if (!checkdate) {
+        const createProfit = DailyProfitsummaryRepo.create({
+          total_profit: profit,
+        });
+        await manager.save(createProfit);
+        return {
+          message: 'successfuly create profit column',
+          success: true,
+        };
       }
-    }
-    const profit_sum = Number(checkdate.total_profit ) + total_profit 
-     await DailyProfitsummaryRepo.update({id:checkdate.id }, {total_profit:String(profit_sum)})
+      const profit_sum = Number(checkdate.total_profit) + total_profit;
+      await DailyProfitsummaryRepo.update(
+        { id: checkdate.id },
+        { total_profit: String(profit_sum) },
+      );
 
-     return{
-      message:"successfuly update profit table",
-      success:true
-     }
-
-  }catch(error){
-    return{
-      message:`failed to make changes profit ${error}`,
-      success:false
+      return {
+        message: 'successfuly update profit table',
+        success: true,
+      };
+    } catch (error) {
+      return {
+        message: `failed to make changes profit ${error}`,
+        success: false,
+      };
     }
-  }
-    return{
-      message:"successfuly",
-      success:true
-    }
-
+    return {
+      message: 'successfuly',
+      success: true,
+    };
   }
   async SaleRecord(
     dto: CreateSaleDto,
@@ -306,11 +318,14 @@ export class SalesService {
   ): Promise<ResponseType<any>> {
     return await this.Datasource.transaction(async (manager) => {
       try {
-        if(dto.paymentstatus !== paymentstatus.Paid && dto.paymentstatus !== paymentstatus.Pending){
-          return{
-            message:`sales failed since the paid status is ${dto.paymentstatus} `,
-            success:false
-          }
+        if (
+          dto.paymentstatus !== paymentstatus.Paid &&
+          dto.paymentstatus !== paymentstatus.Pending
+        ) {
+          return {
+            message: `sales failed since the paid status is ${dto.paymentstatus} `,
+            success: false,
+          };
         }
         const product_id = dto.ProductId;
         const findProduct_cat = await manager
@@ -371,6 +386,13 @@ export class SalesService {
           );
           if (!stockupdate.success)
             throw new Error(String(stockupdate.message) || 'Unknown Error');
+          const Profitrecord = await this.Profitupdatesummary(
+            manager,
+            dto.Net_profit,
+          );
+          if (!Profitrecord.success) {
+            throw new Error(String(Profitrecord.message));
+          }
 
           return {
             message: 'Successfuly  return data',
@@ -381,7 +403,6 @@ export class SalesService {
         if (findProduct_cat.product_category === category.retailsales) {
           if (dto.Stock_status === StockStatus.NotEnough)
             throw new Error('Stock is not Enough for  sale');
-
           const saveSale = manager.create(RetailSales, {
             product: { id: product_id },
             Revenue: dto.Revenue,
@@ -433,6 +454,13 @@ export class SalesService {
 
           if (!stockupdate.success)
             throw new Error(String(stockupdate.message));
+          const Profitrecord = await this.Profitupdatesummary(
+            manager,
+            dto.Net_profit,
+          );
+          if (!Profitrecord.success) {
+            throw new Error(String(Profitrecord.message));
+          }
           return {
             message: 'Successfuly  return data',
             success: true,
@@ -581,49 +609,74 @@ export class SalesService {
         .where('DATE(w."CreatedAt") = CURRENT_DATE')
         .groupBy('p.id, p.product_name, p.product_category, u.fullname')
         .getRawMany();
-    const Retailpending = await this.RetailsalesRepository.createQueryBuilder('r')
-        .leftJoin('r.product', 'p')
-        .leftJoin('r.user', 'u')
-        .select([
-          'p.id AS product_id',
-          'p.product_name AS product_name',
-          'p.product_category AS product_category',
-          'u.fullname AS seller',
-          'r.paymentstatus AS status',
-          'r.Total_pc_pkg_litre AS total_quantity',
-          'r.Revenue AS total_revenue',
-          'r.Net_profit AS total_profit',
-        ])
-        .where('DATE(r."CreatedAt") = CURRENT_DATE AND  r.paymentstatus =:status', {status:'pending'})
-        // .groupBy('p.id, p.product_name, p.product_category, u.fullname, r.paymentstatus')
-        .getRawMany();
+    const Retailpending = await this.RetailsalesRepository.createQueryBuilder(
+      'r',
+    )
+      .leftJoin('r.product', 'p')
+      .leftJoin('r.user', 'u')
+      .select([
+        'p.id AS product_id',
+        'p.product_name AS product_name',
+        'p.product_category AS product_category',
+        'u.fullname AS seller',
+        'r.paymentstatus AS status',
+        'r.Total_pc_pkg_litre AS total_quantity',
+        'r.Revenue AS total_revenue',
+        'r.Net_profit AS total_profit',
+      ])
+      .where(
+        'DATE(r."CreatedAt") = CURRENT_DATE AND  r.paymentstatus =:status',
+        { status: 'pending' },
+      )
+      // .groupBy('p.id, p.product_name, p.product_category, u.fullname, r.paymentstatus')
+      .getRawMany();
 
-        const Wholepending = await this.WholesalesRepository.createQueryBuilder('w')
-        .leftJoin('w.product', 'p')
-        .leftJoin('w.user', 'u')
-        .select([
-          'p.id AS product_id',
-          'p.product_name AS product_name',
-          'p.product_category AS product_category',
-          'u.fullname AS seller',
-          'w.Total_pc_pkg_litre AS total_quantity',
-          'w.paymentstatus AS status',
-          'w.Revenue AS total_revenue',
-          'w.Net_profit AS total_profit',
-        ])
-        .where('DATE(w."CreatedAt") = CURRENT_DATE AND w.paymentstatus =:status ', {status:'pending'})
-        // .groupBy('p.id, p.product_name, p.product_category, u.fullname, w.paymentstatus')
-        .getRawMany();
-     const AllcombinedPending = [...Retailpending, ... Wholepending]
-     const Allcombined = [...Normalsalesretailreturn,...Normalsaleswholereturn]
-     const totalRevenue = Allcombined.reduce((acc, curr)=> acc + Number(curr.total_revenue), 0)
-     const totolRetailRevenue  = Normalsalesretailreturn.reduce((acc, curr)=> acc + Number(curr.total_revenue), 0)
-     const totalWholeRevenue  = Normalsaleswholereturn.reduce((acc, curr)=> acc + Number(curr.total_revenue),0)
+    const Wholepending = await this.WholesalesRepository.createQueryBuilder('w')
+      .leftJoin('w.product', 'p')
+      .leftJoin('w.user', 'u')
+      .select([
+        'p.id AS product_id',
+        'p.product_name AS product_name',
+        'p.product_category AS product_category',
+        'u.fullname AS seller',
+        'w.Total_pc_pkg_litre AS total_quantity',
+        'w.paymentstatus AS status',
+        'w.Revenue AS total_revenue',
+        'w.Net_profit AS total_profit',
+      ])
+      .where(
+        'DATE(w."CreatedAt") = CURRENT_DATE AND w.paymentstatus =:status ',
+        { status: 'pending' },
+      )
+      // .groupBy('p.id, p.product_name, p.product_category, u.fullname, w.paymentstatus')
+      .getRawMany();
+    const AllcombinedPending = [...Retailpending, ...Wholepending];
+    const Allcombined = [...Normalsalesretailreturn, ...Normalsaleswholereturn];
+    const totalRevenue = Allcombined.reduce(
+      (acc, curr) => acc + Number(curr.total_revenue),
+      0,
+    );
+    const totolRetailRevenue = Normalsalesretailreturn.reduce(
+      (acc, curr) => acc + Number(curr.total_revenue),
+      0,
+    );
+    const totalWholeRevenue = Normalsaleswholereturn.reduce(
+      (acc, curr) => acc + Number(curr.total_revenue),
+      0,
+    );
     return {
       message: 'successfully ',
       success: true,
-      data: {Normalsaleswholereturn,Normalsalesretailreturn, Allcombined, totalRevenue, totalWholeRevenue, totolRetailRevenue, AllcombinedPending, Retailpending}
-
+      data: {
+        Normalsaleswholereturn,
+        Normalsalesretailreturn,
+        Allcombined,
+        totalRevenue,
+        totalWholeRevenue,
+        totolRetailRevenue,
+        AllcombinedPending,
+        Retailpending,
+      },
     };
   }
 }

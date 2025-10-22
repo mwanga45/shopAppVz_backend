@@ -11,7 +11,7 @@ import { DailyProfitsummary } from './entities/profitsummary.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([WholeSales, RetailSales,Stock,Stock_transaction]),
+    TypeOrmModule.forFeature([WholeSales, RetailSales,Stock,Stock_transaction, DailyProfitsummary]),
     ProductModule,
     StockModule,
   ],
