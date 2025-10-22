@@ -18,6 +18,7 @@ import { Customer } from 'src/entities/customer.entity';
 import { StockService } from 'src/stock/stock.service';
 import { WholeSales } from 'src/sales/entities/wholesale.entity';
 import { RetailSales } from 'src/sales/entities/retailsale.entity';
+import { SalesService } from 'src/sales/sales.service';
 
 @Injectable()
 export class DebtService {
@@ -32,6 +33,7 @@ export class DebtService {
     private readonly dialservecheck: dialValidate,
     private readonly DataSource: DataSource,
     private readonly Stockserve: StockService,
+    private readonly SaleService:SalesService
   ) {}
 
   async CreateDept(
@@ -100,7 +102,7 @@ export class DebtService {
             Reasons: 'Sold',
             product_category: findproduct.product_category,
           };
-
+         
           const stockupdate = await this.Stockserve.updateStockTransactional(
             manager,
             UpdateStockDto,
@@ -322,7 +324,6 @@ export class DebtService {
         };
 
         const UpdateDebt = await manager.update(Debt, { id: id }, updateDto);
-
         if (!UpdateDebt.affected || UpdateDebt.affected === 0)
           throw new Error('failed to make update');
         const AddDebtTrack = manager.create(Debt_track, {

@@ -10,11 +10,13 @@ import { User } from 'src/entities/user.entity';
 import { StockModule } from 'src/stock/stock.module';
 import { WholeSales } from 'src/sales/entities/wholesale.entity';
 import { RetailSales } from 'src/sales/entities/retailsale.entity';
+import { SalesModule } from 'src/sales/sales.module';
 
 @Module({
   imports:[
     TypeOrmModule.forFeature([Debt, Debt_track, Product, Customer, User, WholeSales, RetailSales]),
-    StockModule
+    StockModule,
+    SalesModule
   ],
   controllers: [DebtController],
   providers: [DebtService, dialValidate],

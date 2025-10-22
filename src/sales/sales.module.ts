@@ -17,5 +17,6 @@ import { DailyProfitsummary } from './entities/profitsummary.entity';
   ],
   controllers: [SalesController],
   providers: [SalesService],
+  exports:[SalesService]
 })
 export class SalesModule {}
