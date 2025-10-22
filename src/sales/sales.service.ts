@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateSaleDto, SalesResponseDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
 import { WholeSales } from './entities/wholesale.entity';
-import { Repository } from 'typeorm';
+import { EntityManager, Raw, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/product/entities/product.entity';
 import { RetailSales } from './entities/retailsale.entity';
@@ -29,8 +29,11 @@ export class SalesService {
     @InjectRepository(Stock) private readonly Stockrepo: Repository<Stock>,
     @InjectRepository(Product_discount)
     private readonly ProductDiscrepo: Repository<Product_discount>,
+    @InjectRepository(DailyProfitsummary)
+    private readonly ProfitsummaryRepo: Repository<DailyProfitsummary>,
     private readonly Stockserv: StockService,
     private readonly Datasource: DataSource,
+    
   ) {}
 
   StockCheck = async (
@@ -257,8 +260,40 @@ export class SalesService {
     };
   }
 
-  async Profitupdatesummary ():Promise<ResponseType<any>>{
-    
+  async Profitupdatesummary (manager:EntityManager, total_profit:number):Promise<ResponseType<any>>{
+    const now = new Date()
+    const  dateoftoday = now.toISOString().split('T')[0]
+    const profit = String(total_profit)
+
+  const DailyProfitsummaryRepo = manager.getRepository(this.ProfitsummaryRepo.target)
+  try{
+    const checkdate = await DailyProfitsummaryRepo.findOne({
+      where:{ CreatedAt:Raw((alias) => `DATE(${alias}) = '${dateoftoday}'`)}
+    })
+    if(!checkdate){
+      const createProfit  =   DailyProfitsummaryRepo.create({
+        total_profit:profit
+      })
+      await manager.save(createProfit)
+      return{
+        message:"successfuly create profit column",
+        success:true
+      }
+    }
+    const profit_sum = Number(checkdate.total_profit ) + total_profit 
+     await DailyProfitsummaryRepo.update({id:checkdate.id }, {total_profit:String(profit_sum)})
+
+     return{
+      message:"successfuly update profit table",
+      success:true
+     }
+
+  }catch(error){
+    return{
+      message:`failed to make changes profit ${error}`,
+      success:false
+    }
+  }
     return{
       message:"successfuly",
       success:true
