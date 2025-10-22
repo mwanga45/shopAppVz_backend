@@ -33,7 +33,7 @@ export class DebtService {
     private readonly dialservecheck: dialValidate,
     private readonly DataSource: DataSource,
     private readonly Stockserve: StockService,
-    private readonly SaleService:SalesService
+    private readonly SaleService: SalesService,
   ) {}
 
   async CreateDept(
@@ -102,7 +102,7 @@ export class DebtService {
             Reasons: 'Sold',
             product_category: findproduct.product_category,
           };
-         
+
           const stockupdate = await this.Stockserve.updateStockTransactional(
             manager,
             UpdateStockDto,
@@ -147,7 +147,6 @@ export class DebtService {
         status1: 'partialpaid',
         status2: 'debt',
       })
-
       .orderBy('d.id')
       .getRawMany();
     return {
@@ -287,15 +286,27 @@ export class DebtService {
         });
         if (!findDebt) throw new Error('Debt data is not exist');
 
-        if(findDebt.paidmoney < Number(findDebt.Revenue)){
-           await manager.update(Debt, {id:id}, {paymentstatus:findDebt.paidmoney == 0? paymentstatus.Dept :paymentstatus.Parctial})
+        if (findDebt.paidmoney < Number(findDebt.Revenue)) {
+          await manager.update(
+            Debt,
+            { id: id },
+            {
+              paymentstatus:
+                findDebt.paidmoney == 0
+                  ? paymentstatus.Dept
+                  : paymentstatus.Parctial,
+            },
+          );
         }
 
         if (
           findDebt.paidmoney >= Number(findDebt.Revenue) ||
           findDebt.paymentstatus === paymentstatus.Paid
         ) {
-          if (findDebt.paymentstatus !== paymentstatus.Paid && Number(findDebt.Revenue) === findDebt.paidmoney) {
+          if (
+            findDebt.paymentstatus !== paymentstatus.Paid &&
+            Number(findDebt.Revenue) === findDebt.paidmoney
+          ) {
             const checkpayementstatus = await manager.update(
               Debt,
               { id: id },
@@ -322,7 +333,6 @@ export class DebtService {
                 ? paymentstatus.Parctial
                 : paymentstatus.Dept,
         };
-
         const UpdateDebt = await manager.update(Debt, { id: id }, updateDto);
         if (!UpdateDebt.affected || UpdateDebt.affected === 0)
           throw new Error('failed to make update');
@@ -334,50 +344,63 @@ export class DebtService {
         const savedTrack = await manager.save(AddDebtTrack);
         if (!savedTrack || !savedTrack.id)
           throw new Error('Failed to addtrack');
+        const profit_calulate =
+          dto.paidmoney &&
+          (dto.paidmoney * findDebt.Net_profit) / findDebt.Revenue;
+        const save_profit = await this.SaleService.Profitupdatesummary(
+          manager,
+          profit_calulate ?? 0,
+        );
 
         const AddedDebt = await manager.findOne(Debt, {
-          where:{id:id},
-          relations:['product', 'user']
-        })
-        if(AddedDebt?.paymentstatus === paymentstatus.Paid){
-          if (AddedDebt.product.product_category === category.wholesales){
+          where: { id: id },
+          relations: ['product', 'user'],
+        });
+
+        if (AddedDebt?.paymentstatus === paymentstatus.Paid) {
+          if (AddedDebt.product.product_category === category.wholesales) {
             const saveSale = manager.create(WholeSales, {
-            product: {id:AddedDebt.product.id },
-            Revenue: AddedDebt.Revenue,
-            Total_pc_pkg_litre: AddedDebt.Total_pc_pkg_litre,
-            Net_profit: AddedDebt.Net_profit,
-            paymentstatus: AddedDebt.paymentstatus,
-            Expected_Profit: AddedDebt.Expected_profit,
-            profit_deviation: AddedDebt.profit_deviation,
-            percentage_deviation:AddedDebt.Percentage_deviation,
-            percentage_discount: AddedDebt.Discount_percentage,
-            user: { id:AddedDebt.user.id },
-          });
-          await manager.save(saveSale)
-          return {
-            message:"Debt is  complited paid and  payment  is already sent to the  sales",
-            success:true
-          }
-          }else if(AddedDebt.product.product_category === category.retailsales){
+              product: { id: AddedDebt.product.id },
+              Revenue: AddedDebt.Revenue,
+              Total_pc_pkg_litre: AddedDebt.Total_pc_pkg_litre,
+              Net_profit: AddedDebt.Net_profit,
+              paymentstatus: AddedDebt.paymentstatus,
+              Expected_Profit: AddedDebt.Expected_profit,
+              profit_deviation: AddedDebt.profit_deviation,
+              percentage_deviation: AddedDebt.Percentage_deviation,
+              percentage_discount: AddedDebt.Discount_percentage,
+              user: { id: AddedDebt.user.id },
+            });
+
+            await manager.save(saveSale);
+            return {
+              message:
+                'Debt is  complited paid and  payment  is already sent to the  sales',
+              success: true,
+            };
+          } else if (
+            AddedDebt.product.product_category === category.retailsales
+          ) {
             const saveSale = manager.create(RetailSales, {
-            product: {id:AddedDebt.product.id },
-            Revenue: AddedDebt.Revenue,
-            Total_pc_pkg_litre: AddedDebt.Total_pc_pkg_litre,
-            Net_profit: AddedDebt.Net_profit,
-            paymentstatus: AddedDebt.paymentstatus,
-            Expected_Profit: AddedDebt.Expected_profit,
-            profit_deviation: AddedDebt.profit_deviation,
-            percentage_deviation:AddedDebt.Percentage_deviation,
-            percentage_discount: AddedDebt.Discount_percentage,
-            user: { id:AddedDebt.user.id },
-          });
-          await manager.save(saveSale)
-          return {
-            message:"Debt is  complited paid and  payment  is already sent to the  sales",
-            success:true
-          }
-          }else{
-            throw new Error("product is not available")
+              product: { id: AddedDebt.product.id },
+              Revenue: AddedDebt.Revenue,
+              Total_pc_pkg_litre: AddedDebt.Total_pc_pkg_litre,
+              Net_profit: AddedDebt.Net_profit,
+              paymentstatus: AddedDebt.paymentstatus,
+              Expected_Profit: AddedDebt.Expected_profit,
+              profit_deviation: AddedDebt.profit_deviation,
+              percentage_deviation: AddedDebt.Percentage_deviation,
+              percentage_discount: AddedDebt.Discount_percentage,
+              user: { id: AddedDebt.user.id },
+            });
+            await manager.save(saveSale);
+            return {
+              message:
+                'Debt is  complited paid and  payment  is already sent to the  sales',
+              success: true,
+            };
+          } else {
+            throw new Error('product is not available');
           }
         }
 
@@ -395,12 +418,12 @@ export class DebtService {
     });
   }
 
-  async Test (id:any):Promise<any>{
-const returnAdded = await this.DebtRepo.findOne({
-  where: { id },
-  relations: ['product', 'user']
-});
-    return returnAdded
+  async Test(id: any): Promise<any> {
+    const returnAdded = await this.DebtRepo.findOne({
+      where: { id },
+      relations: ['product', 'user'],
+    });
+    return returnAdded;
   }
   async returndebt(): Promise<ResponseType<any>> {
     const returndebt = await this.DebtRepo.find();
