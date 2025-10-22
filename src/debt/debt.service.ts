@@ -282,6 +282,10 @@ export class DebtService {
         });
         if (!findDebt) throw new Error('Debt data is not exist');
 
+        if(findDebt.paidmoney < Number(findDebt.Revenue)){
+           await manager.update(Debt, {id:id}, {paymentstatus:findDebt.paidmoney == 0?paymentstatus.Dept :paymentstatus.Parctial})
+        }
+
         if (
           findDebt.paidmoney >= Number(findDebt.Revenue) ||
           findDebt.paymentstatus === paymentstatus.Paid
