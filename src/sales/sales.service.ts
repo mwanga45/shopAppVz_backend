@@ -409,7 +409,6 @@ export class SalesService {
   async TodaySaleAnalysis(): Promise<ResponseType<any>> {
     return await this.Datasource.transaction(async (manager) => {
       try {
-        // return sales record
         const date = new Date();
         const Eachsales = await manager
           .createQueryBuilder(WholeSales, 'w')

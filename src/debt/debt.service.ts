@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateDebtDto } from './dto/create-debt.dto';
 import { UpdateDebtDto } from './dto/update-debt.dto';
 import {
+  category,
   ChangeType,
   paymentstatus,
   ResponseType,
@@ -15,6 +16,8 @@ import { Product } from 'src/product/entities/product.entity';
 import { dialValidate } from 'src/common/helper/phone.helper';
 import { Customer } from 'src/entities/customer.entity';
 import { StockService } from 'src/stock/stock.service';
+import { WholeSales } from 'src/sales/entities/wholesale.entity';
+import { RetailSales } from 'src/sales/entities/retailsale.entity';
 
 @Injectable()
 export class DebtService {
@@ -331,6 +334,52 @@ export class DebtService {
         if (!savedTrack || !savedTrack.id)
           throw new Error('Failed to addtrack');
 
+        const AddedDebt = await manager.findOne(Debt, {
+          where:{id:id},
+          relations:['product', 'user']
+        })
+        if(AddedDebt?.paymentstatus === paymentstatus.Paid){
+          if (AddedDebt.product.product_category === category.wholesales){
+            const saveSale = manager.create(WholeSales, {
+            product: {id:AddedDebt.product.id },
+            Revenue: AddedDebt.Revenue,
+            Total_pc_pkg_litre: AddedDebt.Total_pc_pkg_litre,
+            Net_profit: AddedDebt.Net_profit,
+            paymentstatus: AddedDebt.paymentstatus,
+            Expected_Profit: AddedDebt.Expected_profit,
+            profit_deviation: AddedDebt.profit_deviation,
+            percentage_deviation:AddedDebt.Percentage_deviation,
+            percentage_discount: AddedDebt.Discount_percentage,
+            user: { id:AddedDebt.user.id },
+          });
+          await manager.save(saveSale)
+          return {
+            message:"Debt is  complited paid and  payment  is already sent to the  sales",
+            success:true
+          }
+          }else if(AddedDebt.product.product_category === category.retailsales){
+            const saveSale = manager.create(RetailSales, {
+            product: {id:AddedDebt.product.id },
+            Revenue: AddedDebt.Revenue,
+            Total_pc_pkg_litre: AddedDebt.Total_pc_pkg_litre,
+            Net_profit: AddedDebt.Net_profit,
+            paymentstatus: AddedDebt.paymentstatus,
+            Expected_Profit: AddedDebt.Expected_profit,
+            profit_deviation: AddedDebt.profit_deviation,
+            percentage_deviation:AddedDebt.Percentage_deviation,
+            percentage_discount: AddedDebt.Discount_percentage,
+            user: { id:AddedDebt.user.id },
+          });
+          await manager.save(saveSale)
+          return {
+            message:"Debt is  complited paid and  payment  is already sent to the  sales",
+            success:true
+          }
+          }else{
+            throw new Error("product is not available")
+          }
+        }
+
         return {
           message: 'successfuly  update debt',
           success: true,
@@ -345,6 +394,13 @@ export class DebtService {
     });
   }
 
+  async Test (id:any):Promise<any>{
+const returnAdded = await this.DebtRepo.findOne({
+  where: { id },
+  relations: ['product', 'user']
+});
+    return returnAdded
+  }
   async returndebt(): Promise<ResponseType<any>> {
     const returndebt = await this.DebtRepo.find();
     return {

@@ -8,10 +8,12 @@ import { Product } from 'src/product/entities/product.entity';
 import { Customer } from 'src/entities/customer.entity';
 import { User } from 'src/entities/user.entity';
 import { StockModule } from 'src/stock/stock.module';
+import { WholeSales } from 'src/sales/entities/wholesale.entity';
+import { RetailSales } from 'src/sales/entities/retailsale.entity';
 
 @Module({
   imports:[
-    TypeOrmModule.forFeature([Debt, Debt_track, Product, Customer, User]),
+    TypeOrmModule.forFeature([Debt, Debt_track, Product, Customer, User, WholeSales, RetailSales]),
     StockModule
   ],
   controllers: [DebtController],
