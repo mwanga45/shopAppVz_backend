@@ -10,7 +10,7 @@ export class Debt extends baseEntity {
   @Column('decimal', { precision: 10, scale: 4 })
   Total_pc_pkg_litre: number;
 
-  @Column('decimal', { precision: 10, scale: 4 })
+  @Column('decimal', { precision: 14, scale: 4 })
   Revenue: number;
 
   @Column('decimal', { precision: 10, scale: 4 })

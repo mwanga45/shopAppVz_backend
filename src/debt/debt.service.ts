@@ -283,14 +283,14 @@ export class DebtService {
         if (!findDebt) throw new Error('Debt data is not exist');
 
         if(findDebt.paidmoney < Number(findDebt.Revenue)){
-           await manager.update(Debt, {id:id}, {paymentstatus:findDebt.paidmoney == 0?paymentstatus.Dept :paymentstatus.Parctial})
+           await manager.update(Debt, {id:id}, {paymentstatus:findDebt.paidmoney == 0? paymentstatus.Dept :paymentstatus.Parctial})
         }
 
         if (
           findDebt.paidmoney >= Number(findDebt.Revenue) ||
           findDebt.paymentstatus === paymentstatus.Paid
         ) {
-          if (findDebt.paymentstatus !== paymentstatus.Paid) {
+          if (findDebt.paymentstatus !== paymentstatus.Paid && Number(findDebt.Revenue) === findDebt.paidmoney) {
             const checkpayementstatus = await manager.update(
               Debt,
               { id: id },
@@ -304,17 +304,17 @@ export class DebtService {
           }
           throw new Error('The debt is already  been completed paid');
         }
-        const { ProductId, Stock_status, paidmoney, ...restdto } = dto;
+        // const { ProductId, Stock_status, paidmoney, ...restdto } = dto;
         const newpaidsum = findDebt.paidmoney + (Number(dto.paidmoney) ?? 0);
         if (newpaidsum > Number(findDebt.Revenue)) {
           throw new Error('The paid sum  can not be greater than Revenue');
         }
         const updateDto: any = {
-          ...restdto,
-          product: { id: dto.ProductId },
+          // ...restdto,
+          // product: { id: dto.ProductId },
           paidmoney: newpaidsum,
           paymentstatus:
-            newpaidsum === paidmoney
+            newpaidsum === Number(findDebt.Revenue)
               ? paymentstatus.Paid
               : newpaidsum > 0
                 ? paymentstatus.Parctial
