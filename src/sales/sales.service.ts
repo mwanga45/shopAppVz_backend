@@ -15,6 +15,7 @@ import { StockService } from 'src/stock/stock.service';
 import { Stock } from 'src/stock/entities/stock.entity';
 import { DataSource } from 'typeorm';
 import { SaleSummary, MostProfit } from 'src/type/type.interface';
+import { DailyProfitsummary } from './entities/profitsummary.entity';
 
 @Injectable()
 export class SalesService {
@@ -256,6 +257,14 @@ export class SalesService {
     };
   }
 
+  async Profitupdatesummary ():Promise<ResponseType<any>>{
+    
+    return{
+      message:"successfuly",
+      success:true
+    }
+
+  }
   async SaleRecord(
     dto: CreateSaleDto,
     userId: any,
@@ -319,6 +328,7 @@ export class SalesService {
             Reasons: 'Sold',
             product_category: findProduct_cat.product_category,
           };
+
           const stockupdate = await this.Stockserv.updateStockTransactional(
             manager,
             UpdateStockDto,
@@ -394,6 +404,7 @@ export class SalesService {
             data: fetchlastRec,
           };
         }
+
         return {
           message: 'Failed',
           success: false,

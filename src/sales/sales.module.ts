@@ -7,6 +7,7 @@ import { RetailSales} from './entities/retailsale.entity'
 import { ProductModule } from 'src/product/product.module';
 import { StockModule } from 'src/stock/stock.module';
 import { Stock,Stock_transaction } from 'src/stock/entities/stock.entity';
+import { DailyProfitsummary } from './entities/profitsummary.entity';
 
 @Module({
   imports: [
