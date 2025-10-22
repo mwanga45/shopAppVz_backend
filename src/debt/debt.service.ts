@@ -304,7 +304,6 @@ export class DebtService {
           }
           throw new Error('The debt is already  been completed paid');
         }
-        // const { ProductId, Stock_status, paidmoney, ...restdto } = dto;
         const newpaidsum = findDebt.paidmoney + (Number(dto.paidmoney) ?? 0);
         if (newpaidsum > Number(findDebt.Revenue)) {
           throw new Error('The paid sum  can not be greater than Revenue');
