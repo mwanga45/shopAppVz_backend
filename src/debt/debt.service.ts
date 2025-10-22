@@ -310,8 +310,6 @@ export class DebtService {
           throw new Error('The paid sum  can not be greater than Revenue');
         }
         const updateDto: any = {
-          // ...restdto,
-          // product: { id: dto.ProductId },
           paidmoney: newpaidsum,
           paymentstatus:
             newpaidsum === Number(findDebt.Revenue)
