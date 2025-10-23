@@ -189,8 +189,19 @@ export class ProfitDevService {
 
     let Percentage_deviation = 0
     Percentage_deviation = averageRevenue === 0 ? 0 : Deviation/averageRevenue *100
-    const DebtInfosummary  = await this.DebtRepo.createQueryBuilder('d')
-    .select('')
+ const upcomingDebts = await this.DebtRepo.createQueryBuilder('d')
+  .select(['d.Debtor_name AS Debtor_name', 'd.PaymentDateAt AS ReturnDate'])
+  .where('d.paymentstatus != :status', { status: 'Paid' })
+  .andWhere('d.PaymentDateAt >= :today', { today:currentdate })
+  .orderBy('d.PaymentDateAt', 'ASC')
+  .limit(7)
+  .getRawMany();
+
+// 2️⃣ Get total unpaid money
+const totalUnpaid = await this.DebtRepo.createQueryBuilder('d')
+  .select('SUM(d.Revenue - d.paidmoney)', 'total_unpaid')
+  .where('d.paymentstatus != :status', { status: 'Paid' })
+  .getRawOne();
     return {
       message: 'successfuly returned',
       success: true,
@@ -208,7 +219,11 @@ export class ProfitDevService {
         Debttotalpaid,
         TodayRevenue,
         Deviation,
-        Percentage_deviation
+        Percentage_deviation,
+        totalUnpaid,
+        upcomingDebts,
+        
+
       },
     };
   }
