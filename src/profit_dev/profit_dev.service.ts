@@ -17,16 +17,20 @@ export class ProfitDevService {
   async AdminAnalysis(): Promise<ResponseType<any>> {
     const now = new Date();
     const dateOfToday = now.toISOString().split('T')[0];
+    const yesterday  = new Date(now)
+    yesterday.setDate(now.getDate()-1)
+    const dateofyesterday = yesterday.toISOString().split('T')[0]
     const profit = await this.ProfitsummaryRepo.createQueryBuilder('d')
       .select('d.total_profit')
       .orderBy('d.total_profit', 'DESC')
+      .where('DATE(d.CreatedAt) = :dateofyesterday', {dateofyesterday})
       .limit(2)
       .getRawMany();
-    const findAlldata = await this.ProfitsummaryRepo.find()
+
     return {
       message: 'successly returned',
       success: true,
-      data: {profit,findAlldata}
+      data: profit
     };
   }
 }
