@@ -13,6 +13,8 @@ import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
 import { DebtModule } from './debt/debt.module';
 import { SmsModule } from './sms/sms.module';
+import { ProfitDevController } from './profit_dev/profit_dev.controller';
+import { ProfitDevService } from './profit_dev/profit_dev.service';
 
 
 @Module({
@@ -36,7 +38,7 @@ import { SmsModule } from './sms/sms.module';
     DebtModule,
     SmsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, ProfitDevController],
+  providers: [AppService, ProfitDevService],
 })
 export class AppModule {}

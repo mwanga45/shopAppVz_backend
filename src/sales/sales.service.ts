@@ -628,7 +628,7 @@ export class SalesService {
         'DATE(r."CreatedAt") = CURRENT_DATE AND  r.paymentstatus =:status',
         { status: 'pending' },
       )
-      // .groupBy('p.id, p.product_name, p.product_category, u.fullname, r.paymentstatus')
+
       .getRawMany();
 
     const Wholepending = await this.WholesalesRepository.createQueryBuilder('w')
