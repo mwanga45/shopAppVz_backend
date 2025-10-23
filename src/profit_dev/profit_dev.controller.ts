@@ -9,4 +9,8 @@ export class ProfitDevController {
   Getprofit(){
     return this.ProfitDevservice.AdminAnalysis()
   }
+  @Get('dash')
+  GetDashinfo(){
+    return this.ProfitDevservice.DashboardResult()
+  }
 }

@@ -17,7 +17,7 @@ export class ProfitDevService {
     @InjectRepository(RetailSales)
     private readonly Retailrepo: Repository<RetailSales>,
     @InjectRepository(Debt_track)
-    private readonly DebtTrackRepo: Repository<Debt_track>
+    private readonly DebtTrackRepo: Repository<Debt_track>,
   ) {}
 
   async AdminAnalysis(): Promise<ResponseType<any>> {
@@ -57,35 +57,26 @@ export class ProfitDevService {
   async DashboardResult(): Promise<ResponseType<any>> {
     const now = new Date();
     const dateOfToday = now.toISOString().split('T')[0];
-    const yesterday = new Date(now);
-    yesterday.setDate(now.getDate() - 1);
-    const dateofyesterday = yesterday.toISOString().split('T')[0];
     const daysrevenueW = await this.WholesalesRepo.createQueryBuilder('w')
-    .select(
-      'SUM(w.Revenue)',
-      'wRevenue',
-    )
-    .where('DATE(w.CreatedAt) <= :dateOfToday', {dateOfToday})
-    .limit(28)
-    .getRawMany()
-    const daysrevenueR = await this.Retailrepo.createQueryBuilder('r')
-    .select(
-        'SUM(r.Revenue), rRevenue'
-    )
-    .where('DATE(r.CreatedAt) <= :dateOfToday', {dateOfToday})
-    .limit(28)
-    .getRawMany()
+      .select('SUM(w.Revenue)', 'wRevenue')
+      .where('DATE(w.CreatedAt) <= :dateOfToday', { dateOfToday })
+      .limit(28)
+      .getRawMany();
 
-    const Debt_payment  = await this.DebtTrackRepo.createQueryBuilder('t')
-    .select('SUM(t.paidmoney)', 'paidmoney')
-    .where('DATE(t.CreatedAt) = :dateOfToday', {dateOfToday})
-    .getRawMany()
+    const daysrevenueR = await this.Retailrepo.createQueryBuilder('r')
+      .select('SUM(r.Revenue)', 'rRevenue')
+      .where('DATE(r.CreatedAt) <= :dateOfToday', { dateOfToday })
+      .limit(28)
+      .getRawMany();
+
+    const Debt_payment = await this.DebtTrackRepo.createQueryBuilder('t')
+      .select('SUM(t.paidmoney)', 'paidmoney')
+      .where('DATE(t.CreatedAt) = :dateOfToday', { dateOfToday })
+      .getRawMany();
     return {
       message: 'successfuly returned',
       success: true,
-      data:{daysrevenueW, daysrevenueR,Debt_payment}
+      data: { daysrevenueW, daysrevenueR, Debt_payment },
     };
   }
 }
-
-
