@@ -16,4 +16,7 @@ export class CreateOrderDto {
     @IsString()
     OrderDate:string
 
+    @IsString()
+    Quantity:string
+
 }

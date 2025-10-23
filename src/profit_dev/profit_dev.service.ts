@@ -20,7 +20,7 @@ export class ProfitDevService {
     @InjectRepository(Debt_track)
     private readonly DebtTrackRepo: Repository<Debt_track>,
     @InjectRepository(Debt)
-    private readonly DebtRepo:Repository<Debt>
+    private readonly DebtRepo: Repository<Debt>,
   ) {}
 
   async AdminAnalysis(): Promise<ResponseType<any>> {
@@ -181,27 +181,29 @@ export class ProfitDevService {
     const averageRevenue =
       revenues.length > 0 ? totalRevenue / revenues.length : 0;
     const TodayRevenue = await this.ProfitsummaryRepo.createQueryBuilder('r')
-    .select('r.total_revenue', 'generated_today')
-    .where('DATE(r.CreatedAt) = :today', {today:currentdate})
-    .getRawOne()
+      .select('r.total_revenue', 'generated_today')
+      .where('DATE(r.CreatedAt) = :today', { today: currentdate })
+      .getRawOne();
 
-    const Deviation = averageRevenue - Number(TodayRevenue?.generated_today || 0)
+    const Deviation =
+      averageRevenue - Number(TodayRevenue?.generated_today || 0);
 
-    let Percentage_deviation = 0
-    Percentage_deviation = averageRevenue === 0 ? 0 : Deviation/averageRevenue *100
- const upcomingDebts = await this.DebtRepo.createQueryBuilder('d')
-  .select(['d.Debtor_name AS Debtor_name', 'd.PaymentDateAt AS ReturnDate'])
-  .where('d.paymentstatus != :status', { status: 'Paid' })
-  .andWhere('d.PaymentDateAt >= :today', { today:currentdate })
-  .orderBy('d.PaymentDateAt', 'ASC')
-  .limit(7)
-  .getRawMany();
+    let Percentage_deviation = 0;
+    Percentage_deviation =
+      averageRevenue === 0 ? 0 : (Deviation / averageRevenue) * 100;
 
-// 2️⃣ Get total unpaid money
-const totalUnpaid = await this.DebtRepo.createQueryBuilder('d')
-  .select('SUM(d.Revenue - d.paidmoney)', 'total_unpaid')
-  .where('d.paymentstatus != :status', { status: 'Paid' })
-  .getRawOne();
+    const upcomingDebts = await this.DebtRepo.createQueryBuilder('d')
+      .select(['d.Debtor_name AS Debtor_name', 'd.PaymentDateAt AS ReturnDate'])
+      .where('d.paymentstatus != :status', { status: 'Paid' })
+      .andWhere('d.PaymentDateAt >= :today', { today: currentdate })
+      .orderBy('d.PaymentDateAt', 'ASC')
+      .limit(7)
+      .getRawMany();
+
+    const totalUnpaid = await this.DebtRepo.createQueryBuilder('d')
+      .select('SUM(d.Revenue - d.paidmoney)', 'total_unpaid')
+      .where('d.paymentstatus != :status', { status: 'Paid' })
+      .getRawOne();
     return {
       message: 'successfuly returned',
       success: true,
@@ -222,8 +224,6 @@ const totalUnpaid = await this.DebtRepo.createQueryBuilder('d')
         Percentage_deviation,
         totalUnpaid,
         upcomingDebts,
-        
-
       },
     };
   }

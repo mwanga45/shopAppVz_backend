@@ -1,11 +1,10 @@
 import { baseEntity } from "src/common/base.entity";
-import { Column, Entity } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToMany } from "typeorm";
+import { paymentstatus } from "src/type/type.interface";
+import { User } from "src/entities/user.entity";
 
 @Entity()
 export class Order extends baseEntity {
-    @Column()
-    userId:string
-
     @Column()
     product_name:string
 
@@ -14,6 +13,12 @@ export class Order extends baseEntity {
 
     @Column()
     Order_Description:string
+
+    @Column()
+    Payamount:string
+
+    @Column()
+    Paidamount:string
     
     @Column()
     client_phone:string
@@ -21,8 +26,12 @@ export class Order extends baseEntity {
     @Column({type:"date"})
     OrderDate:string
 
-    @Column({default:"pending"})
-    OrderStatus:string
+    @Column()
+    OrderStatus:paymentstatus
+
+    @ManyToMany(()=> User , (user)=> user.order)
+    @JoinColumn({name:"userId"})
+    user:User
 
 
 }
