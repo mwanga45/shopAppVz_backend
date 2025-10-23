@@ -350,6 +350,7 @@ export class DebtService {
         const save_profit = await this.SaleService.Profitupdatesummary(
           manager,
           profit_calulate ?? 0,
+          dto.paidmoney ?? 0
         );
 
         const AddedDebt = await manager.findOne(Debt, {

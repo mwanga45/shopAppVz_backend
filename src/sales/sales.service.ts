@@ -267,10 +267,12 @@ export class SalesService {
   async Profitupdatesummary(
     manager: EntityManager,
     total_profit: number,
+    total_revenue:number
   ): Promise<ResponseType<any>> {
     const now = new Date();
     const dateoftoday = now.toISOString().split('T')[0];
     const profit = String(total_profit);
+    const Revenue = String(total_revenue)
 
     const DailyProfitsummaryRepo = manager.getRepository(
       this.ProfitsummaryRepo.target,
@@ -284,6 +286,7 @@ export class SalesService {
       if (!checkdate) {
         const createProfit = DailyProfitsummaryRepo.create({
           total_profit: profit,
+          total_revenue:Revenue
         });
         await manager.save(createProfit);
         return {
@@ -292,9 +295,10 @@ export class SalesService {
         };
       }
       const profit_sum = Number(checkdate.total_profit) + total_profit;
+      const totalRevenue = Number(checkdate.total_revenue) + total_revenue
       await DailyProfitsummaryRepo.update(
         { id: checkdate.id },
-        { total_profit: String(profit_sum) },
+        { total_profit: String(profit_sum), total_revenue:String(totalRevenue)},
       );
 
       return {
@@ -389,6 +393,7 @@ export class SalesService {
           const Profitrecord = await this.Profitupdatesummary(
             manager,
             dto.Net_profit,
+            dto.Revenue
           );
           if (!Profitrecord.success) {
             throw new Error(String(Profitrecord.message));
@@ -457,6 +462,7 @@ export class SalesService {
           const Profitrecord = await this.Profitupdatesummary(
             manager,
             dto.Net_profit,
+            dto.Revenue
           );
           if (!Profitrecord.success) {
             throw new Error(String(Profitrecord.message));

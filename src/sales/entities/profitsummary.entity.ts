@@ -5,7 +5,8 @@ import { Column, Entity } from "typeorm";
 export class DailyProfitsummary extends baseEntity{
    @Column()
    total_profit:string
-   @Column()
+
+   @Column({default:"0"})
    total_revenue:string
    
 }
