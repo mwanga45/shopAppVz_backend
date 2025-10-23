@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { WholeSales } from 'src/sales/entities/wholesale.entity';
 import { RetailSales } from 'src/sales/entities/retailsale.entity';
 import { Debt_track } from 'src/debt/entities/debt.entity';
-import { promises } from 'dns';
+
 
 @Injectable()
 export class ProfitDevService {
@@ -58,17 +58,9 @@ export class ProfitDevService {
   async DashboardResult(): Promise<ResponseType<any>> {
     const now = new Date();
     const dateOfToday = now.toISOString().split('T')[0];
-    const daysrevenueW = await this.WholesalesRepo.createQueryBuilder('w')
-      .select('SUM(w.Revenue)', 'wRevenue')
-      .where('DATE(w.CreatedAt) <= :dateOfToday', { dateOfToday })
-      .limit(28)
-      .getRawMany();
 
-    const daysrevenueR = await this.Retailrepo.createQueryBuilder('r')
-      .select('SUM(r.Revenue)', 'rRevenue')
-      .where('DATE(r.CreatedAt) <= :dateOfToday', { dateOfToday })
-      .limit(28)
-      .getRawMany();
+
+    
 
     const Debt_payment = await this.DebtTrackRepo.createQueryBuilder('t')
       .select('SUM(t.paidmoney)', 'paidmoney')
@@ -78,6 +70,9 @@ export class ProfitDevService {
   const currentMonth = now.getMonth() + 1; 
   const currentYear = now.getFullYear();
   const currentday  = now.getDate()
+  const currentdate = now.toISOString().split('T'[0])
+
+
 
     const mostSoldProduct = await this.WholesalesRepo.createQueryBuilder('w')
     .leftJoin('w.product', 'p')
@@ -158,10 +153,22 @@ export class ProfitDevService {
     const Wholetotalsales = Number(wholesalesResult.wRevenue || 0)
     const Debttotalpaid = Number(DebtResult.dRevenue || 0)
     const  combineResult = Retailtotalsales + Wholetotalsales + Debttotalpaid
+
+const revenues = await this.ProfitsummaryRepo.createQueryBuilder('p')
+  .select('p.total_revenue', 'total_revenue')
+  .where('p.CreatedAt <= :today', { today: currentdate }) // current day
+  .orderBy('p.CreatedAt', 'DESC')
+  .limit(28)
+  .getRawMany();
+
+const totalRevenue = revenues.reduce((sum, r) => sum + Number(r.total_revenue || 0), 0);
+const averageRevenue = revenues.length > 0 ? totalRevenue / revenues.length : 0;
+
+
     return {
       message: 'successfuly returned',
       success: true,
-      data: { daysrevenueW, daysrevenueR, Debt_payment , mostSoldProduct ,mostSoldProductRetail, leastSoldProduct, leastSoldProductRetails,combineResult, Wholetotalsales, Retailtotalsales, Debttotalpaid}
+      data: {totalRevenue, averageRevenue, Debt_payment , mostSoldProduct ,mostSoldProductRetail, leastSoldProduct, leastSoldProductRetails,combineResult, Wholetotalsales, Retailtotalsales, Debttotalpaid}
     };
   }
 }

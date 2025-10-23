@@ -357,7 +357,6 @@ export class DebtService {
           where: { id: id },
           relations: ['product', 'user'],
         });
-
         if (AddedDebt?.paymentstatus === paymentstatus.Paid) {
           if (AddedDebt.product.product_category === category.wholesales) {
             const saveSale = manager.create(WholeSales, {
