@@ -3,12 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DailyProfitsummary } from 'src/sales/entities/profitsummary.entity';
 import { ResponseType } from 'src/type/type.interface';
 import { Repository } from 'typeorm';
+import { WholeSales } from 'src/sales/entities/wholesale.entity';
 
 @Injectable()
 export class ProfitDevService {
   constructor(
     @InjectRepository(DailyProfitsummary)
     private readonly ProfitsummaryRepo: Repository<DailyProfitsummary>,
+    @InjectRepository(WholeSales)
+    private readonly WholesalesRepo:Repository<WholeSales>
   ) {}
 
   async AdminAnalysis(): Promise<ResponseType<any>> {
@@ -16,13 +19,14 @@ export class ProfitDevService {
     const dateOfToday = now.toISOString().split('T')[0];
     const profit = await this.ProfitsummaryRepo.createQueryBuilder('d')
       .select('d.total_profit')
-      .orderBy('d.id', 'DESC')
+      .orderBy('d.total_profit', 'DESC')
       .limit(2)
       .getRawMany();
+    const findAlldata = await this.ProfitsummaryRepo.find()
     return {
       message: 'successly returned',
       success: true,
-      data: profit,
+      data: {profit,findAlldata}
     };
   }
 }

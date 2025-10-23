@@ -41,7 +41,7 @@ import { ProfitDevModule } from './profit_dev/profit_dev.module';
     ProfitDevModule,
     ProfitDevModule
   ],
-  controllers: [AppController, ProfitDevController],
-  providers: [AppService, ProfitDevService],
+  controllers: [AppController],
+  providers: [AppService,],
 })
 export class AppModule {}

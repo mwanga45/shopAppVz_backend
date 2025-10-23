@@ -1,6 +1,12 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
+import { ProfitDevService } from './profit_dev.service';
 
 @Controller('profit-dev')
 export class ProfitDevController {
-    
+  constructor (private readonly ProfitDevservice:ProfitDevService){}  
+
+  @Get('profit')
+  Getprofit(){
+    return this.ProfitDevservice.AdminAnalysis()
+  }
 }
