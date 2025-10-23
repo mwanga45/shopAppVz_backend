@@ -75,11 +75,15 @@ export class ProfitDevService {
     .where('DATE(r.CreatedAt) <= :dateOfToday', {dateOfToday})
     .limit(28)
     .getRawMany()
-    const Debt_payment  = await this
+
+    const Debt_payment  = await this.DebtTrackRepo.createQueryBuilder('t')
+    .select('SUM(t.paidmoney)', 'paidmoney')
+    .where('DATE(t.CreatedAt) = :dateOfToday', {dateOfToday})
+    .getRawMany()
     return {
       message: 'successfuly returned',
       success: true,
-      data:{daysrevenueW, daysrevenueR}
+      data:{daysrevenueW, daysrevenueR,Debt_payment}
     };
   }
 }
