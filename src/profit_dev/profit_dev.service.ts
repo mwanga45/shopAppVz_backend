@@ -182,6 +182,11 @@ export class ProfitDevService {
     .where('DATE(r.CreatedAt) = :today', {today:currentdate})
     .getRawOne()
 
+    const Deviation = averageRevenue - Number(TodayRevenue?.generated_today || 0)
+
+    let Percentage_deviation = 0
+    Percentage_deviation = averageRevenue === 0 ? 0 : Deviation/averageRevenue *100
+
     return {
       message: 'successfuly returned',
       success: true,
@@ -197,7 +202,9 @@ export class ProfitDevService {
         Wholetotalsales,
         Retailtotalsales,
         Debttotalpaid,
-        TodayRevenue
+        TodayRevenue,
+        Deviation,
+        Percentage_deviation
       },
     };
   }
