@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { WholeSales } from 'src/sales/entities/wholesale.entity';
 import { RetailSales } from 'src/sales/entities/retailsale.entity';
 import { Debt_track } from 'src/debt/entities/debt.entity';
+import { promises } from 'dns';
 
 @Injectable()
 export class ProfitDevService {
@@ -138,18 +139,28 @@ export class ProfitDevService {
     const retailsaleRev_DAY = this.Retailrepo.createQueryBuilder('r')
     .select('COALESCE(SUM(r.Revenue), 0)', 'rRevenue')
     .where('EXTRACT(YEAR FROM r.CreatedAt) = :year',{year:currentYear})
-    .andWhere('EXTRACT(MONTH FROM r.CreateAt) = :month', {month:currentMonth})
+    .andWhere('EXTRACT(MONTH FROM r.CreatedAt) = :month', {month:currentMonth})
     .andWhere('EXTRACT(DAY FROM r.CreatedAt) = :day', {day:currentday})
 
-    const DebtPaid_DAY = this.DebtTrackRepo.createQueryBuilder('d')
+    const Debtpaid_DAY = this.DebtTrackRepo.createQueryBuilder('d')
     .select('COALESCE(SUM(d.paidmoney) , 0)', 'dRevenue')
-    .where('EXTRACT(YEAR FROM d.CreateAt) = :year', {year:currentYear})
+    .where('EXTRACT(YEAR FROM d.CreatedAt) = :year', {year:currentYear})
     .andWhere('EXTRACT (MONTH FROM d.CreatedAt) = :month',{month:currentMonth})
     .andWhere('EXTRACT(DAY FROM d.CreatedAt) = :day', {day:currentday})
+
+    const [wholesalesResult, retailsaleResult, DebtResult] =  await Promise.all([
+      wholesalesRev_DAY.getRawOne(),
+      retailsaleRev_DAY.getRawOne(),
+      Debtpaid_DAY.getRawOne()
+    ])
+    const Retailtotalsales = Number(retailsaleResult.rRevenue || 0)
+    const Wholetotalsales = Number(wholesalesResult.wRevenue || 0)
+    const Debttotalpaid = Number(DebtResult.dRevenue || 0)
+    const  combineResult = Retailtotalsales + Wholetotalsales + Debttotalpaid
     return {
       message: 'successfuly returned',
       success: true,
-      data: { daysrevenueW, daysrevenueR, Debt_payment , mostSoldProduct ,mostSoldProductRetail, leastSoldProduct, leastSoldProductRetails,}
+      data: { daysrevenueW, daysrevenueR, Debt_payment , mostSoldProduct ,mostSoldProductRetail, leastSoldProduct, leastSoldProductRetails,combineResult, Wholetotalsales, Retailtotalsales, Debttotalpaid}
     };
   }
 }
