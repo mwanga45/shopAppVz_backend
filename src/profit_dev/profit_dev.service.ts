@@ -113,6 +113,8 @@ export class ProfitDevService {
     .limit(1)
     .getRawOne()
 
+    
+
     const leastSoldProductRetails = await this.Retailrepo.createQueryBuilder('r')
     .leftJoin('r.product', 'p')
     .select('p.product_name', 'product_name')
