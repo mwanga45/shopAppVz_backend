@@ -137,7 +137,9 @@ export class ProfitDevService {
 
     const retailsaleRev_DAY = this.Retailrepo.createQueryBuilder('r')
     .select('COALESCE(SUM(r.Revenue), 0)', 'rRevenue')
-    .where('EXTRACT(YEAR FROM ')
+    .where('EXTRACT(YEAR FROM r.CreatedAt) = :year',{year:currentYear})
+    .andWhere('EXTRACT(MONTH FROM r.CreateAt) = :month', {month:currentMonth})
+    .andWhere('EXTRACT(DAY FROM r.CreatedAt) = :day', {day:currentday})
     return {
       message: 'successfuly returned',
       success: true,
