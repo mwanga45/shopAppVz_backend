@@ -76,6 +76,7 @@ export class ProfitDevService {
 
   const currentMonth = now.getMonth() + 1; 
   const currentYear = now.getFullYear();
+  const currentday  = now.getDate()
 
     const mostSoldProduct = await this.WholesalesRepo.createQueryBuilder('w')
     .leftJoin('w.product', 'p')
@@ -127,6 +128,16 @@ export class ProfitDevService {
     .limit(1)
     .getRawOne()
 
+    const wholesalesRev_DAY =  this.WholesalesRepo.createQueryBuilder('w')
+    .select('COALESCE(SUM(w.Revenue), 0)', 'wRevenue')
+    .where('EXTRACT(YEAR FROM w.CreatedAt) = :year', {year:currentYear})
+    .andWhere('EXTRACT(MONTH FROM w.CreatedAt) = :month', {month:currentMonth})
+    .andWhere('EXTRACT(DAY FROM w.CreatedAt) = :day', {day:currentday})
+
+
+    const retailsaleRev_DAY = this.Retailrepo.createQueryBuilder('r')
+    .select('COALESCE(SUM(r.Revenue), 0)', 'rRevenue')
+    .where('EXTRACT(YEAR FROM ')
     return {
       message: 'successfuly returned',
       success: true,
