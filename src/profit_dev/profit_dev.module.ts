@@ -4,10 +4,12 @@ import { DailyProfitsummary } from 'src/sales/entities/profitsummary.entity';
 import { ProfitDevService } from './profit_dev.service';
 import { ProfitDevController } from './profit_dev.controller';
 import { WholeSales } from 'src/sales/entities/wholesale.entity';
+import { RetailSales } from 'src/sales/entities/retailsale.entity';
+import { Debt_track } from 'src/debt/entities/debt.entity';
 
 @Module({
     imports:[
-        TypeOrmModule.forFeature([DailyProfitsummary, WholeSales])
+        TypeOrmModule.forFeature([DailyProfitsummary, WholeSales, RetailSales, Debt_track])
     ],
     providers:[ProfitDevService],
     controllers:[ProfitDevController]
