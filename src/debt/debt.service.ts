@@ -370,6 +370,7 @@ export class DebtService {
               profit_deviation: AddedDebt.profit_deviation,
               percentage_deviation: AddedDebt.Percentage_deviation,
               percentage_discount: AddedDebt.Discount_percentage,
+              sale_origin:"debt_payment",
               user: { id: AddedDebt.user.id },
             });
 
@@ -392,6 +393,7 @@ export class DebtService {
               profit_deviation: AddedDebt.profit_deviation,
               percentage_deviation: AddedDebt.Percentage_deviation,
               percentage_discount: AddedDebt.Discount_percentage,
+              sale_origin:"debt_payment",
               user: { id: AddedDebt.user.id },
             });
             await manager.save(saveSale);

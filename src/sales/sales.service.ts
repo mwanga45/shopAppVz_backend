@@ -506,6 +506,7 @@ export class SalesService {
             'w.Revenue',
           ])
           .where('DATE(w.CreatedAt) = CURRENT_DATE')
+          .andWhere('w.sale_origin = :origin', { origin: 'direct' })
           .getRawMany();
 
         const Salessummary: SaleSummary[] = Object.values(
@@ -597,7 +598,9 @@ export class SalesService {
           'SUM(r.Revenue) AS total_revenue',
           'SUM(r.Net_profit) AS total_profit',
         ])
-        .where('DATE(r."CreatedAt") = CURRENT_DATE')
+        .where('DATE(r.CreatedAt) = CURRENT_DATE')
+        .andWhere('r.sale_origin = :origin', { origin: 'direct' })
+
         .groupBy('p.id, p.product_name, p.product_category, u.fullname')
         .getRawMany();
 
@@ -614,7 +617,9 @@ export class SalesService {
           'SUM(w.Revenue) AS total_revenue',
           'SUM(w.Net_profit) AS total_profit',
         ])
-        .where('DATE(w."CreatedAt") = CURRENT_DATE')
+        .where('DATE(w.CreatedAt) = CURRENT_DATE')
+        .andWhere('w.sale_origin = :origin', { origin: 'direct' })
+
         .groupBy('p.id, p.product_name, p.product_category, u.fullname')
         .getRawMany();
     const Retailpending = await this.RetailsalesRepository.createQueryBuilder(
@@ -636,7 +641,7 @@ export class SalesService {
         'DATE(r."CreatedAt") = CURRENT_DATE AND  r.paymentstatus =:status',
         { status: 'pending' },
       )
-
+      .andWhere('r.sale_origin = :origin', { origin: 'direct' })
       .getRawMany();
 
     const Wholepending = await this.WholesalesRepository.createQueryBuilder('w')
@@ -656,7 +661,7 @@ export class SalesService {
         'DATE(w."CreatedAt") = CURRENT_DATE AND w.paymentstatus =:status ',
         { status: 'pending' },
       )
-      // .groupBy('p.id, p.product_name, p.product_category, u.fullname, w.paymentstatus')
+      .andWhere('w.sale_origin = :origin', { origin: 'direct' })
       .getRawMany();
     const AllcombinedPending = [...Retailpending, ...Wholepending];
     const Allcombined = [...Normalsalesretailreturn, ...Normalsaleswholereturn];
