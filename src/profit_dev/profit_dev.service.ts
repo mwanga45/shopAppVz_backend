@@ -67,10 +67,10 @@ export class ProfitDevService {
     const currentYear = now.getFullYear();
     const currentday = now.getDate();
     const currentdate = now.toISOString().split('T')[0];
-    const yesterday = new Date(now)
-    yesterday.setDate(now.getDate()-1)
-    const dateofyesterday = yesterday.toISOString().split('T')[0]
-  
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    const dateofyesterday = yesterday.toISOString().split('T')[0];
+
     const mostSoldProduct = await this.WholesalesRepo.createQueryBuilder('w')
       .leftJoin('w.product', 'p')
       .select('p.product_name', 'product_name')
@@ -166,7 +166,7 @@ export class ProfitDevService {
 
     const revenues = await this.ProfitsummaryRepo.createQueryBuilder('p')
       .select('p.total_revenue', 'total_revenue')
-      .where('p.CreatedAt <= :yest', { yest: yesterday }) 
+      .where('p.CreatedAt <= :yest', { yest: yesterday })
       .orderBy('p.CreatedAt', 'DESC')
       .limit(28)
       .getRawMany();
@@ -177,6 +177,10 @@ export class ProfitDevService {
     );
     const averageRevenue =
       revenues.length > 0 ? totalRevenue / revenues.length : 0;
+    const TodayRevenue = await this.ProfitsummaryRepo.createQueryBuilder('r')
+    .select('r.total_revenue', 'generated_today')
+    .where('DATE(r.CreatedAt) = :today', {today:currentdate})
+    .getRawOne()
 
     return {
       message: 'successfuly returned',
@@ -193,6 +197,7 @@ export class ProfitDevService {
         Wholetotalsales,
         Retailtotalsales,
         Debttotalpaid,
+        TodayRevenue
       },
     };
   }
