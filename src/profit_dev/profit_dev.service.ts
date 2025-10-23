@@ -140,6 +140,12 @@ export class ProfitDevService {
     .where('EXTRACT(YEAR FROM r.CreatedAt) = :year',{year:currentYear})
     .andWhere('EXTRACT(MONTH FROM r.CreateAt) = :month', {month:currentMonth})
     .andWhere('EXTRACT(DAY FROM r.CreatedAt) = :day', {day:currentday})
+
+    const DebtPaid_DAY = this.DebtTrackRepo.createQueryBuilder('d')
+    .select('COALESCE(SUM(d.paidmoney) , 0)', 'dRevenue')
+    .where('EXTRACT(YEAR FROM d.CreateAt) = :year', {year:currentYear})
+    .andWhere('EXTRACT (MONTH FROM d.CreatedAt) = :month',{month:currentMonth})
+    .andWhere('EXTRACT(DAY FROM d.CreatedAt) = :day', {day:currentday})
     return {
       message: 'successfuly returned',
       success: true,
