@@ -15,6 +15,7 @@ import { DebtModule } from './debt/debt.module';
 import { SmsModule } from './sms/sms.module';
 import { ProfitDevController } from './profit_dev/profit_dev.controller';
 import { ProfitDevService } from './profit_dev/profit_dev.service';
+import { ProfitDevModule } from './profit_dev/profit_dev.module';
 
 
 @Module({
@@ -37,6 +38,8 @@ import { ProfitDevService } from './profit_dev/profit_dev.service';
     OrderModule,
     DebtModule,
     SmsModule,
+    ProfitDevModule,
+    ProfitDevModule
   ],
   controllers: [AppController, ProfitDevController],
   providers: [AppService, ProfitDevService],
