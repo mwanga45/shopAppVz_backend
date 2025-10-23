@@ -12,10 +12,10 @@ export class OrderController {
   createOrder(@Body() createOrderDto:CreateOrderDto) {
     return this.orderService.createOrder(createOrderDto);
   }
-  @Get('active')
-  GetActive() {
-    return this.orderService.ProductSummary();
-  }
+  // @Get('active')
+  // GetActive() {
+  //   return this.orderService.ProductSummary();
+  // }
   @Get('customerInfo')
   Getstatus(){
     return this.orderService.findAllcustomer()

@@ -1,8 +1,7 @@
-import { isNotEmpty, IsString } from "class-validator";
+import { isNotEmpty, IsNumber, IsString } from "class-validator";
 
 export class CreateOrderDto {
-    @IsString()
-    user_id:string
+
 
     @IsString()
     product_name:string
@@ -15,6 +14,12 @@ export class CreateOrderDto {
 
     @IsString()
     OrderDate:string
+
+    @IsNumber()
+    paidMoney:number
+
+    @IsNumber()
+    payamount:number
 
     @IsString()
     Quantity:string
