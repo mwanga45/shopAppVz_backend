@@ -11,10 +11,18 @@ export class ProfitDevService {
         private readonly ProfitsummaryRepo:Repository<DailyProfitsummary>
     ){}
 
-    async Profit_trend():Promise<ResponseType<any>>{
+    async AdminAnalysis ():Promise<ResponseType<any>>{
+        const now = new Date()
+        const dateOfToday = now.toISOString().split('T')[0];
+        const profit = await this.ProfitsummaryRepo.createQueryBuilder('d')
+        .select('d.total_profit')
+        .orderBy('d.id', 'DESC')
+        .limit (2)
+        .getRawMany()
         return{
             message:"successly returned",
-            success:true
+            success:true,
+            data:profit
         }
     }
 }
