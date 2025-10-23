@@ -73,10 +73,62 @@ export class ProfitDevService {
       .select('SUM(t.paidmoney)', 'paidmoney')
       .where('DATE(t.CreatedAt) = :dateOfToday', { dateOfToday })
       .getRawMany();
+
+  const currentMonth = now.getMonth() + 1; 
+  const currentYear = now.getFullYear();
+
+    const mostSoldProduct = await this.WholesalesRepo.createQueryBuilder('w')
+    .leftJoin('w.product', 'p')
+    .select('p.product_name', 'product_name')
+    .addSelect('SUM(w.Revenue)', 'total_revenue')
+    .addSelect('SUM(w.Total_pc_pkg_litre)', 'total_quantity')
+    .where('EXTRACT(MONTH FROM w.CreatedAt) = :month', { month: currentMonth })
+    .andWhere('EXTRACT(YEAR FROM w.CreatedAt) = :year', { year: currentYear })
+    .groupBy('p.product_name')
+    .orderBy('SUM(w.Revenue)', 'DESC')
+    .limit(1)
+    .getRawOne();
+
+    const leastSoldProduct = await this.WholesalesRepo.createQueryBuilder('w')
+    .leftJoin('w.product', 'p')
+    .select('p.product_name', 'product_name')
+    .addSelect('SUM(w.Total_pc_pkg_litre)', 'total_quantity')
+    .addSelect('SUM(w.Revenue)', 'Revenue')
+    .where('EXTRACT(MONTH FROM w.CreatedAt) = :month', {month:currentMonth})
+    .andWhere('EXTRACT(YEAR FROM w.CreatedAt) = :year', {year:currentYear})
+    .groupBy('p,product_name')
+    .orderBy('SUM(w.Revenue)', 'ASC')
+    .limit(1)
+    .getRawOne()
+
+    const mostSoldProductRetail = await this.Retailrepo.createQueryBuilder('r')
+    .leftJoin('r.product', 'p')
+    .select('p.product_name', 'product_name')
+    .addSelect('SUM(r.Total_pc_pkg_litre)', 'total_quantity')
+    .addSelect('SUM(r.Revenue)', 'Revenue')
+    .where('EXTRACT(YEAR FROM r.CreatedAt ) = :year', {year:currentYear})
+    .andWhere('EXTRACT(MONTH FROM r.CreatedAt) = :month', {month:currentMonth})
+    .groupBy('p.product_name')
+    .orderBy('SUM(r.Revenue)', 'DESC')
+    .limit(1)
+    .getRawOne()
+
+    const leastSoldProductRetails = await this.Retailrepo.createQueryBuilder('r')
+    .leftJoin('r.product', 'p')
+    .select('p.product_name', 'product_name')
+    .addSelect('SUM(r.Revenue)', 'Revenue')
+    .addSelect('SUM(r.Total_pc_pkg_litre)', 'total_quantity')
+    .where('EXTRACT(YEAR FROM r.CreatedAt) = :year', {year:currentYear})
+    .andWhere('EXTRACT(MONTH FROM r.CreatedAt) = :month', {month:currentMonth})
+    .orderBy('SUM(r.Revenue)', 'ASC')
+    .groupBy('p.product_name')
+    .limit(1)
+    .getRawOne()
+
     return {
       message: 'successfuly returned',
       success: true,
-      data: { daysrevenueW, daysrevenueR, Debt_payment },
+      data: { daysrevenueW, daysrevenueR, Debt_payment , mostSoldProduct ,mostSoldProductRetail, leastSoldProduct, leastSoldProductRetails,}
     };
   }
 }
