@@ -153,6 +153,7 @@ export class ProfitDevService {
       retailsaleRev_DAY.getRawOne(),
       Debtpaid_DAY.getRawOne()
     ])
+    
     const Retailtotalsales = Number(retailsaleResult.rRevenue || 0)
     const Wholetotalsales = Number(wholesalesResult.wRevenue || 0)
     const Debttotalpaid = Number(DebtResult.dRevenue || 0)
