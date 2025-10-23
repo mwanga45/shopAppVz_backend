@@ -12,6 +12,7 @@ import { Stock, Stock_transaction } from 'src/stock/entities/stock.entity';
 import { WholeSales } from 'src/sales/entities/wholesale.entity';
 import { Product_discount } from 'src/product/entities/discount.entity';
 import { Debt, Debt_track } from 'src/debt/entities/debt.entity';
+import { Order } from 'src/order/entities/order.entity';
 
 export enum UserType {
   Admin = 'admin',
@@ -61,4 +62,7 @@ export class User extends baseEntity {
   
   @OneToMany(()=> Debt_track, (track)=> track.user)
   track:Debt_track
+
+  @OneToMany(()=> Order , (order)=> order.user)
+  order:Order[]
 }

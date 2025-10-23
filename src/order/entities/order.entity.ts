@@ -1,5 +1,5 @@
 import { baseEntity } from "src/common/base.entity";
-import { Column, Entity, JoinColumn, ManyToMany } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToMany, ManyToOne } from "typeorm";
 import { paymentstatus } from "src/type/type.interface";
 import { User } from "src/entities/user.entity";
 
@@ -29,9 +29,8 @@ export class Order extends baseEntity {
     @Column()
     OrderStatus:paymentstatus
 
-    @ManyToMany(()=> User , (user)=> user.order)
+    @ManyToOne(()=> User , (user)=> user.order)
     @JoinColumn({name:"userId"})
     user:User
-
 
 }
