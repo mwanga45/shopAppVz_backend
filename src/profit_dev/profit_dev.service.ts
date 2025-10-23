@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { WholeSales } from 'src/sales/entities/wholesale.entity';
 import { RetailSales } from 'src/sales/entities/retailsale.entity';
 import { Debt_track } from 'src/debt/entities/debt.entity';
+import { Debt } from 'src/debt/entities/debt.entity';
 
 @Injectable()
 export class ProfitDevService {
@@ -18,6 +19,8 @@ export class ProfitDevService {
     private readonly Retailrepo: Repository<RetailSales>,
     @InjectRepository(Debt_track)
     private readonly DebtTrackRepo: Repository<Debt_track>,
+    @InjectRepository(Debt)
+    private readonly DebtRepo:Repository<Debt>
   ) {}
 
   async AdminAnalysis(): Promise<ResponseType<any>> {
@@ -186,7 +189,8 @@ export class ProfitDevService {
 
     let Percentage_deviation = 0
     Percentage_deviation = averageRevenue === 0 ? 0 : Deviation/averageRevenue *100
-
+    const DebtInfosummary  = await this.DebtRepo.createQueryBuilder('d')
+    .select('')
     return {
       message: 'successfuly returned',
       success: true,
