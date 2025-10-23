@@ -33,6 +33,10 @@ export class WholeSales extends baseEntity{
   @Column({default:paymentstatus.Paid})
   paymentstatus:paymentstatus
 
+  @Column({ default: 'direct' })
+sale_origin: 'direct' | 'debt_payment';
+
+
   @ManyToOne(()=> User,(user)=>user.wholesales)
   @JoinColumn({name:'userId'})
   user:User;
