@@ -50,7 +50,17 @@ export class OrderService {
           await manager.save(saveUnofficialProduct)
         }
       }
-      const Iscustomerexist = await manager.
+      const Iscustomerexist = await manager.findOne(Customer,{
+        where:{customer_name:dto.client_name}
+      })
+      if(!Iscustomerexist){
+        const saveCustomerInfo = await manager.create(Customer,{
+          customer_name:dto.client_name,
+          phone_number:Phone_number
+        })
+        await manager.save(saveCustomerInfo)
+      }
+      
        return{
         message:"successfuly",
         success:true
