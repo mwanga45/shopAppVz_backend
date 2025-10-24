@@ -20,6 +20,10 @@ export class OrderController {
   Getstatus(){
     return this.orderService.findAllcustomer()
   }
+  @Get('bothproduct')
+  GetBothproduct(){
+    return this.orderService.ReturnOffAndUnoff()
+  }
 
 
 

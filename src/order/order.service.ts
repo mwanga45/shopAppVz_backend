@@ -7,7 +7,7 @@ import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { Ordertype } from './utils/order.type';
 import { dialValidate } from 'src/common/helper/phone.helper';
 import { Customer } from 'src/entities/customer.entity';
-import { ResponseType } from 'src/type/type.interface';
+import { category, ResponseType } from 'src/type/type.interface';
 import { Product } from 'src/product/entities/product.entity';
 import { UnofficialProduct } from './entities/Unofficialproduct.entity';
 
@@ -100,20 +100,8 @@ export class OrderService {
   return{
     message:"su",
     success:true
-
-  }
   }
 
-  async ReturnOffAndUnoff ():Promise<ResponseType<any>>{
-    const findofficalproduct = await this.ProductRepo.createQueryBuilder('p')
-    .select([
-      'p.product_name AS Product_name',
-      ''
-    ])
-    return{
-      message:"succ",
-      success:true
-    }
   }
   async findAllcustomer():Promise<ResponseType<any>>{
   const customerdetails = await this.CustomerRepo.createQueryBuilder('c')
@@ -132,5 +120,42 @@ export class OrderService {
     }
 
   }
+
+  async ReturnOffAndUnoff(): Promise<ResponseType<any>> {
+  const products = await this.ProductRepo.find();
+
+  const filteredProducts = products
+    .filter((product) => {
+      return (
+        product.wholesales_price !== null ||
+        product.retailsales_price !== null
+      );
+    })
+
+    .map((product) => {
+      let newName = product.product_name;
+      let sellingPrice: string | null = null;
+
+      if (product.product_category === category.wholesales) {
+        newName = `w${product.product_name}`;
+        sellingPrice = product.wholesales_price;
+      } else if (product.product_category === category.retailsales) {
+        newName = `r${product.product_name}`;
+        sellingPrice = product.retailsales_price;
+      }
+
+      return {
+        product_name: newName,
+        selling_price: sellingPrice,
+      };
+    });
+
+  return {
+    message: "success",
+    success: true,
+    data: filteredProducts,
+  };
+}
+
 
 }
