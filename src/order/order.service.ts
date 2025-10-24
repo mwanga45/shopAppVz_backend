@@ -8,6 +8,8 @@ import { Ordertype } from './utils/order.type';
 import { dialValidate } from 'src/common/helper/phone.helper';
 import { Customer } from 'src/entities/customer.entity';
 import { ResponseType } from 'src/type/type.interface';
+import { Product } from 'src/product/entities/product.entity';
+import { UnofficialProduct } from './entities/Unofficialproduct.entity';
 
 
 
@@ -17,6 +19,10 @@ export class OrderService {
     @InjectRepository(Order) 
     private readonly orderRepo:Repository<Order>,
     @InjectRepository(Customer) private readonly CustomerRepo: Repository<Customer>,
+    @InjectRepository(Product)
+    private readonly  ProductRepo:Repository<Product>,
+    @InjectRepository(UnofficialProduct)
+    private readonly  UproductRepo:Repository<UnofficialProduct>,
     private readonly validator:dialValidate
   ){}
   private ordertype:Ordertype[] = [] 
@@ -96,6 +102,18 @@ export class OrderService {
     success:true
 
   }
+  }
+
+  async ReturnOffAndUnoff ():Promise<ResponseType<any>>{
+    const findofficalproduct = await this.ProductRepo.createQueryBuilder('p')
+    .select([
+      'p.product_name AS Product_name',
+      ''
+    ])
+    return{
+      message:"succ",
+      success:true
+    }
   }
   async findAllcustomer():Promise<ResponseType<any>>{
   const customerdetails = await this.CustomerRepo.createQueryBuilder('c')
