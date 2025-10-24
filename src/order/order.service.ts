@@ -123,7 +123,6 @@ export class OrderService {
 
   async ReturnOffAndUnoff(): Promise<ResponseType<any>> {
   const products = await this.ProductRepo.find();
-
   const filteredProducts = products
     .filter((product) => {
       return (
@@ -150,10 +149,15 @@ export class OrderService {
       };
     });
 
+    const UnofficialProduct = await this.UproductRepo.createQueryBuilder('u')
+    .select('u.Uproduct_name',"Uproduct_name")
+    .addSelect('u.Uproduct_price', 'selling_price')
+    .getRawMany()
+    const finalResult = {UnofficialProduct,filteredProducts}
   return {
     message: "success",
     success: true,
-    data: filteredProducts,
+    data: finalResult,
   };
 }
 
