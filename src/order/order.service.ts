@@ -28,10 +28,16 @@ export class OrderService {
     private readonly validator:dialValidate
   ){}
   private ordertype:Ordertype[] = [] 
- 
+
   async createOrder(dto:CreateOrderDto) :Promise<ResponseType<any>>{
  return await this.Datasource.transaction(async(manager)=> {
-    try{
+   try{
+      const validatePhone = this.validator.CheckDialformat(dto.Phone_number)
+      if(!validatePhone.success){
+        throw new Error(String(validatePhone.message))
+      }
+      const Phone_number = validatePhone.data
+      
 
        return{
         message:"successfuly",
@@ -40,7 +46,7 @@ export class OrderService {
 
     }catch(error){
       return{
-        message:"su",
+        message:`failed to create order: ${error}`,
         success:false
       }
     }
@@ -101,7 +107,7 @@ export class OrderService {
     .select('u.Uproduct_name',"Uproduct_name")
     .addSelect('u.Uproduct_price', 'selling_price')
     .getRawMany()
-    const finalResult = {UnofficialProduct,filteredProducts}
+    const finalResult = {...UnofficialProduct,...filteredProducts}
   return {
     message: "success",
     success: true,

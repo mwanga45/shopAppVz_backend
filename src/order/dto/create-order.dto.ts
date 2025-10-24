@@ -24,4 +24,7 @@ export class CreateOrderDto {
     @IsString()
     Quantity:string
 
+    @IsString()
+    Phone_number:string
+
 }
