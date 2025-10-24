@@ -37,8 +37,20 @@ export class OrderService {
         throw new Error(String(validatePhone.message))
       }
       const Phone_number = validatePhone.data
-      
 
+      if(!dto.product_name.startsWith('w_') || !dto.product_name.startsWith("r_")){ 
+        const checkproduct_name =  await manager.findOne(UnofficialProduct,{
+          where:{Uproduct_name:dto.product_name}
+        })
+        if(!checkproduct_name){
+          const saveUnofficialProduct =  manager.create(UnofficialProduct,{
+            Uproduct_name:dto.product_name,
+            Uproduct_price:dto.payamount
+          })
+          await manager.save(saveUnofficialProduct)
+        }
+      }
+      const Iscustomerexist = await manager.
        return{
         message:"successfuly",
         success:true
@@ -90,10 +102,10 @@ export class OrderService {
       let sellingPrice: string | null = null;
 
       if (product.product_category === category.wholesales) {
-        newName = `w${product.product_name}`;
+        newName = `w_${product.product_name}`;
         sellingPrice = product.wholesales_price;
       } else if (product.product_category === category.retailsales) {
-        newName = `r${product.product_name}`;
+        newName = `r_${product.product_name}`;
         sellingPrice = product.retailsales_price;
       }
 
