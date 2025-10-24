@@ -13,6 +13,7 @@ import { WholeSales } from 'src/sales/entities/wholesale.entity';
 import { Product_discount } from 'src/product/entities/discount.entity';
 import { Debt, Debt_track } from 'src/debt/entities/debt.entity';
 import { Order } from 'src/order/entities/order.entity';
+import { UnofficialProduct } from 'src/order/entities/Unofficialproduct.entity';
 
 export enum UserType {
   Admin = 'admin',
@@ -65,4 +66,7 @@ export class User extends baseEntity {
 
   @OneToMany(()=> Order , (order)=> order.user)
   order:Order[]
+
+  @OneToMany(()=> UnofficialProduct, (unofficialproduct)=> unofficialproduct.user)
+  unofficialproduct:UnofficialProduct[]
 }
