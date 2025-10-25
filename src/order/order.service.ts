@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateOrderDto } from './dto/create-order.dto';
+import { CreateOrderDto, Orderstatus } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
@@ -7,7 +7,7 @@ import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { Ordertype } from './utils/order.type';
 import { dialValidate } from 'src/common/helper/phone.helper';
 import { Customer } from 'src/entities/customer.entity';
-import { category, ResponseType } from 'src/type/type.interface';
+import { category, paymentstatus, ResponseType } from 'src/type/type.interface';
 import { Product } from 'src/product/entities/product.entity';
 import { UnofficialProduct } from './entities/Unofficialproduct.entity';
 import { DataSource } from 'typeorm';
@@ -54,13 +54,27 @@ export class OrderService {
         where:{customer_name:dto.client_name}
       })
       if(!Iscustomerexist){
-        const saveCustomerInfo = await manager.create(Customer,{
+        const saveCustomerInfo =  manager.create(Customer,{
           customer_name:dto.client_name,
           phone_number:Phone_number
         })
         await manager.save(saveCustomerInfo)
       }
-      
+      const saveOrder = manager.create(Order,{
+     product_name:dto.product_name,
+     client_name:dto.client_name,
+     client_phone:dto.client_phone,
+     Paidamount:dto.paidMoney,
+     Payamount:dto.payamount,
+      OrderStatus:
+    dto.paidMoney === dto.payamount
+      ? paymentstatus.Paid
+      : dto.payamount < dto.paidMoney && dto.payamount !== 0
+      ? paymentstatus.Parctial
+      : paymentstatus.Pending,
+
+      })
+      await manager.save(saveOrder)
        return{
         message:"successfuly",
         success:true

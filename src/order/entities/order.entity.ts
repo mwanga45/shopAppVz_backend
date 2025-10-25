@@ -15,10 +15,10 @@ export class Order extends baseEntity {
     Order_Description:string
 
     @Column()
-    Payamount:string
+    Payamount:number
 
     @Column()
-    Paidamount:string
+    Paidamount:number
     
     @Column()
     client_phone:string

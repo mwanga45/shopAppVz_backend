@@ -1,5 +1,11 @@
 import { isNotEmpty, IsNumber, IsString } from "class-validator";
-
+export enum Orderstatus {
+    Fullpaid ="fullpaid",
+    Partialpaid = 'partialpaid',
+    pending = 'pending',
+    Partial = "Partial"
+    
+}
 export class CreateOrderDto {
 
 
@@ -26,5 +32,8 @@ export class CreateOrderDto {
 
     @IsString()
     Phone_number:string
+
+    @IsString()
+    Orderstatus:Orderstatus
 
 }
