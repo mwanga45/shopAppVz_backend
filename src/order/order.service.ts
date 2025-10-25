@@ -11,6 +11,7 @@ import { category, paymentstatus, ResponseType } from 'src/type/type.interface';
 import { Product } from 'src/product/entities/product.entity';
 import { UnofficialProduct } from './entities/Unofficialproduct.entity';
 import { DataSource } from 'typeorm';
+import { User } from 'src/entities/user.entity';
 
 @Injectable()
 export class OrderService {
@@ -28,7 +29,7 @@ export class OrderService {
   ) {}
   private ordertype: Ordertype[] = [];
 
-  async createOrder(dto: CreateOrderDto): Promise<ResponseType<any>> {
+  async createOrder(dto: CreateOrderDto, userId:any): Promise<ResponseType<any>> {
     return await this.Datasource.transaction(async (manager) => {
       try {
         const validatePhone = this.validator.CheckDialformat(dto.Phone_number);
@@ -76,6 +77,7 @@ export class OrderService {
                 ? paymentstatus.Parctial
                 : paymentstatus.Pending,
         });
+        User:{id:userId}
 
         await manager.save(saveOrder);
         return {
@@ -92,7 +94,7 @@ export class OrderService {
   }
   // create an  function  that  will Automatic make sure is cancelled after ten days
   // after status stays pending for that time and then send are message  as record of
-  // automatic  cancellation of order(Automatic invoke functu=ion)
+  // automatic  cancellation of order(Automatic invoke functuion)
 
   async findAllcustomer(): Promise<ResponseType<any>> {
     const customerdetails = await this.CustomerRepo.createQueryBuilder('c')

@@ -11,7 +11,7 @@ export class Order extends baseEntity {
     @Column()
     client_name:string
 
-    @Column()
+    @Column({default:'Placed order'})
     Order_Description:string
 
     @Column()
