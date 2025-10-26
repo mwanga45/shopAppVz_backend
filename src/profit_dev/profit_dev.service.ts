@@ -76,12 +76,14 @@ lastWeekStart.setHours(0,0,0,0)
 const lastweekSellingProduct = await this.WholesalesRepo.createQueryBuilder('w')
 .leftJoin('w.product', 'p')
 .select('p.product_name', 'product_name')
+.addSelect('p.id', 'product_id')
 .addSelect('SUM(w.Total_pc_pkg_litre)', 'Quantity')
 .where('w.CreatedAt BETWEEN :start AND :end',{
   start:lastWeekStart.toISOString(),
   end:lastWeekEnd.toISOString()
 })
 .groupBy('p.product_name')
+.addGroupBy('p.id')
 .addGroupBy('w.Total_pc_pkg_litre')
 .orderBy('w.Total_pc_pkg_litre', 'DESC')
 .getRawMany()
@@ -97,13 +99,24 @@ const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
       .select('MAX(sub.id)')
       .from('stock_transaction', 'sub')
       .where('sub.product_id = s.product_id')
-      .andWhere('sub.CreatedAt < :lastweekEnd ', {lastweekEnd:lastWeekEnd})
+      .andWhere('sub.CreatedAt < :lastWeekStart', {lastWeekStart:lastWeekStart})
       .andWhere('sub.Change_type = :changeType')
       .getQuery();
     return `s.id = ${subQuery}`;
   })
   .setParameter('changeType', ChangeType.ADD)
   .getRawMany();
+
+  const StockRate = lastweekSellingProduct.map((sp)=>{
+    const stock = StocklastAdd.find((st)=>
+      st.product_id === sp.product_id
+  )
+  if(!stock) return null
+  const stockBefore = Number(stock.new_stock)
+  const total_quantitysold = Number (sp.Quantity)
+  const sale_rate =  total_quantitysold/stockBefore *100
+  return sale_rate.toFixed(2)
+  })
  
   // const rate:RateResult[]
   //  for(let i = 0; i < Stock_transaction.length; i++){
@@ -116,7 +129,7 @@ const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
     return{
       message:"successfuly returned",
       success:true,
-      data:{StocklastAdd, lastWeekEnd, lastWeekStart, lastweekSellingProduct}
+      data:{StocklastAdd, lastWeekEnd, lastWeekStart, lastweekSellingProduct,StockRate}
     }
   }
   async DashboardResult(): Promise<ResponseType<any>> {
