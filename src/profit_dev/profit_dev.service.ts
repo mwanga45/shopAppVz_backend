@@ -73,11 +73,18 @@ const lastWeekStart = new Date(lastWeekEnd)
 lastWeekStart.setDate(lastWeekEnd.getDate()- 6)
 lastWeekStart.setHours(0,0,0,0)
 
-// const lastweekSellingProduct = await this.WholesalesRepo.createQueryBuilder('w')
-// .leftJoin('w.product', 'p')
-// .select('p.product_name', 'product_name')
-// .addSelect('SUM(w.Total_pc_pkg_litre)', 'Quantity')
-// .where
+const lastweekSellingProduct = await this.WholesalesRepo.createQueryBuilder('w')
+.leftJoin('w.product', 'p')
+.select('p.product_name', 'product_name')
+.addSelect('SUM(w.Total_pc_pkg_litre)', 'Quantity')
+.where('w.CreatedAt BETWEEN :start AND :end',{
+  start:lastWeekStart.toISOString(),
+  end:lastWeekEnd.toISOString()
+})
+.groupBy('p.product_name')
+.addGroupBy('w.Total_pc_pkg_litre')
+.orderBy('w.Total_pc_pkg_litre', 'DESC')
+.getRawMany()
 const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
   .leftJoin('s.product', 'p')
   .select('s.product_id', 'product_id')
@@ -90,6 +97,7 @@ const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
       .select('MAX(sub.id)')
       .from('stock_transaction', 'sub')
       .where('sub.product_id = s.product_id')
+      .andWhere('sub.CreatedAt < :lastweekEnd ', {lastweekEnd:lastWeekEnd})
       .andWhere('sub.Change_type = :changeType')
       .getQuery();
     return `s.id = ${subQuery}`;
@@ -108,7 +116,7 @@ const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
     return{
       message:"successfuly returned",
       success:true,
-      data:{StocklastAdd, lastWeekEnd, lastWeekStart}
+      data:{StocklastAdd, lastWeekEnd, lastWeekStart, lastweekSellingProduct}
     }
   }
   async DashboardResult(): Promise<ResponseType<any>> {
