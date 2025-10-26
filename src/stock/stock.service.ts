@@ -127,7 +127,7 @@ async Test(): Promise<any> {
             message:'Failed  to find  the targeted product '
           }
         }
-        const FindSum = findTotal.total + updateStockDto.total_stock
+        const FindSum = Number(findTotal.total )+ updateStockDto.total_stock
 
         const Updatestk = await this.stockRepo.update({ product: { id: updateStockDto.product_id } }, { 
           Total_stock:FindSum,
@@ -157,7 +157,8 @@ async Test(): Promise<any> {
         await this.recstockRepo.save(updatestocktrans)
           return{
           message:`Succefuly Update Stock ${FindSum}`,
-          success:true
+          success:true,
+          data:[FindSum, findTotal.total, prevStockForNewTransaction]
         }
 
         }else if(updateStockDto.Method === ChangeType.REMOVE){
@@ -172,8 +173,14 @@ async Test(): Promise<any> {
           success:false
         }
       }
-      const updateTotalstock = findTotal.total - updateStockDto.total_stock;
-      const updatestock  = await this.stockRepo.update({ product: { id: updateStockDto.product_id } },{ // Updated to use product_id
+      const updateTotalstock = Number(findTotal.total) - updateStockDto.total_stock;
+      if(updateTotalstock < 0 ){
+        return{
+          message:"can  not remove  stock below 0",
+          success:false
+        }
+      }
+      const updatestock  = await this.stockRepo.update({ product: { id: updateStockDto.product_id } },{
       Total_stock:updateTotalstock,
       user:{id:userId}
       })
@@ -203,7 +210,8 @@ async Test(): Promise<any> {
       this.recstockRepo.save(newstocktrancrec)
       return{
         message:"Succesfuly Updatw Stock (reduce number stock)",
-        success:true
+        success:true,
+        data:{findNewstock,QueryStockTrans,updateTotalstock, findTotal}
       }
     }
     return{
