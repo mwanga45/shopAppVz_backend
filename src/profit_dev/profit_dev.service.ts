@@ -64,11 +64,25 @@ export class ProfitDevService {
     };
   }
     async GraphDataAndPeformanceRate():Promise<ResponseType<any>>{
-    const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
-    .select('s.new_stock','new_stock' )
-    .addSelect('s.product_id', 'product_id')
-    .where('s.Change_type = :changeType', {changeType:ChangeType.ADD})
-    .getRawMany()
+const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
+  .leftJoin('s.product', 'p')
+  .select('s.product_id', 'product_id')
+  .addSelect('p.product_name')
+  .addSelect('s.new_stock', 'new_stock')
+  .where('s.Change_type = :changeType', { changeType: ChangeType.ADD })
+  .andWhere(qb => {
+    const subQuery = qb
+      .subQuery()
+      .select('MAX(sub.id)')
+      .from('stock_transaction', 'sub')
+      .where('sub.product_id = s.product_id')
+      .andWhere('sub.Change_type = :changeType')
+      .getQuery();
+    return `s.id = ${subQuery}`;
+  })
+  .setParameter('changeType', ChangeType.ADD)
+  .getRawMany();
+
 
 
     return{
