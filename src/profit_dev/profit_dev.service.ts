@@ -132,6 +132,8 @@ export class ProfitDevService {
     .addSelect('s.CreatedAt', 'date')
     .where('s.CreatedAt > :end', {end:lastWeekEnd})
     .getRawMany()
+    
+    const compareRevenue = [RevenuePrevweek, RevenuethisWeek]
     return {
       message: 'successfuly returned',
       success: true,
@@ -141,8 +143,7 @@ export class ProfitDevService {
         lastWeekStart,
         lastweekSellingProduct,
         StockRate,
-        RevenuePrevweek,
-        RevenuethisWeek
+       compareRevenue
       },
     };
   }
