@@ -114,8 +114,11 @@ const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
   if(!stock) return null
   const stockBefore = Number(stock.new_stock)
   const total_quantitysold = Number (sp.Quantity)
-  const sale_rate =  total_quantitysold/stockBefore *100
-  return sale_rate.toFixed(2)
+  const sale_rate =  (total_quantitysold/stockBefore *100).toFixed(2)
+  return{
+    saleRate:sale_rate,
+    product_name:sp.product_name,
+  }
   })
  
   // const rate:RateResult[]
