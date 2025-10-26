@@ -8,10 +8,11 @@ import { RetailSales } from 'src/sales/entities/retailsale.entity';
 import { Debt_track } from 'src/debt/entities/debt.entity';
 import { Debt } from 'src/debt/entities/debt.entity';
 import { Stock } from 'src/stock/entities/stock.entity';
+import { Stock_transaction } from 'src/stock/entities/stock.entity';
 
 @Module({
     imports:[
-        TypeOrmModule.forFeature([DailyProfitsummary, WholeSales, RetailSales, Debt_track, Debt, Stock])
+        TypeOrmModule.forFeature([DailyProfitsummary, WholeSales, RetailSales, Debt_track, Debt, Stock,Stock_transaction])
     ],
     providers:[ProfitDevService],
     controllers:[ProfitDevController]

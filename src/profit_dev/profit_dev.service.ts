@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DailyProfitsummary } from 'src/sales/entities/profitsummary.entity';
-import { ResponseType } from 'src/type/type.interface';
+import { ChangeType, ResponseType } from 'src/type/type.interface';
 import { Repository } from 'typeorm';
 import { WholeSales } from 'src/sales/entities/wholesale.entity';
 import { RetailSales } from 'src/sales/entities/retailsale.entity';
 import { Debt_track } from 'src/debt/entities/debt.entity';
 import { Debt } from 'src/debt/entities/debt.entity';
 import { Stock } from 'src/stock/entities/stock.entity';
+import { Stock_transaction } from 'src/stock/entities/stock.entity';
 
 @Injectable()
 export class ProfitDevService {
@@ -23,7 +24,9 @@ export class ProfitDevService {
     @InjectRepository(Debt)
     private readonly DebtRepo: Repository<Debt>,
     @InjectRepository (Stock) 
-    private readonly Stockrepo:Repository<Stock>
+    private readonly Stockrepo:Repository<Stock>,
+    @InjectRepository(Stock_transaction)
+    private readonly StockTrnasrepo:Repository<Stock_transaction>
   ) {}
 
   async AdminAnalysis(): Promise<ResponseType<any>> {
@@ -60,12 +63,18 @@ export class ProfitDevService {
       data: { profit, findprofit_margin },
     };
   }
-    async GraphDataandPeformanceRate():Promise<ResponseType<any>>{
+    async GraphDataAndPeformanceRate():Promise<ResponseType<any>>{
+    const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
+    .select('s.new_stock','new_stock' )
+    .addSelect('s.product_id', 'product_id')
+    .where('s.Change_type = :changeType', {changeType:ChangeType.ADD})
+    .getRawMany()
 
 
     return{
-      message:"",
-      success:true
+      message:"successfuly returned",
+      success:true,
+      data:StocklastAdd
     }
   }
   async DashboardResult(): Promise<ResponseType<any>> {

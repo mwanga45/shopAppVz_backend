@@ -13,4 +13,8 @@ export class ProfitDevController {
   GetDashinfo(){
     return this.ProfitDevservice.DashboardResult()
   }
+  @Get('graph')
+  GetghaphData(){
+    return this.ProfitDevservice.GraphDataAndPeformanceRate()
+  }
 }
