@@ -1,4 +1,4 @@
-import { isNotEmpty, IsNumber, IsString } from "class-validator";
+import { isNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 export enum Orderstatus {
     Fullpaid ="fullpaid",
     Partialpaid = 'partialpaid',
@@ -35,5 +35,9 @@ export class CreateOrderDto {
 
     @IsString()
     Orderstatus:Orderstatus
+
+    @IsString()
+    @IsOptional()
+    Order_Description:string
 
 }

@@ -145,11 +145,12 @@ export class OrderService {
       .select('u.Uproduct_name', 'Uproduct_name')
       .addSelect('u.Uproduct_price', 'selling_price')
       .getRawMany();
-    const finalResult = { ...UnofficialProduct, ...filteredProducts };
+    const finalResult = [Object.values(UnofficialProduct), Object.values(filteredProducts) ];
+    const combineResult = finalResult.flat()
     return {
       message: 'success',
       success: true,
-      data: finalResult,
+      data: combineResult,
     };
   }
 }
