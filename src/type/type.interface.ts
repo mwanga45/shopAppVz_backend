@@ -29,6 +29,7 @@ export enum product_type{
     Liquid= "Liquid",
     Solid = "Solid"
 }
+
 export enum  category {
   wholesales ="wholesales",
   retailsales= "retailsales"
@@ -78,4 +79,8 @@ export interface SmsRecipient {
   schedule: string;
   sms: string;
   recipients: SmsRecipient[];
+}
+export interface RateResult {
+  product_name:string,
+  rate:number
 }

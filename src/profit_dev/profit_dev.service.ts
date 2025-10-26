@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DailyProfitsummary } from 'src/sales/entities/profitsummary.entity';
-import { ChangeType, ResponseType } from 'src/type/type.interface';
+import { ChangeType, RateResult, ResponseType } from 'src/type/type.interface';
 import { Repository } from 'typeorm';
 import { WholeSales } from 'src/sales/entities/wholesale.entity';
 import { RetailSales } from 'src/sales/entities/retailsale.entity';
@@ -63,7 +63,21 @@ export class ProfitDevService {
       data: { profit, findprofit_margin },
     };
   }
-    async GraphDataAndPeformanceRate():Promise<ResponseType<any>>{
+async GraphDataAndPeformanceRate():Promise<ResponseType<any>>{
+const now = new Date()
+const lastWeekEnd = new Date(now)
+lastWeekEnd.setDate(now.getDate()- now.getDay())
+lastWeekEnd.setHours(0,0,0,0)
+
+const lastWeekStart = new Date(lastWeekEnd)
+lastWeekStart.setDate(lastWeekEnd.getDate()- 6)
+lastWeekStart.setHours(0,0,0,0)
+
+// const lastweekSellingProduct = await this.WholesalesRepo.createQueryBuilder('w')
+// .leftJoin('w.product', 'p')
+// .select('p.product_name', 'product_name')
+// .addSelect('SUM(w.Total_pc_pkg_litre)', 'Quantity')
+// .where
 const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
   .leftJoin('s.product', 'p')
   .select('s.product_id', 'product_id')
@@ -82,13 +96,19 @@ const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
   })
   .setParameter('changeType', ChangeType.ADD)
   .getRawMany();
+ 
+  // const rate:RateResult[]
+  //  for(let i = 0; i < Stock_transaction.length; i++){
+  //   const rate = Number(Stock_transaction[i]?.new_stock?? 0) /
+
+  //  }
 
 
 
     return{
       message:"successfuly returned",
       success:true,
-      data:StocklastAdd
+      data:{StocklastAdd, lastWeekEnd, lastWeekStart}
     }
   }
   async DashboardResult(): Promise<ResponseType<any>> {
