@@ -123,17 +123,31 @@ export class ProfitDevService {
       };
     });
     const RevenuePrevweek = await this.ProfitsummaryRepo.createQueryBuilder('s')
-    .select('s.total_revenue', 'total_revenue')
-    .addSelect('s.CreatedAt', 'date')
-    .where('s.CreatedAt BETWEEN :start AND :end',{start:lastWeekStart,end:lastWeekEnd})
-    .getRawMany()
+      .select('s.total_revenue', 'total_revenue')
+      .addSelect('s.CreatedAt', 'date')
+      .where('s.CreatedAt BETWEEN :start AND :end', {
+        start: lastWeekStart,
+        end: lastWeekEnd,
+      })
+      .getRawMany();
     const RevenuethisWeek = await this.ProfitsummaryRepo.createQueryBuilder('s')
-    .select('s.total_revenue', 'total_revenue')
-    .addSelect('s.CreatedAt', 'date')
-    .where('s.CreatedAt > :end', {end:lastWeekEnd})
-    .getRawMany()
-    
-    const compareRevenue = [RevenuePrevweek, RevenuethisWeek]
+      .select('s.total_revenue', 'total_revenue')
+      .addSelect('s.CreatedAt', 'date')
+      .where('s.CreatedAt > :end', { end: lastWeekEnd })
+      .getRawMany();
+
+    const compareRevenue = [RevenuePrevweek, RevenuethisWeek];
+    const ProfitvsRevenueEachMonth =
+      await this.ProfitsummaryRepo.createQueryBuilder('s')
+        .select('EXTRACT(MONTH FROM s.CreatedAt)', 'month') // month number (1-12)
+        .addSelect('EXTRACT(YEAR FROM s.CreatedAt)', 'year')
+        .addSelect('SUM(s.total_revenue:: numeric)', 'total_revenue')
+        .addSelect('SUM(s.total_profit:: numeric)', 'total_profit')
+        .groupBy('EXTRACT(YEAR FROM s.CreatedAt)')
+        .addGroupBy('EXTRACT(MONTH FROM s.CreatedAt)')
+        .orderBy('EXTRACT(YEAR FROM s.CreatedAt)', 'ASC')
+        .addOrderBy('EXTRACT(MONTH FROM s.CreatedAt)', 'ASC')
+        .getRawMany();
     return {
       message: 'successfuly returned',
       success: true,
@@ -143,10 +157,12 @@ export class ProfitDevService {
         lastWeekStart,
         lastweekSellingProduct,
         StockRate,
-       compareRevenue
+        compareRevenue,
+        ProfitvsRevenueEachMonth,
       },
     };
   }
+
   async DashboardResult(): Promise<ResponseType<any>> {
     const now = new Date();
     const dateOfToday = now.toISOString().split('T')[0];
