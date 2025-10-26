@@ -7,6 +7,7 @@ import { WholeSales } from 'src/sales/entities/wholesale.entity';
 import { RetailSales } from 'src/sales/entities/retailsale.entity';
 import { Debt_track } from 'src/debt/entities/debt.entity';
 import { Debt } from 'src/debt/entities/debt.entity';
+import { Stock } from 'src/stock/entities/stock.entity';
 
 @Injectable()
 export class ProfitDevService {
@@ -21,6 +22,8 @@ export class ProfitDevService {
     private readonly DebtTrackRepo: Repository<Debt_track>,
     @InjectRepository(Debt)
     private readonly DebtRepo: Repository<Debt>,
+    @InjectRepository (Stock) 
+    private readonly Stockrepo:Repository<Stock>
   ) {}
 
   async AdminAnalysis(): Promise<ResponseType<any>> {
@@ -56,6 +59,14 @@ export class ProfitDevService {
       success: true,
       data: { profit, findprofit_margin },
     };
+  }
+    async GraphDataandPeformanceRate():Promise<ResponseType<any>>{
+
+
+    return{
+      message:"",
+      success:true
+    }
   }
   async DashboardResult(): Promise<ResponseType<any>> {
     const now = new Date();
@@ -148,6 +159,7 @@ export class ProfitDevService {
       })
       .andWhere('EXTRACT(DAY FROM r.CreatedAt) = :day', { day: currentday });
 
+      
     const Debtpaid_DAY = this.DebtTrackRepo.createQueryBuilder('d')
       .select('COALESCE(SUM(d.paidmoney) , 0)', 'dRevenue')
       .where('EXTRACT(YEAR FROM d.CreatedAt) = :year', { year: currentYear })
