@@ -70,6 +70,7 @@ export class OrderService {
           Paidamount: dto.paidMoney,
           Payamount: dto.payamount,
           OrderDate: dto.OrderDate,
+          user: { id: userId },
           OrderStatus:
             dto.paidMoney === dto.payamount
               ? paymentstatus.Paid
@@ -77,7 +78,6 @@ export class OrderService {
                 ? paymentstatus.Parctial
                 : paymentstatus.Pending,
         });
-        User:{id:userId}
 
         await manager.save(saveOrder);
         return {
@@ -152,5 +152,141 @@ export class OrderService {
       success: true,
       data: combineResult,
     };
+  }
+
+  async findAllOrders(userId: any): Promise<ResponseType<any>> {
+    try {
+      console.log('Fetching orders for userId:', userId);
+      
+      // First try with the relationship join
+      let orders = await this.orderRepo
+        .createQueryBuilder('order')
+        .leftJoin('order.user', 'user')
+        .where('user.id = :userId', { userId })
+        .select([
+          'order.id as id',
+          'order.product_name as productName',
+          'order.client_name as clientName',
+          'order.client_phone as clientPhone',
+          'order.OrderDate as orderDate',
+          'order.Paidamount as paidMoney',
+          'order.Payamount as payMoney',
+          'order.OrderStatus as orderStatus',
+          'user.username as username'
+        ])
+        .orderBy('order.OrderDate', 'DESC')
+        .getRawMany();
+
+      // If no orders found with relationship, try direct query
+      if (orders.length === 0) {
+        console.log('No orders found with relationship, trying direct query');
+        orders = await this.orderRepo
+          .createQueryBuilder('order')
+          .where('order.userId = :userId', { userId })
+          .select([
+            'order.id as id',
+            'order.product_name as productName',
+            'order.client_name as clientName',
+            'order.client_phone as clientPhone',
+            'order.OrderDate as orderDate',
+            'order.Paidamount as paidMoney',
+            'order.Payamount as payMoney',
+            'order.OrderStatus as orderStatus'
+          ])
+          .orderBy('order.OrderDate', 'DESC')
+          .getRawMany();
+        
+        // Add default username if not found
+        orders = orders.map(order => ({
+          ...order,
+          username: 'Unknown User'
+        }));
+      }
+
+      console.log('Found orders:', orders.length);
+
+      return {
+        message: 'Orders fetched successfully',
+        success: true,
+        data: orders,
+      };
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      return {
+        message: `Failed to fetch orders: ${error}`,
+        success: false,
+        data: [],
+      };
+    }
+  }
+
+  async findOrdersByDateRange(userId: any, startDate: string, endDate: string): Promise<ResponseType<any>> {
+    try {
+      console.log('Fetching orders by date range for userId:', userId, 'from', startDate, 'to', endDate);
+      
+      // First try with the relationship join
+      let orders = await this.orderRepo
+        .createQueryBuilder('order')
+        .leftJoin('order.user', 'user')
+        .where('user.id = :userId', { userId })
+        .andWhere('order.OrderDate >= :startDate', { startDate })
+        .andWhere('order.OrderDate <= :endDate', { endDate })
+        .select([
+          'order.id as id',
+          'order.product_name as productName',
+          'order.client_name as clientName',
+          'order.client_phone as clientPhone',
+          'order.OrderDate as orderDate',
+          'order.Paidamount as paidMoney',
+          'order.Payamount as payMoney',
+          'order.OrderStatus as orderStatus',
+          'user.username as username'
+        ])
+        .orderBy('order.OrderDate', 'DESC')
+        .getRawMany();
+
+      // If no orders found with relationship, try direct query
+      if (orders.length === 0) {
+        console.log('No orders found with relationship, trying direct query');
+        orders = await this.orderRepo
+          .createQueryBuilder('order')
+          .where('order.userId = :userId', { userId })
+          .andWhere('order.OrderDate >= :startDate', { startDate })
+          .andWhere('order.OrderDate <= :endDate', { endDate })
+          .select([
+            'order.id as id',
+            'order.product_name as productName',
+            'order.client_name as clientName',
+            'order.client_phone as clientPhone',
+            'order.OrderDate as orderDate',
+            'order.Paidamount as paidMoney',
+            'order.Payamount as payMoney',
+            'order.OrderStatus as orderStatus'
+          ])
+          .orderBy('order.OrderDate', 'DESC')
+          .getRawMany();
+        
+        // Add default username if not found
+        orders = orders.map(order => ({
+          ...order,
+          username: 'Unknown User'
+        }));
+      }
+
+      console.log('Found orders in date range:', orders.length);
+
+      return {
+        message: 'Orders fetched successfully',
+        success: true,
+        data: orders,
+      };
+    } catch (error) {
+      console.error('Error fetching orders by date range:', error);
+      return {
+        message: `Failed to fetch orders: ${error}`,
+        success: false,
+        data: [],
+      };
+    }
   }
 }

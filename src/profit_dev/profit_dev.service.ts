@@ -139,7 +139,7 @@ export class ProfitDevService {
     const compareRevenue = [RevenuePrevweek, RevenuethisWeek];
     const ProfitvsRevenueEachMonth =
       await this.ProfitsummaryRepo.createQueryBuilder('s')
-        .select('EXTRACT(MONTH FROM s.CreatedAt)', 'month') // month number (1-12)
+        .select('EXTRACT(MONTH FROM s.CreatedAt)', 'month')
         .addSelect('EXTRACT(YEAR FROM s.CreatedAt)', 'year')
         .addSelect('SUM(s.total_revenue:: numeric)', 'total_revenue')
         .addSelect('SUM(s.total_profit:: numeric)', 'total_profit')
