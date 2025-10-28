@@ -9,6 +9,7 @@ import { Debt_track } from 'src/debt/entities/debt.entity';
 import { Debt } from 'src/debt/entities/debt.entity';
 import { Stock } from 'src/stock/entities/stock.entity';
 import { Stock_transaction } from 'src/stock/entities/stock.entity';
+import { CashFlow } from 'src/entities/cashFlow.entity';
 
 @Injectable()
 export class ProfitDevService {
