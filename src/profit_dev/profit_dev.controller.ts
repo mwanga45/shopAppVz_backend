@@ -13,6 +13,10 @@ export class ProfitDevController {
   GetDashinfo(){
     return this.ProfitDevservice.DashboardResult()
   }
+  @Get('networth')
+  GetNetworth(){
+    return this.ProfitDevservice.Networthcalculate()
+  }
   @Get('graph')
   GetghaphData(){
     return this.ProfitDevservice.GraphDataAndPeformanceRate()

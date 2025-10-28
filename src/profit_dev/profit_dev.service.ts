@@ -164,6 +164,30 @@ export class ProfitDevService {
     };
   }
 
+
+  async Networthcalculate():Promise<ResponseType<any>>{
+    const Stockdata = await this.Stockrepo.createQueryBuilder('cal')
+    .leftJoin('cal.product', 'p')
+    .select('p.id', 'pid')
+    .addSelect('p.rpurchase_price', 'rpurchase_price')
+    .addSelect('p.wpurchase_price', 'wpurchase_price')
+    .addSelect('cal.Total_stock', 'Total_stock')
+    .groupBy('p.id')
+    .addGroupBy('cal.Total_stock')
+    .getRawMany()
+
+  const StockWorth = Stockdata.reduce((acc, curr)=>{
+    const price = curr.rpurchase_price !== null ?Number(curr.rpurchase_price ) :Number(curr.wpurchase_price ?? 0 )
+    const Totalstock = Number(curr.Total_stock)
+    const stocknetworth = acc + price * Totalstock
+    return stocknetworth
+  },0)
+    return{
+      message:"successfuly",
+      success:true,
+      data:{StockWorth,Stockdata}
+    }
+  }
   async DashboardResult(): Promise<ResponseType<any>> {
     const now = new Date();
     const dateOfToday = now.toISOString().split('T')[0];
