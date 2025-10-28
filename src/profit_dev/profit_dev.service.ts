@@ -164,29 +164,40 @@ export class ProfitDevService {
     };
   }
 
-
-  async Networthcalculate():Promise<ResponseType<any>>{
+  async Networthcalculate(): Promise<ResponseType<any>> {
     const Stockdata = await this.Stockrepo.createQueryBuilder('cal')
-    .leftJoin('cal.product', 'p')
-    .select('p.id', 'pid')
-    .addSelect('p.rpurchase_price', 'rpurchase_price')
-    .addSelect('p.wpurchase_price', 'wpurchase_price')
-    .addSelect('cal.Total_stock', 'Total_stock')
-    .groupBy('p.id')
-    .addGroupBy('cal.Total_stock')
-    .getRawMany()
+      .leftJoin('cal.product', 'p')
+      .select('p.id', 'pid')
+      .addSelect('p.rpurchase_price', 'rpurchase_price')
+      .addSelect('p.wpurchase_price', 'wpurchase_price')
+      .addSelect('cal.Total_stock', 'Total_stock')
+      .groupBy('p.id')
+      .addGroupBy('cal.Total_stock')
+      .getRawMany();
 
-  const StockWorth = Stockdata.reduce((acc, curr)=>{
-    const price = curr.rpurchase_price !== null ?Number(curr.rpurchase_price ) :Number(curr.wpurchase_price ?? 0 )
-    const Totalstock = Number(curr.Total_stock)
-    const stocknetworth = acc + price * Totalstock
-    return stocknetworth
-  },0)
-    return{
-      message:"successfuly",
-      success:true,
-      data:{StockWorth,Stockdata}
-    }
+    const StockWorth = Stockdata.reduce((acc, curr) => {
+      const price =
+        curr.rpurchase_price !== null
+          ? Number(curr.rpurchase_price)
+          : Number(curr.wpurchase_price ?? 0);
+      const Totalstock = Number(curr.Total_stock);
+      const stocknetworth = acc + price * Totalstock;
+      return stocknetworth;
+    }, 0);
+    const MoneyDistribution = await this.ProfitsummaryRepo
+    .createQueryBuilder('c')
+      .select('c.total_revenue', 'total_revenue')
+      .addSelect('c.bankTotal_Revenue', 'bank_revenue')
+      .orderBy('c.id', 'DESC')
+      .limit(1)
+      .getRawOne();
+     const onHandCash = Number(MoneyDistribution.total_revenue)- Number(MoneyDistribution.bank_revenue)
+     const cashStored = {MoneyDistribution,onHandCash}
+    return {
+      message: 'successfuly',
+      success: true,
+      data: { StockWorth, Stockdata, MoneyDistribution, cashStored },
+    };
   }
   async DashboardResult(): Promise<ResponseType<any>> {
     const now = new Date();
