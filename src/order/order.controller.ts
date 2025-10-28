@@ -23,7 +23,8 @@ export class OrderController {
   GetBothproduct(){
     return this.orderService.ReturnOffAndUnoff()
   }
-
+  
+  @UseGuards(AuthGuard('jwt'))
   @Get('orders')
   getOrders(@Request() req) {
     try {

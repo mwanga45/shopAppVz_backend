@@ -12,7 +12,7 @@ export class Order extends baseEntity {
     client_name:string
 
     @Column({default:'Placed order'})
-    Order_Description:string
+  
 
     @Column()
     Payamount:number
