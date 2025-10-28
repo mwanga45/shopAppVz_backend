@@ -8,5 +8,11 @@ export class DailyProfitsummary extends baseEntity{
 
    @Column({default:"0"})
    total_revenue:string
+
+   @Column({default:"0"})
+   bankTotal_Revenue:string
+
+   @Column({default:'0'})
+   bankTotal_profit:string
    
 }
