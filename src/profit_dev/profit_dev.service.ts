@@ -166,7 +166,6 @@ export class ProfitDevService {
   async DashboardResult(): Promise<ResponseType<any>> {
     const now = new Date();
     const dateOfToday = now.toISOString().split('T')[0];
-
     const Debt_payment = await this.DebtTrackRepo.createQueryBuilder('t')
       .select('SUM(t.paidmoney)', 'paidmoney')
       .where('DATE(t.CreatedAt) = :dateOfToday', { dateOfToday })

@@ -161,8 +161,6 @@ export class OrderService {
       // First try with the relationship join
       let orders = await this.orderRepo
         .createQueryBuilder('order')
-        .leftJoin('order.user', 'user')
-        .where('user.id = :userId', { userId })
         .select([
           'order.id as id',
           'order.product_name as productName',
@@ -172,7 +170,6 @@ export class OrderService {
           'order.Paidamount as paidMoney',
           'order.Payamount as payMoney',
           'order.OrderStatus as orderStatus',
-          'user.username as username'
         ])
         .orderBy('order.OrderDate', 'DESC')
         .getRawMany();
@@ -182,7 +179,6 @@ export class OrderService {
         console.log('No orders found with relationship, trying direct query');
         orders = await this.orderRepo
           .createQueryBuilder('order')
-          .where('order.userId = :userId', { userId })
           .select([
             'order.id as id',
             'order.product_name as productName',
@@ -228,7 +224,6 @@ export class OrderService {
       let orders = await this.orderRepo
         .createQueryBuilder('order')
         .leftJoin('order.user', 'user')
-        .where('user.id = :userId', { userId })
         .andWhere('order.OrderDate >= :startDate', { startDate })
         .andWhere('order.OrderDate <= :endDate', { endDate })
         .select([
@@ -240,7 +235,6 @@ export class OrderService {
           'order.Paidamount as paidMoney',
           'order.Payamount as payMoney',
           'order.OrderStatus as orderStatus',
-          'user.username as username'
         ])
         .orderBy('order.OrderDate', 'DESC')
         .getRawMany();
@@ -250,7 +244,6 @@ export class OrderService {
         console.log('No orders found with relationship, trying direct query');
         orders = await this.orderRepo
           .createQueryBuilder('order')
-          .where('order.userId = :userId', { userId })
           .andWhere('order.OrderDate >= :startDate', { startDate })
           .andWhere('order.OrderDate <= :endDate', { endDate })
           .select([
