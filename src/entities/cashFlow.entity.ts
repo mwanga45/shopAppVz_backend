@@ -5,8 +5,10 @@ import { Column, Entity } from "typeorm";
 export class CashFlow extends baseEntity{
   @Column()
   Bankcash:string
+  
   @Column()
   onhandCash:string
+
   @Column()
   Bankdebt:string
 }
