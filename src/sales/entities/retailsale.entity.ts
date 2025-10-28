@@ -34,6 +34,9 @@ export class RetailSales extends baseEntity {
   @Column({ default: 'direct' })
   sale_origin: 'direct' | 'debt_payment';
 
+  @Column({default:"cash"})
+  paymentMethod:'cash' |'bank'
+  
   @ManyToOne(() => Product, { eager: true })
   @JoinColumn({ name: 'productId' })
   product: Product;
