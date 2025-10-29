@@ -246,6 +246,7 @@ export class ProfitDevService {
     const mostSoldProductRetail = await this.Retailrepo.createQueryBuilder('r')
       .leftJoin('r.product', 'p')
       .select('p.product_name', 'product_name')
+      .addSelect('r.CreatedAt', 'CreatedAt')
       .addSelect('SUM(r.Total_pc_pkg_litre)', 'total_quantity')
       .addSelect('SUM(r.Revenue)', 'Revenue')
       .where('EXTRACT(YEAR FROM r.CreatedAt ) = :year', { year: currentYear })
@@ -253,6 +254,7 @@ export class ProfitDevService {
         month: currentMonth,
       })
       .groupBy('p.product_name')
+      .addGroupBy('r.CreatedAt')
       .orderBy('SUM(r.Revenue)', 'DESC')
       .limit(1)
       .getRawOne();
@@ -323,6 +325,7 @@ export class ProfitDevService {
       revenues.length > 0 ? totalRevenue / revenues.length : 0;
     const TodayRevenue = await this.ProfitsummaryRepo.createQueryBuilder('r')
       .select('r.total_revenue', 'generated_today')
+      .addSelect('r.bankTotal_Revenue', 'bankRevenue')
       .where('DATE(r.CreatedAt) = :today', { today: currentdate })
       .getRawOne();
 
@@ -360,11 +363,11 @@ export class ProfitDevService {
         Wholetotalsales,
         Retailtotalsales,
         Debttotalpaid,
-        TodayRevenue,
         Deviation,
         Percentage_deviation,
         totalUnpaid,
         upcomingDebts,
+        TodayRevenue,
       },
     };
   }
