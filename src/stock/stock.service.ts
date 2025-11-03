@@ -9,11 +9,11 @@ import { EntityManager, Repository } from 'typeorm';
 import { ResponseType } from 'src/type/type.interface';
 import { StockType, ChangeType } from 'src/type/type.interface';
 import { Product } from 'src/product/entities/product.entity';
-// import { StockUpdateHelper } from 'src/common/helper/stockUpdate,helper';
-// import { WebSocketSubjectConfig } from 'rxjs/webSocket';
+import { WholeSales } from 'src/sales/entities/wholesale.entity';
 @Injectable()
 export class StockService {
   constructor(
+    @InjectRepository(WholeSales) private readonly WholesalesRepo: Repository<WholeSales>,
     @InjectRepository(Stock) private readonly stockRepo: Repository<Stock>,
     @InjectRepository(Stock_transaction)
     private readonly recstockRepo: Repository<Stock_transaction>,
@@ -100,24 +100,11 @@ export class StockService {
     };
   }
   async Test(): Promise<any> {
-    const findTotal = await this.stockRepo
-      .createQueryBuilder('s')
-      .leftJoin('s.product', 'product')
-      .select('s.Total_stock', 'total')
-      .addSelect('p.product_name', 'product_name')
-      .getRawMany();
 
-    if (!findTotal) {
-      return {
-        success: false,
-        message: 'Failed to find the targeted product',
-      };
-    }
 
     return {
       message: 'test',
       success: true,
-      data: findTotal,
     };
   }
 

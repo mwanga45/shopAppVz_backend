@@ -226,8 +226,8 @@ export class ProfitDevService {
       .andWhere('EXTRACT(YEAR FROM w.CreatedAt) = :year', { year: currentYear })
       .groupBy('p.product_name')
       .orderBy('SUM(w.Revenue)', 'DESC')
-      .limit(1)
-      .getRawOne();
+      // .limit(1)
+      .getRawMany();
 
     const leastSoldProduct = await this.WholesalesRepo.createQueryBuilder('w')
       .leftJoin('w.product', 'p')
@@ -240,8 +240,8 @@ export class ProfitDevService {
       .andWhere('EXTRACT(YEAR FROM w.CreatedAt) = :year', { year: currentYear })
       .groupBy('p,product_name')
       .orderBy('SUM(w.Revenue)', 'ASC')
-      .limit(1)
-      .getRawOne();
+      // .limit(1)
+      .getRawMany();
 
     const mostSoldProductRetail = await this.Retailrepo.createQueryBuilder('r')
       .leftJoin('r.product', 'p')
@@ -257,7 +257,7 @@ export class ProfitDevService {
       .addGroupBy('r.CreatedAt')
       .orderBy('SUM(r.Revenue)', 'DESC')
       // .limit(1)
-      .getRawOne();
+      .getRawMany();
 
     const leastSoldProductRetails = await this.Retailrepo.createQueryBuilder(
       'r',
@@ -272,8 +272,8 @@ export class ProfitDevService {
       })
       .orderBy('SUM(r.Revenue)', 'ASC')
       .groupBy('p.product_name')
-      .limit(1)
-      .getRawOne();
+      // .limit(1)
+      .getRawMany();
 
     const wholesalesRev_DAY = this.WholesalesRepo.createQueryBuilder('w')
       .select('COALESCE(SUM(w.Revenue), 0)', 'wRevenue')
