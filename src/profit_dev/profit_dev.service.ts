@@ -246,7 +246,7 @@ export class ProfitDevService {
     const mostSoldProductRetail = await this.Retailrepo.createQueryBuilder('r')
       .leftJoin('r.product', 'p')
       .select('p.product_name', 'product_name')
-      .addSelect('r.CreatedAt', 'CreatedAt')
+      // .addSelect('r.CreatedAt', 'CreatedAt')
       .addSelect('SUM(r.Total_pc_pkg_litre)', 'total_quantity')
       .addSelect('SUM(r.Revenue)', 'Revenue')
       .where('EXTRACT(YEAR FROM r.CreatedAt ) = :year', { year: currentYear })
@@ -256,7 +256,7 @@ export class ProfitDevService {
       .groupBy('p.product_name')
       .addGroupBy('r.CreatedAt')
       .orderBy('SUM(r.Revenue)', 'DESC')
-      .limit(1)
+      // .limit(1)
       .getRawOne();
 
     const leastSoldProductRetails = await this.Retailrepo.createQueryBuilder(
