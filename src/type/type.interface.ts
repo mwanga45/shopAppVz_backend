@@ -84,3 +84,7 @@ export interface RateResult {
   product_name:string,
   rate:number
 }
+export interface TodayRevenue{
+   generated_today: string,
+  bankRevenue:string
+}

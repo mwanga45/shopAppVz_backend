@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DailyProfitsummary } from 'src/sales/entities/profitsummary.entity';
-import { ChangeType, RateResult, ResponseType } from 'src/type/type.interface';
+import { ChangeType, RateResult, ResponseType, TodayRevenue } from 'src/type/type.interface';
 import { Repository } from 'typeorm';
 import { WholeSales } from 'src/sales/entities/wholesale.entity';
 import { RetailSales } from 'src/sales/entities/retailsale.entity';
@@ -327,14 +327,17 @@ export class ProfitDevService {
       .select('r.total_revenue', 'generated_today')
       .addSelect('r.bankTotal_Revenue', 'bankRevenue')
       .where('DATE(r.CreatedAt) = :today', { today: currentdate })
-      .getRawOne();
+      .getRawMany();
+      const Revenue:TodayRevenue[] = TodayRevenue
 
-    const Deviation =
-      averageRevenue - Number(TodayRevenue?.generated_today || 0);
+    const Deviation = Revenue.map((item) => {
+      return averageRevenue - Number(item.generated_today ?? 0)
+    })
+       
 
-    let Percentage_deviation = 0;
-    Percentage_deviation =
-      averageRevenue === 0 ? 0 : (Deviation / averageRevenue) * 100;
+    // let Percentage_deviation = 0;
+    // Percentage_deviation =
+    //   averageRevenue === 0 ? 0 : (Deviation / averageRevenue) * 100;
 
     const upcomingDebts = await this.DebtRepo.createQueryBuilder('d')
       .select(['d.Debtor_name AS Debtor_name', 'd.PaymentDateAt AS ReturnDate'])
@@ -364,7 +367,7 @@ export class ProfitDevService {
         Retailtotalsales,
         Debttotalpaid,
         Deviation,
-        Percentage_deviation,
+        // Percentage_deviation,
         totalUnpaid,
         upcomingDebts,
         TodayRevenue,
