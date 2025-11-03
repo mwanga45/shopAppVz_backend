@@ -335,9 +335,9 @@ export class ProfitDevService {
     })
        
 
-    // let Percentage_deviation = 0;
-    // Percentage_deviation =
-    //   averageRevenue === 0 ? 0 : (Deviation / averageRevenue) * 100;
+    let Percentage_deviation = 0;
+    Percentage_deviation =
+      averageRevenue === 0 ? 0 : ( Number(Deviation?? 0)/ averageRevenue) * 100;
 
     const upcomingDebts = await this.DebtRepo.createQueryBuilder('d')
       .select(['d.Debtor_name AS Debtor_name', 'd.PaymentDateAt AS ReturnDate'])
@@ -367,7 +367,7 @@ export class ProfitDevService {
         Retailtotalsales,
         Debttotalpaid,
         Deviation,
-        // Percentage_deviation,
+        Percentage_deviation,
         totalUnpaid,
         upcomingDebts,
         TodayRevenue,
