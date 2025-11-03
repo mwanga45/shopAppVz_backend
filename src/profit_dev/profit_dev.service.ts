@@ -224,9 +224,9 @@ export class ProfitDevService {
         month: currentMonth,
       })
       .andWhere('EXTRACT(YEAR FROM w.CreatedAt) = :year', { year: currentYear })
+      .limit(1)
       .groupBy('p.product_name')
       .orderBy('SUM(w.Revenue)', 'DESC')
-      // .limit(1)
       .getRawMany();
 
     const leastSoldProduct = await this.WholesalesRepo.createQueryBuilder('w')
@@ -237,26 +237,25 @@ export class ProfitDevService {
       .where('EXTRACT(MONTH FROM w.CreatedAt) = :month', {
         month: currentMonth,
       })
+      .limit(1)
       .andWhere('EXTRACT(YEAR FROM w.CreatedAt) = :year', { year: currentYear })
       .groupBy('p,product_name')
       .orderBy('SUM(w.Revenue)', 'ASC')
-      // .limit(1)
       .getRawMany();
 
     const mostSoldProductRetail = await this.Retailrepo.createQueryBuilder('r')
       .leftJoin('r.product', 'p')
       .select('p.product_name', 'product_name')
-      // .addSelect('r.CreatedAt', 'CreatedAt')
       .addSelect('SUM(r.Total_pc_pkg_litre)', 'total_quantity')
       .addSelect('SUM(r.Revenue)', 'Revenue')
       .where('EXTRACT(YEAR FROM r.CreatedAt ) = :year', { year: currentYear })
       .andWhere('EXTRACT(MONTH FROM r.CreatedAt) = :month', {
         month: currentMonth,
       })
+      .limit(1)
       .groupBy('p.product_name')
       .addGroupBy('r.CreatedAt')
       .orderBy('SUM(r.Revenue)', 'DESC')
-      // .limit(1)
       .getRawMany();
 
     const leastSoldProductRetails = await this.Retailrepo.createQueryBuilder(
@@ -270,9 +269,9 @@ export class ProfitDevService {
       .andWhere('EXTRACT(MONTH FROM r.CreatedAt) = :month', {
         month: currentMonth,
       })
+      .limit(1)
       .orderBy('SUM(r.Revenue)', 'ASC')
       .groupBy('p.product_name')
-      // .limit(1)
       .getRawMany();
 
     const wholesalesRev_DAY = this.WholesalesRepo.createQueryBuilder('w')
@@ -351,6 +350,8 @@ export class ProfitDevService {
       .select('SUM(d.Revenue - d.paidmoney)', 'total_unpaid')
       .where('d.paymentstatus != :status', { status: 'Paid' })
       .getRawOne();
+
+    const CombineSold = [mostSoldProduct, mostSoldProductRetail]
     return {
       message: 'successfuly returned',
       success: true,
@@ -371,6 +372,7 @@ export class ProfitDevService {
         totalUnpaid,
         upcomingDebts,
         TodayRevenue,
+      CombineSold
       },
     };
   }
