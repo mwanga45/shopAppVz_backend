@@ -99,7 +99,6 @@ export class ProfitDevService {
       .addGroupBy('p.id')
       .addGroupBy('w.CreatedAt')
       .addGroupBy('w.Total_pc_pkg_litre')
-      // .orderBy('w.Total_pc_pkg_litre', 'DESC')
       .orderBy('w.CreatedAt', 'ASC')
       .getRawMany();
 
@@ -135,7 +134,6 @@ export class ProfitDevService {
       .addGroupBy('p.id')
       .addGroupBy('w.CreatedAt')
       .addGroupBy('w.Total_pc_pkg_litre')
-      // .orderBy('w.Total_pc_pkg_litre', 'DESC')
       .orderBy('w.CreatedAt', 'ASC')
       .getRawMany();
 
