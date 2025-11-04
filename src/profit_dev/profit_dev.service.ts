@@ -83,6 +83,7 @@ export class ProfitDevService {
     thisWeekEnd.setDate(lastWeekEnd.getDate() + 7);
     thisWeekEnd.setHours(0, 0, 0, 0);
 
+    const day = thisWeekEnd.toDateString().slice(0, 3)
     const lastweekSellingProduct = await this.WholesalesRepo.createQueryBuilder(
       'w',
     )
@@ -110,6 +111,8 @@ export class ProfitDevService {
             Revenue: 0,
             Quantity: 0,
             Date: curr.Date,
+            day:curr.Date.toDateString().slice(0, 3)
+
           };
         }
         acc[curr.Date].Revenue += Number(curr.Revenue);
@@ -143,7 +146,8 @@ export class ProfitDevService {
             acc[curr.Date] ={
               Revenue:0,
               Quantity:0,
-              Date:curr.Date
+              Date:curr.Date,
+              day:curr.Date.toDateString().slice(0, 3)
             }
           }
           acc[curr.Date].Revenue += Number(curr.Revenue)
@@ -225,7 +229,8 @@ export class ProfitDevService {
         lastweek_finalResult,
         thisWeekEnd,
         ThisweekSellingProduct,
-        thisweek_finalResult
+        thisweek_finalResult,
+        day
       },
     };
   }

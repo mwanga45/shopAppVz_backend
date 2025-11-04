@@ -93,5 +93,6 @@ export interface LastweeksellInterface{
         product_id: 1,
         product_name: string,
         Quantity: number,
-        Revenue: number
+        Revenue: number,
+        day:string
 }
