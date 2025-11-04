@@ -82,8 +82,6 @@ export class ProfitDevService {
     const thisWeekEnd = new Date(lastWeekEnd);
     thisWeekEnd.setDate(lastWeekEnd.getDate() + 7);
     thisWeekEnd.setHours(0, 0, 0, 0);
-
-    const day = thisWeekEnd.toDateString().slice(0, 3)
     const lastweekSellingProduct = await this.WholesalesRepo.createQueryBuilder(
       'w',
     )
@@ -102,9 +100,10 @@ export class ProfitDevService {
       .addGroupBy('w.CreatedAt')
       .addGroupBy('w.Total_pc_pkg_litre')
       .orderBy('w.Total_pc_pkg_litre', 'DESC')
+      .addOrderBy('w.CreatedAt', 'ASC')
       .getRawMany();
 
-    const lastweek_finalResult: LastweeksellInterface[] = Object.values(
+    const Lastweek: LastweeksellInterface[] = Object.values(
       lastweekSellingProduct.reduce((acc, curr) => {
         if (!acc[curr.Date]) {
           acc[curr.Date] = {
@@ -112,7 +111,6 @@ export class ProfitDevService {
             Quantity: 0,
             Date: curr.Date,
             day:curr.Date.toDateString().slice(0, 3)
-
           };
         }
         acc[curr.Date].Revenue += Number(curr.Revenue);
@@ -138,9 +136,10 @@ export class ProfitDevService {
       .addGroupBy('w.CreatedAt')
       .addGroupBy('w.Total_pc_pkg_litre')
       .orderBy('w.Total_pc_pkg_litre', 'DESC')
+      .addOrderBy('w.CreatedAt', 'ASC')
       .getRawMany();
 
-      const thisweek_finalResult:LastweeksellInterface[] = Object.values(
+      const  Thisweek:LastweeksellInterface[] = Object.values(
         ThisweekSellingProduct.reduce((acc, curr)=>{
           if(!acc[curr.Date]){
             acc[curr.Date] ={
@@ -155,7 +154,7 @@ export class ProfitDevService {
           return acc
         }, {})
       )
-
+    const combinewholesalesGraphData = {Thisweek, Lastweek}
     const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
       .leftJoin('s.product', 'p')
       .select('s.product_id', 'product_id')
@@ -226,11 +225,11 @@ export class ProfitDevService {
         StockRate,
         compareRevenue,
         ProfitvsRevenueEachMonth,
-        lastweek_finalResult,
         thisWeekEnd,
         ThisweekSellingProduct,
-        thisweek_finalResult,
-        day
+        combinewholesalesGraphData,
+        Lastweek,
+        Thisweek,
       },
     };
   }
