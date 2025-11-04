@@ -4,6 +4,7 @@ import { DailyProfitsummary } from 'src/sales/entities/profitsummary.entity';
 import {
   ChangeType,
   LastweeksellInterface,
+  paymentstatus,
   RateResult,
   ResponseType,
   TodayRevenue,
@@ -231,7 +232,6 @@ export class ProfitDevService {
       },
     };
   }
-
   async Networthcalculate(): Promise<ResponseType<any>> {
     const Stockdata = await this.Stockrepo.createQueryBuilder('cal')
       .leftJoin('cal.product', 'p')
@@ -263,11 +263,18 @@ export class ProfitDevService {
     const onHandCash =
       Number(MoneyDistribution.total_revenue) -
       Number(MoneyDistribution.bank_revenue);
+      const DebtMoney = await this.DebtRepo.createQueryBuilder('d')
+      .select('SUM(d.Revenue)', 'Revenue')
+      .addSelect('SUM(d. paidmoney)', 'TotalPaid')
+      .where('d.paymentstatus != :status', {status:paymentstatus.Paid } )
+      .getRawMany()
+    const CustomerDebt =  DebtMoney.length > 0 ? Number(DebtMoney[0].Revenue)- Number(DebtMoney[0].TotalPaid):0
     const cashStored = { MoneyDistribution, onHandCash };
+
     return {
       message: 'successfuly',
       success: true,
-      data: { StockWorth, Stockdata, MoneyDistribution, cashStored },
+      data: { StockWorth, Stockdata, MoneyDistribution, cashStored, DebtMoney, CustomerDebt },
     };
   }
   async DashboardResult(): Promise<ResponseType<any>> {
