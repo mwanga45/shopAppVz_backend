@@ -73,6 +73,9 @@ export class ProfitDevService {
     const lastWeekStart = new Date(lastWeekEnd);
     lastWeekStart.setDate(lastWeekEnd.getDate() - 6);
     lastWeekStart.setHours(0, 0, 0, 0);
+    const thisWeekEnd = new Date(lastWeekStart)
+    thisWeekEnd.setDate(lastWeekEnd.getDate() + 6)
+    thisWeekEnd.setHours(0,0,0,0)
 
     const lastweekSellingProduct = await this.WholesalesRepo.createQueryBuilder(
       'w',
@@ -81,7 +84,7 @@ export class ProfitDevService {
       .select('p.product_name', 'product_name')
       .addSelect('p.id', 'product_id')
       .addSelect('SUM(w.Total_pc_pkg_litre)', 'Quantity')
-      .addSelect('w.CreatedAt', 'Date')
+      .addSelect('DATE(w.CreatedAt)', 'Date')
       .addSelect('SUM(w.Revenue)', 'Revenue')
       .where('w.CreatedAt BETWEEN :start AND :end', {
         start: lastWeekStart.toISOString(),
@@ -94,7 +97,7 @@ export class ProfitDevService {
       .orderBy('w.Total_pc_pkg_litre', 'DESC')
       .getRawMany();
 
-      const finalResult:LastweeksellInterface[] = Object.values(
+      const lastweek_finalResult:LastweeksellInterface[] = Object.values(
         lastweekSellingProduct.reduce((acc, curr)=>{
           if(!acc[curr.Date]){
             acc[curr.Date] ={
@@ -108,6 +111,13 @@ export class ProfitDevService {
           return acc
         }, {})
       )
+      const ThisweekSellingProduct  = await this.WholesalesRepo.createQueryBuilder('w')
+      .leftJoin('w.product', 'p')
+      .select('p.product_name', 'product_name')
+      .addSelect('SUM(w.Revenue)', 'Revenue')
+      .addSelect('SUM(w.Total_pc_pkg_litre)', 'Quantity')
+      .addSelect('DATE(w.CreatedAt)', 'Date')
+      .where('w.')
     const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
       .leftJoin('s.product', 'p')
       .select('s.product_id', 'product_id')
@@ -178,7 +188,8 @@ export class ProfitDevService {
         StockRate,
         compareRevenue,
         ProfitvsRevenueEachMonth,
-        finalResult
+        lastweek_finalResult,
+        thisWeekEnd
       },
     };
   }
