@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DailyProfitsummary } from 'src/sales/entities/profitsummary.entity';
-import { ChangeType, LastweeksellInterface, RateResult, ResponseType, TodayRevenue } from 'src/type/type.interface';
+import {
+  ChangeType,
+  LastweeksellInterface,
+  RateResult,
+  ResponseType,
+  TodayRevenue,
+} from 'src/type/type.interface';
 import { Repository } from 'typeorm';
 import { WholeSales } from 'src/sales/entities/wholesale.entity';
 import { RetailSales } from 'src/sales/entities/retailsale.entity';
@@ -73,9 +79,9 @@ export class ProfitDevService {
     const lastWeekStart = new Date(lastWeekEnd);
     lastWeekStart.setDate(lastWeekEnd.getDate() - 6);
     lastWeekStart.setHours(0, 0, 0, 0);
-    const thisWeekEnd = new Date(lastWeekStart)
-    thisWeekEnd.setDate(lastWeekEnd.getDate() + 6)
-    thisWeekEnd.setHours(0,0,0,0)
+    const thisWeekEnd = new Date(lastWeekEnd);
+    thisWeekEnd.setDate(lastWeekEnd.getDate() + 7);
+    thisWeekEnd.setHours(0, 0, 0, 0);
 
     const lastweekSellingProduct = await this.WholesalesRepo.createQueryBuilder(
       'w',
@@ -97,8 +103,42 @@ export class ProfitDevService {
       .orderBy('w.Total_pc_pkg_litre', 'DESC')
       .getRawMany();
 
-      const lastweek_finalResult:LastweeksellInterface[] = Object.values(
-        lastweekSellingProduct.reduce((acc, curr)=>{
+    const lastweek_finalResult: LastweeksellInterface[] = Object.values(
+      lastweekSellingProduct.reduce((acc, curr) => {
+        if (!acc[curr.Date]) {
+          acc[curr.Date] = {
+            Revenue: 0,
+            Quantity: 0,
+            Date: curr.Date,
+          };
+        }
+        acc[curr.Date].Revenue += Number(curr.Revenue);
+        acc[curr.Date].Quantity += Number(curr.Quantity);
+        return acc;
+      }, {}),
+    );
+    const ThisweekSellingProduct = await this.WholesalesRepo.createQueryBuilder(
+      'w',
+    )
+      .leftJoin('w.product', 'p')
+      .select('p.product_name', 'product_name')
+      .addSelect('p.id', 'product_id')
+      .addSelect('SUM(w.Revenue)', 'Revenue')
+      .addSelect('SUM(w.Total_pc_pkg_litre)', 'Quantity')
+      .addSelect('DATE(w.CreatedAt)', 'Date')
+      .where('w.CreatedAt BETWEEN :start AND :end', {
+        start: lastWeekEnd.toISOString(),
+        end: thisWeekEnd.toISOString(),
+      })
+      .groupBy('p.product_name')
+      .addGroupBy('p.id')
+      .addGroupBy('w.CreatedAt')
+      .addGroupBy('w.Total_pc_pkg_litre')
+      .orderBy('w.Total_pc_pkg_litre', 'DESC')
+      .getRawMany();
+
+      const thisweek_finalResult:LastweeksellInterface[] = Object.values(
+        ThisweekSellingProduct.reduce((acc, curr)=>{
           if(!acc[curr.Date]){
             acc[curr.Date] ={
               Revenue:0,
@@ -106,18 +146,12 @@ export class ProfitDevService {
               Date:curr.Date
             }
           }
-          acc[curr.Date].Revenue += Number(curr.Revenue) 
+          acc[curr.Date].Revenue += Number(curr.Revenue)
           acc[curr.Date].Quantity += Number(curr.Quantity)
           return acc
         }, {})
       )
-      const ThisweekSellingProduct  = await this.WholesalesRepo.createQueryBuilder('w')
-      .leftJoin('w.product', 'p')
-      .select('p.product_name', 'product_name')
-      .addSelect('SUM(w.Revenue)', 'Revenue')
-      .addSelect('SUM(w.Total_pc_pkg_litre)', 'Quantity')
-      .addSelect('DATE(w.CreatedAt)', 'Date')
-      .where('w.')
+
     const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
       .leftJoin('s.product', 'p')
       .select('s.product_id', 'product_id')
@@ -189,7 +223,9 @@ export class ProfitDevService {
         compareRevenue,
         ProfitvsRevenueEachMonth,
         lastweek_finalResult,
-        thisWeekEnd
+        thisWeekEnd,
+        ThisweekSellingProduct,
+        thisweek_finalResult
       },
     };
   }
@@ -214,15 +250,18 @@ export class ProfitDevService {
       const stocknetworth = acc + price * Totalstock;
       return stocknetworth;
     }, 0);
-    const MoneyDistribution = await this.ProfitsummaryRepo
-    .createQueryBuilder('c')
+    const MoneyDistribution = await this.ProfitsummaryRepo.createQueryBuilder(
+      'c',
+    )
       .select('c.total_revenue', 'total_revenue')
       .addSelect('c.bankTotal_Revenue', 'bank_revenue')
       .orderBy('c.id', 'DESC')
       .limit(1)
       .getRawOne();
-     const onHandCash = Number(MoneyDistribution.total_revenue)- Number(MoneyDistribution.bank_revenue)
-     const cashStored = {MoneyDistribution,onHandCash}
+    const onHandCash =
+      Number(MoneyDistribution.total_revenue) -
+      Number(MoneyDistribution.bank_revenue);
+    const cashStored = { MoneyDistribution, onHandCash };
     return {
       message: 'successfuly',
       success: true,
@@ -357,16 +396,17 @@ export class ProfitDevService {
       .addSelect('r.bankTotal_Revenue', 'bankRevenue')
       .where('DATE(r.CreatedAt) = :today', { today: currentdate })
       .getRawMany();
-      const Revenue:TodayRevenue[] = TodayRevenue
+    const Revenue: TodayRevenue[] = TodayRevenue;
 
     const Deviation = Revenue.map((item) => {
-      return averageRevenue - Number(item.generated_today ?? 0)
-    })
-       
+      return averageRevenue - Number(item.generated_today ?? 0);
+    });
 
     let Percentage_deviation = 0;
     Percentage_deviation =
-      averageRevenue === 0 ? 0 : ( Number(Deviation?? 0)/ averageRevenue) * 100;
+      averageRevenue === 0
+        ? 0
+        : (Number(Deviation ?? 0) / averageRevenue) * 100;
 
     const upcomingDebts = await this.DebtRepo.createQueryBuilder('d')
       .select(['d.Debtor_name AS Debtor_name', 'd.PaymentDateAt AS ReturnDate'])
@@ -381,7 +421,7 @@ export class ProfitDevService {
       .where('d.paymentstatus != :status', { status: 'Paid' })
       .getRawOne();
 
-    const CombineSold = [mostSoldProduct, mostSoldProductRetail]
+    const CombineSold = [mostSoldProduct, mostSoldProductRetail];
     return {
       message: 'successfuly returned',
       success: true,
@@ -402,7 +442,7 @@ export class ProfitDevService {
         totalUnpaid,
         upcomingDebts,
         TodayRevenue,
-      CombineSold
+        CombineSold,
       },
     };
   }
