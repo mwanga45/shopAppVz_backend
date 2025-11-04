@@ -269,12 +269,14 @@ export class ProfitDevService {
       .where('d.paymentstatus != :status', {status:paymentstatus.Paid } )
       .getRawMany()
     const CustomerDebt =  DebtMoney.length > 0 ? Number(DebtMoney[0].Revenue)- Number(DebtMoney[0].TotalPaid):0
+    let networth = 0
+    networth = StockWorth - CustomerDebt
     const cashStored = { MoneyDistribution, onHandCash };
 
     return {
       message: 'successfuly',
       success: true,
-      data: { StockWorth, Stockdata, MoneyDistribution, cashStored, DebtMoney, CustomerDebt },
+      data: { StockWorth, Stockdata, MoneyDistribution, cashStored, DebtMoney, CustomerDebt, networth },
     };
   }
   async DashboardResult(): Promise<ResponseType<any>> {
