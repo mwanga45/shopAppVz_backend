@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DailyProfitsummary } from 'src/sales/entities/profitsummary.entity';
-import { ChangeType, RateResult, ResponseType, TodayRevenue } from 'src/type/type.interface';
+import { ChangeType, LastweeksellInterface, RateResult, ResponseType, TodayRevenue } from 'src/type/type.interface';
 import { Repository } from 'typeorm';
 import { WholeSales } from 'src/sales/entities/wholesale.entity';
 import { RetailSales } from 'src/sales/entities/retailsale.entity';
@@ -81,15 +81,33 @@ export class ProfitDevService {
       .select('p.product_name', 'product_name')
       .addSelect('p.id', 'product_id')
       .addSelect('SUM(w.Total_pc_pkg_litre)', 'Quantity')
+      .addSelect('w.CreatedAt', 'Date')
+      .addSelect('SUM(w.Revenue)', 'Revenue')
       .where('w.CreatedAt BETWEEN :start AND :end', {
         start: lastWeekStart.toISOString(),
         end: lastWeekEnd.toISOString(),
       })
       .groupBy('p.product_name')
       .addGroupBy('p.id')
+      .addGroupBy('w.CreatedAt')
       .addGroupBy('w.Total_pc_pkg_litre')
       .orderBy('w.Total_pc_pkg_litre', 'DESC')
       .getRawMany();
+
+      const finalResult:LastweeksellInterface[] = Object.values(
+        lastweekSellingProduct.reduce((acc, curr)=>{
+          if(!acc[curr.Date]){
+            acc[curr.Date] ={
+              Revenue:0,
+              Quantity:0,
+              Date:curr.Date
+            }
+          }
+          acc[curr.Date].Revenue += Number(curr.Revenue) 
+          acc[curr.Date].Quantity += Number(curr.Quantity)
+          return acc
+        }, {})
+      )
     const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
       .leftJoin('s.product', 'p')
       .select('s.product_id', 'product_id')
@@ -160,6 +178,7 @@ export class ProfitDevService {
         StockRate,
         compareRevenue,
         ProfitvsRevenueEachMonth,
+        finalResult
       },
     };
   }

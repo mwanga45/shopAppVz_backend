@@ -88,3 +88,10 @@ export interface TodayRevenue{
    generated_today: string,
   bankRevenue:string
 }
+export interface LastweeksellInterface{
+     Date: string,
+        product_id: 1,
+        product_name: string,
+        Quantity: number,
+        Revenue: number
+}
