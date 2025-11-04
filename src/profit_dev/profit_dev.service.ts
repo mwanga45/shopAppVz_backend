@@ -99,8 +99,8 @@ export class ProfitDevService {
       .addGroupBy('p.id')
       .addGroupBy('w.CreatedAt')
       .addGroupBy('w.Total_pc_pkg_litre')
-      .orderBy('w.Total_pc_pkg_litre', 'DESC')
-      .addOrderBy('w.CreatedAt', 'ASC')
+      // .orderBy('w.Total_pc_pkg_litre', 'DESC')
+      .orderBy('w.CreatedAt', 'ASC')
       .getRawMany();
 
     const Lastweek: LastweeksellInterface[] = Object.values(
@@ -135,8 +135,8 @@ export class ProfitDevService {
       .addGroupBy('p.id')
       .addGroupBy('w.CreatedAt')
       .addGroupBy('w.Total_pc_pkg_litre')
-      .orderBy('w.Total_pc_pkg_litre', 'DESC')
-      .addOrderBy('w.CreatedAt', 'ASC')
+      // .orderBy('w.Total_pc_pkg_litre', 'DESC')
+      .orderBy('w.CreatedAt', 'ASC')
       .getRawMany();
 
       const  Thisweek:LastweeksellInterface[] = Object.values(
