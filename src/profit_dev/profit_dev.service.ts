@@ -81,8 +81,13 @@ export class ProfitDevService {
     const lastWeekStart = new Date(lastWeekEnd);
     lastWeekStart.setDate(lastWeekEnd.getDate() - 6);
     lastWeekStart.setHours(0, 0, 0, 0);
-    const thisWeekEnd = new Date(lastWeekEnd);
-    thisWeekEnd.setDate(lastWeekEnd.getDate() + 7);
+
+    const currentDay = now.getDay();
+    const thisWeekStart = new Date(now);
+    thisWeekStart.setDate(now.getDate() - currentDay);
+
+    const thisWeekEnd = new Date(thisWeekStart);
+    thisWeekEnd.setDate(thisWeekStart.getDate() + 6);
     thisWeekEnd.setHours(0, 0, 0, 0);
     const lastweekSellingProduct = await this.WholesalesRepo.createQueryBuilder(
       'w',
@@ -150,7 +155,7 @@ export class ProfitDevService {
       .addSelect('SUM(w.Total_pc_pkg_litre)', 'Quantity')
       .addSelect('DATE(w.CreatedAt)', 'Date')
       .where('w.CreatedAt BETWEEN :start AND :end', {
-        start: lastWeekEnd.toISOString(),
+        start: thisWeekStart.toISOString(),
         end: thisWeekEnd.toISOString(),
       })
       .groupBy('p.product_name')
@@ -173,7 +178,7 @@ export class ProfitDevService {
         }
         acc[datestr].Revenue += Number(curr.Revenue);
         acc[datestr].Quantity += Number(curr.Quantity);
-        return acc
+        return acc;
       },
       {} as Record<string, LastweeksellInterface>,
     );
@@ -196,8 +201,8 @@ export class ProfitDevService {
         });
       }
     }
-    
-    const Thisweek: LastweeksellInterface[] = alldataThisweek
+
+    const Thisweek: LastweeksellInterface[] = alldataThisweek;
     const combinewholesalesGraphData = { Thisweek, Lastweek };
     const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
       .leftJoin('s.product', 'p')
