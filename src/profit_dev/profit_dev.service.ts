@@ -131,22 +131,8 @@ export class ProfitDevService {
         })
       }
     }
-    const lastweek:LastweeksellInterface[] = allData
-    const Lastweek: LastweeksellInterface[] = Object.values(
-      lastweekSellingProduct.reduce((acc, curr) => {
-        if (!acc[curr.Date]) {
-          acc[curr.Date] = {
-            Revenue: 0,
-            Quantity: 0,
-            Date: curr.Date,
-            day:curr.Date.toDateString().slice(0, 3)
-          };
-        }
-        acc[curr.Date].Revenue += Number(curr.Revenue);
-        acc[curr.Date].Quantity += Number(curr.Quantity);
-        return acc;
-      }, {}),
-    );
+    const Lastweek:LastweeksellInterface[] = allData
+    
     const ThisweekSellingProduct = await this.WholesalesRepo.createQueryBuilder(
       'w',
     )
@@ -258,8 +244,6 @@ export class ProfitDevService {
         combinewholesalesGraphData,
         Lastweek,
         Thisweek,
-        lastweek,
-        summarized
       },
     };
   }
