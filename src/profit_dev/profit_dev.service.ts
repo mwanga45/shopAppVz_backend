@@ -17,6 +17,7 @@ import { Debt } from 'src/debt/entities/debt.entity';
 import { Stock } from 'src/stock/entities/stock.entity';
 import { Stock_transaction } from 'src/stock/entities/stock.entity';
 import { CashFlow } from 'src/entities/cashFlow.entity';
+import { AsyncLocalStorage } from 'async_hooks';
 
 @Injectable()
 export class ProfitDevService {
@@ -116,9 +117,21 @@ export class ProfitDevService {
       acc[datekey].Quantity += Number(curr.Quantity)
       return acc
     }, {} as Record<string,LastweeksellInterface>)
+    const allData:LastweeksellInterface[] = []
     for(let d =new Date(lastWeekStart); d <= lastWeekEnd; d.setDate(d.getDate() +1) ){
-      
+      const datestr = d.toISOString().split('T')[0]
+      if(summarized[datestr]){
+        allData.push(summarized[datestr])
+      }else{
+        allData.push({
+          Revenue:0,
+          Quantity:0,
+          Date:datestr,
+          day:d.toDateString().slice(0,3)
+        })
+      }
     }
+    const lastweek:LastweeksellInterface[] = allData
     const Lastweek: LastweeksellInterface[] = Object.values(
       lastweekSellingProduct.reduce((acc, curr) => {
         if (!acc[curr.Date]) {
@@ -245,6 +258,8 @@ export class ProfitDevService {
         combinewholesalesGraphData,
         Lastweek,
         Thisweek,
+        lastweek,
+        summarized
       },
     };
   }
