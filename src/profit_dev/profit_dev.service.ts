@@ -104,13 +104,13 @@ export class ProfitDevService {
       .orderBy('w.CreatedAt', 'ASC')
       .getRawMany();
     const summarized = lastweekSellingProduct.reduce((acc, curr)=>{
-      const datekey = curr.Date
+      const datekey = new Date(curr.Date).toISOString().split('T')[0]
       if(!acc[datekey]){
         acc[datekey] = {
           Revenue:0,
           Quantity:0,
           Date:datekey,
-          day:datekey.toDateString().slice(0,3)
+          day:new Date(datekey).toDateString().slice(0,3)
         }
       }
       acc[datekey].Revenue += Number(curr.Revenue)
