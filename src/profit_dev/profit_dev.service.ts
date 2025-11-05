@@ -173,6 +173,7 @@ export class ProfitDevService {
         }
         acc[datestr].Revenue += Number(curr.Revenue);
         acc[datestr].Quantity += Number(curr.Quantity);
+        return acc
       },
       {} as Record<string, LastweeksellInterface>,
     );
@@ -195,22 +196,8 @@ export class ProfitDevService {
         });
       }
     }
-    const thisweek: LastweeksellInterface[] = alldataThisweek;
-    const Thisweek: LastweeksellInterface[] = Object.values(
-      ThisweekSellingProduct.reduce((acc, curr) => {
-        if (!acc[curr.Date]) {
-          acc[curr.Date] = {
-            Revenue: 0,
-            Quantity: 0,
-            Date: curr.Date,
-            day: curr.Date.toDateString().slice(0, 3),
-          };
-        }
-        acc[curr.Date].Revenue += Number(curr.Revenue);
-        acc[curr.Date].Quantity += Number(curr.Quantity);
-        return acc;
-      }, {}),
-    );
+    
+    const Thisweek: LastweeksellInterface[] = alldataThisweek
     const combinewholesalesGraphData = { Thisweek, Lastweek };
     const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
       .leftJoin('s.product', 'p')
@@ -287,7 +274,6 @@ export class ProfitDevService {
         combinewholesalesGraphData,
         Lastweek,
         Thisweek,
-        thisweek,
       },
     };
   }
