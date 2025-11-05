@@ -166,7 +166,22 @@ export class ProfitDevService {
       acc[datestr].Revenue += Number(curr.Revenue)
       acc[datestr].Quantity += Number(curr.Quantity)
     }, {} as Record<string, LastweeksellInterface>)
-    
+
+    const alldataThisweek:LastweeksellInterface[] = []
+    for(let d = new Date(lastWeekEnd); d <= thisWeekEnd ; d.setDate(d.getDate()+ 1)){
+      const datestr = d.toISOString().split('T')[0]
+      if(SummarizedThisweek[datestr]){
+        alldataThisweek.push(SummarizedThisweek[datestr])
+      }else{
+        alldataThisweek.push({
+          Revenue:0,
+          Quantity:0,
+          Date:datestr,
+          day:new Date(datestr).toDateString().slice(0,3)
+})
+      }
+    }
+    const thisweek:LastweeksellInterface[] = alldataThisweek
       const  Thisweek:LastweeksellInterface[] = Object.values(
         ThisweekSellingProduct.reduce((acc, curr)=>{
           if(!acc[curr.Date]){
@@ -258,6 +273,8 @@ export class ProfitDevService {
         combinewholesalesGraphData,
         Lastweek,
         Thisweek,
+        thisweek
+
       },
     };
   }
