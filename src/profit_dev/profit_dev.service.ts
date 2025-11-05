@@ -103,35 +103,42 @@ export class ProfitDevService {
       .addGroupBy('w.Total_pc_pkg_litre')
       .orderBy('w.CreatedAt', 'ASC')
       .getRawMany();
-    const summarizedLastweek = lastweekSellingProduct.reduce((acc, curr)=>{
-      const datekey = new Date(curr.Date).toISOString().split('T')[0]
-      if(!acc[datekey]){
-        acc[datekey] = {
-          Revenue:0,
-          Quantity:0,
-          Date:datekey,
-          day:new Date(datekey).toDateString().slice(0,3)
+    const summarizedLastweek = lastweekSellingProduct.reduce(
+      (acc, curr) => {
+        const datekey = new Date(curr.Date).toISOString().split('T')[0];
+        if (!acc[datekey]) {
+          acc[datekey] = {
+            Revenue: 0,
+            Quantity: 0,
+            Date: datekey,
+            day: new Date(datekey).toDateString().slice(0, 3),
+          };
         }
-      }
-      acc[datekey].Revenue += Number(curr.Revenue)
-      acc[datekey].Quantity += Number(curr.Quantity)
-      return acc
-    }, {} as Record<string,LastweeksellInterface>)
-    const allData:LastweeksellInterface[] = []
-    for(let d =new Date(lastWeekStart); d <= lastWeekEnd; d.setDate(d.getDate() +1) ){
-      const datestr = d.toISOString().split('T')[0]
-      if(summarizedLastweek[datestr]){
-        allData.push(summarizedLastweek[datestr])
-      }else{
+        acc[datekey].Revenue += Number(curr.Revenue);
+        acc[datekey].Quantity += Number(curr.Quantity);
+        return acc;
+      },
+      {} as Record<string, LastweeksellInterface>,
+    );
+    const allData: LastweeksellInterface[] = [];
+    for (
+      let d = new Date(lastWeekStart);
+      d <= lastWeekEnd;
+      d.setDate(d.getDate() + 1)
+    ) {
+      const datestr = d.toISOString().split('T')[0];
+      if (summarizedLastweek[datestr]) {
+        allData.push(summarizedLastweek[datestr]);
+      } else {
         allData.push({
-          Revenue:0,
-          Quantity:0,
-          Date:datestr,
-          day:d.toDateString().slice(0,3)
-        })
+          Revenue: 0,
+          Quantity: 0,
+          Date: datestr,
+          day: d.toDateString().slice(0, 3),
+        });
       }
     }
-    const Lastweek:LastweeksellInterface[] = allData
+    const Lastweek: LastweeksellInterface[] = allData;
 
     const ThisweekSellingProduct = await this.WholesalesRepo.createQueryBuilder(
       'w',
@@ -152,52 +159,59 @@ export class ProfitDevService {
       .addGroupBy('w.Total_pc_pkg_litre')
       .orderBy('w.CreatedAt', 'ASC')
       .getRawMany();
-    
-  const SummarizedThisweek = ThisweekSellingProduct.reduce((acc, curr)=>{
-      const datestr = new Date(curr.Date).toISOString().split('T')[0]
-      if(!acc[datestr]){
-        acc[datestr] = {
-          Revenue:0,
-          Date:datestr,
-          day:new Date(datestr).toDateString().slice(0,3),
-          Quantity:0
-        }
-      }
-      acc[datestr].Revenue += Number(curr.Revenue)
-      acc[datestr].Quantity += Number(curr.Quantity)
-    }, {} as Record<string, LastweeksellInterface>)
 
-    const alldataThisweek:LastweeksellInterface[] = []
-    for(let d = new Date(lastWeekEnd); d <= thisWeekEnd ; d.setDate(d.getDate()+ 1)){
-      const datestr = d.toISOString().split('T')[0]
-      if(SummarizedThisweek[datestr]){
-        alldataThisweek.push(SummarizedThisweek[datestr])
-      }else{
+    const SummarizedThisweek = ThisweekSellingProduct.reduce(
+      (acc, curr) => {
+        const datestr = new Date(curr.Date).toISOString().split('T')[0];
+        if (!acc[datestr]) {
+          acc[datestr] = {
+            Revenue: 0,
+            Date: datestr,
+            day: new Date(datestr).toDateString().slice(0, 3),
+            Quantity: 0,
+          };
+        }
+        acc[datestr].Revenue += Number(curr.Revenue);
+        acc[datestr].Quantity += Number(curr.Quantity);
+      },
+      {} as Record<string, LastweeksellInterface>,
+    );
+
+    const alldataThisweek: LastweeksellInterface[] = [];
+    for (
+      let d = new Date(lastWeekEnd);
+      d <= thisWeekEnd;
+      d.setDate(d.getDate() + 1)
+    ) {
+      const datestr = d.toISOString().split('T')[0];
+      if (SummarizedThisweek[datestr]) {
+        alldataThisweek.push(SummarizedThisweek[datestr]);
+      } else {
         alldataThisweek.push({
-          Revenue:0,
-          Quantity:0,
-          Date:datestr,
-          day:new Date(datestr).toDateString().slice(0,3)
-})
+          Revenue: 0,
+          Quantity: 0,
+          Date: datestr,
+          day: new Date(datestr).toDateString().slice(0, 3),
+        });
       }
     }
-    const thisweek:LastweeksellInterface[] = alldataThisweek
-      const  Thisweek:LastweeksellInterface[] = Object.values(
-        ThisweekSellingProduct.reduce((acc, curr)=>{
-          if(!acc[curr.Date]){
-            acc[curr.Date] ={
-              Revenue:0,
-              Quantity:0,
-              Date:curr.Date,
-              day:curr.Date.toDateString().slice(0, 3)
-            }
-          }
-          acc[curr.Date].Revenue += Number(curr.Revenue)
-          acc[curr.Date].Quantity += Number(curr.Quantity)
-          return acc
-        }, {})
-      )
-    const combinewholesalesGraphData = {Thisweek, Lastweek}
+    const thisweek: LastweeksellInterface[] = alldataThisweek;
+    const Thisweek: LastweeksellInterface[] = Object.values(
+      ThisweekSellingProduct.reduce((acc, curr) => {
+        if (!acc[curr.Date]) {
+          acc[curr.Date] = {
+            Revenue: 0,
+            Quantity: 0,
+            Date: curr.Date,
+            day: curr.Date.toDateString().slice(0, 3),
+          };
+        }
+        acc[curr.Date].Revenue += Number(curr.Revenue);
+        acc[curr.Date].Quantity += Number(curr.Quantity);
+        return acc;
+      }, {}),
+    );
+    const combinewholesalesGraphData = { Thisweek, Lastweek };
     const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
       .leftJoin('s.product', 'p')
       .select('s.product_id', 'product_id')
@@ -273,8 +287,7 @@ export class ProfitDevService {
         combinewholesalesGraphData,
         Lastweek,
         Thisweek,
-        thisweek
-
+        thisweek,
       },
     };
   }
@@ -309,20 +322,31 @@ export class ProfitDevService {
     const onHandCash =
       Number(MoneyDistribution.total_revenue) -
       Number(MoneyDistribution.bank_revenue);
-      const DebtMoney = await this.DebtRepo.createQueryBuilder('d')
+    const DebtMoney = await this.DebtRepo.createQueryBuilder('d')
       .select('SUM(d.Revenue)', 'Revenue')
       .addSelect('SUM(d. paidmoney)', 'TotalPaid')
-      .where('d.paymentstatus != :status', {status:paymentstatus.Paid } )
-      .getRawMany()
-    const CustomerDebt =  DebtMoney.length > 0 ? Number(DebtMoney[0].Revenue)- Number(DebtMoney[0].TotalPaid):0
-    let networth = 0
-    networth = StockWorth - CustomerDebt
+      .where('d.paymentstatus != :status', { status: paymentstatus.Paid })
+      .getRawMany();
+    const CustomerDebt =
+      DebtMoney.length > 0
+        ? Number(DebtMoney[0].Revenue) - Number(DebtMoney[0].TotalPaid)
+        : 0;
+    let networth = 0;
+    networth = StockWorth - CustomerDebt;
     const cashStored = { MoneyDistribution, onHandCash };
 
     return {
       message: 'successfuly',
       success: true,
-      data: { StockWorth, Stockdata, MoneyDistribution, cashStored, DebtMoney, CustomerDebt, networth },
+      data: {
+        StockWorth,
+        Stockdata,
+        MoneyDistribution,
+        cashStored,
+        DebtMoney,
+        CustomerDebt,
+        networth,
+      },
     };
   }
   async DashboardResult(): Promise<ResponseType<any>> {
