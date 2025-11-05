@@ -15,9 +15,6 @@ export class CashFlow extends baseEntity{
   @Column({type:'decimal', precision:10, scale:2, default:0})
   Electricity:number
 
-  @Column({type:'decimal', precision:10, scale:2, default:0})
-  EmployeeSalary:number
-
   @Column({type:"decimal", precision:10, scale:2})
   Food:number
 }

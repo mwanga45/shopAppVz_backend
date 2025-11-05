@@ -102,7 +102,23 @@ export class ProfitDevService {
       .addGroupBy('w.Total_pc_pkg_litre')
       .orderBy('w.CreatedAt', 'ASC')
       .getRawMany();
-
+    const summarized = lastweekSellingProduct.reduce((acc, curr)=>{
+      const datekey = curr.Date
+      if(!acc[datekey]){
+        acc[datekey] = {
+          Revenue:0,
+          Quantity:0,
+          Date:datekey,
+          day:datekey.toDateString().slice(0,3)
+        }
+      }
+      acc[datekey].Revenue += Number(curr.Revenue)
+      acc[datekey].Quantity += Number(curr.Quantity)
+      return acc
+    }, {} as Record<string,LastweeksellInterface>)
+    for(let d =new Date(lastWeekStart); d <= lastWeekEnd; d.setDate(d.getDate() +1) ){
+      
+    }
     const Lastweek: LastweeksellInterface[] = Object.values(
       lastweekSellingProduct.reduce((acc, curr) => {
         if (!acc[curr.Date]) {
