@@ -17,7 +17,7 @@ import { Debt } from 'src/debt/entities/debt.entity';
 import { Stock } from 'src/stock/entities/stock.entity';
 import { Stock_transaction } from 'src/stock/entities/stock.entity';
 import { CashFlow } from 'src/entities/cashFlow.entity';
-import { AsyncLocalStorage } from 'async_hooks';
+
 
 @Injectable()
 export class ProfitDevService {
@@ -263,6 +263,21 @@ export class ProfitDevService {
         .orderBy('EXTRACT(YEAR FROM s.CreatedAt)', 'ASC')
         .addOrderBy('EXTRACT(MONTH FROM s.CreatedAt)', 'ASC')
         .getRawMany();
+
+    const totalRevenueTrend = await this.ProfitsummaryRepo.createQueryBuilder('p')
+  .select('DATE(p.CreatedAt)', 'date')
+  .addSelect('SUM(CAST(p.total_revenue AS DECIMAL(15,2)))', 'rate')
+  .groupBy('DATE(p.CreatedAt)')
+  .orderBy('DATE(p.CreatedAt)', 'ASC')
+  .getRawMany();
+
+// Convert each date string into a JS Date object
+const formattedResult = totalRevenueTrend.map((row,index, arr ) => {
+  
+});
+
+;
+
     return {
       message: 'successfuly returned',
       success: true,
@@ -279,6 +294,8 @@ export class ProfitDevService {
         combinewholesalesGraphData,
         Lastweek,
         Thisweek,
+        formattedResult,
+        totalRevenueTrend
       },
     };
   }
