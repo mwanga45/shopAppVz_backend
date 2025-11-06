@@ -277,7 +277,7 @@ const formattedResult = totalRevenueTrend.map((row,index, arr ) => {
   const previous = index > 0 ? Number(arr[index - 1].total_revenue) : current
   const  Rate = previous === 0 ? 0: Math.abs(Number((current)-Number(previous))/Number(previous) * 100)
   return{
-    date:new Date(row.date),
+    date:new Date(row.date).toISOString().split('T')[0],
     rate:Number(Rate.toFixed(2))
   } 
 });
