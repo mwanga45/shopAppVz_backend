@@ -273,9 +273,13 @@ export class ProfitDevService {
 
 // Convert each date string into a JS Date object
 const formattedResult = totalRevenueTrend.map((row,index, arr ) => {
-  const current = row.total_revenue
-  const previous = index > 0 ? arr[index - 1].total_revenue : current
-  const  Rate = previous === 0 ? 0: Math.abs(Number(current)-Number(previous)/Number(previous) * 100) 
+  const current = Number(row.total_revenue)
+  const previous = index > 0 ? Number(arr[index - 1].total_revenue) : current
+  const  Rate = previous === 0 ? 0: Math.abs(Number((current)-Number(previous))/Number(previous) * 100)
+  return{
+    date:new Date(row.date),
+    rate:Number(Rate.toFixed(2))
+  } 
 });
 
 ;
