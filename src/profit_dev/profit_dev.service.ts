@@ -82,13 +82,14 @@ export class ProfitDevService {
     lastWeekStart.setDate(lastWeekEnd.getDate() - 6);
     lastWeekStart.setHours(0, 0, 0, 0);
 
-    const currentDay = now.getDay();
-    const thisWeekStart = new Date(now);
-    thisWeekStart.setDate(now.getDate() - currentDay);
+const currentDay = now.getDay(); // Sunday = 0
+const thisWeekStart = new Date(now);
+thisWeekStart.setDate(now.getDate() - currentDay);
+thisWeekStart.setHours(0, 0, 0, 0);
 
-    const thisWeekEnd = new Date(thisWeekStart);
-    thisWeekEnd.setDate(thisWeekStart.getDate() + 6);
-    thisWeekEnd.setHours(0, 0, 0, 0);
+const thisWeekEnd = new Date(thisWeekStart);
+thisWeekEnd.setDate(thisWeekStart.getDate() + 6);
+thisWeekEnd.setHours(23, 59, 59, 999);
     const lastweekSellingProduct = await this.WholesalesRepo.createQueryBuilder(
       'w',
     )
@@ -144,65 +145,64 @@ export class ProfitDevService {
       }
     }
     const Lastweek: LastweeksellInterface[] = allData;
+const ThisweekSellingProduct = await this.WholesalesRepo.createQueryBuilder('w')
+  .leftJoin('w.product', 'p')
+  .select('p.product_name', 'product_name')
+  .addSelect('p.id', 'product_id')
+  .addSelect('SUM(w.Revenue)', 'Revenue')
+  .addSelect('SUM(w.Total_pc_pkg_litre)', 'Quantity')
+  .addSelect('DATE(w.CreatedAt)', 'Date') // okay; may come back as Date or string
+  .where('w.CreatedAt BETWEEN :start AND :end', {
+    start: thisWeekStart,
+    end: thisWeekEnd,
+  })
+  .groupBy('p.product_name')
+  .addGroupBy('p.id')
+  .addGroupBy('DATE(w.CreatedAt)')
+  .orderBy('DATE(w.CreatedAt)', 'ASC')
+  .getRawMany();
 
-    const ThisweekSellingProduct = await this.WholesalesRepo.createQueryBuilder(
-      'w',
-    )
-      .leftJoin('w.product', 'p')
-      .select('p.product_name', 'product_name')
-      .addSelect('p.id', 'product_id')
-      .addSelect('SUM(w.Revenue)', 'Revenue')
-      .addSelect('SUM(w.Total_pc_pkg_litre)', 'Quantity')
-      .addSelect('DATE(w.CreatedAt)', 'Date')
-      .where('w.CreatedAt BETWEEN :start AND :end', {
-        start: thisWeekStart.toISOString(),
-        end: thisWeekEnd.toISOString(),
-      })
-      .groupBy('p.product_name')
-      .addGroupBy('p.id')
-      .addGroupBy('w.CreatedAt')
-      .addGroupBy('w.Total_pc_pkg_litre')
-      .orderBy('w.CreatedAt', 'ASC')
-      .getRawMany();
+// --- safely normalize and summarize by YYYY-MM-DD ---
+const SummarizedThisweek = ThisweekSellingProduct.reduce((acc, curr) => {
+  // curr.Date may be a Date object or a string (DB driver dependent).
+  // Coerce it into a Date object first, then to YYYY-MM-DD.
+  const dateObj = curr.Date instanceof Date ? curr.Date : new Date(String(curr.Date));
 
-    const SummarizedThisweek = ThisweekSellingProduct.reduce(
-      (acc, curr) => {
-        const datestr = new Date(curr.Date).toISOString().split('T')[0];
-        if (!acc[datestr]) {
-          acc[datestr] = {
-            Revenue: 0,
-            Date: datestr,
-            day: new Date(datestr).toDateString().slice(0, 3),
-            Quantity: 0,
-          };
-        }
-        acc[datestr].Revenue += Number(curr.Revenue);
-        acc[datestr].Quantity += Number(curr.Quantity);
-        return acc;
-      },
-      {} as Record<string, LastweeksellInterface>,
-    );
+  // If invalid date, skip this record
+  if (isNaN(dateObj.valueOf())) return acc;
 
-    const alldataThisweek: LastweeksellInterface[] = [];
-    for (
-      let d = new Date(lastWeekEnd);
-      d <= thisWeekEnd;
-      d.setDate(d.getDate() + 1)
-    ) {
-      const datestr = d.toISOString().split('T')[0];
-      if (SummarizedThisweek[datestr]) {
-        alldataThisweek.push(SummarizedThisweek[datestr]);
-      } else {
-        alldataThisweek.push({
-          Revenue: 0,
-          Quantity: 0,
-          Date: datestr,
-          day: new Date(datestr).toDateString().slice(0, 3),
-        });
-      }
-    }
+  const datestr = dateObj.toISOString().split('T')[0]; // format YYYY-MM-DD
+  if (!acc[datestr]) {
+    acc[datestr] = {
+      Revenue: 0,
+      Quantity: 0,
+      Date: datestr,
+      day: new Date(datestr).toDateString().slice(0, 3),
+    };
+  }
 
-    const Thisweek: LastweeksellInterface[] = alldataThisweek;
+  acc[datestr].Revenue += Number(curr.Revenue ?? 0);
+  acc[datestr].Quantity += Number(curr.Quantity ?? 0);
+  return acc;
+}, {} as Record<string, LastweeksellInterface>);
+
+// --- build full week array from thisWeekStart -> thisWeekEnd ---
+const alldataThisweek: LastweeksellInterface[] = [];
+for (let d = new Date(thisWeekStart); d <= thisWeekEnd; d.setDate(d.getDate() + 1)) {
+  const datestr = d.toISOString().split('T')[0];
+  if (SummarizedThisweek[datestr]) {
+    alldataThisweek.push(SummarizedThisweek[datestr]);
+  } else {
+    alldataThisweek.push({
+      Revenue: 0,
+      Quantity: 0,
+      Date: datestr,
+      day: new Date(datestr).toDateString().slice(0, 3),
+    });
+  }
+}
+
+const Thisweek: LastweeksellInterface[] = alldataThisweek;
     const combinewholesalesGraphData = { Thisweek, Lastweek };
     const StocklastAdd = await this.StockTrnasrepo.createQueryBuilder('s')
       .leftJoin('s.product', 'p')
@@ -295,13 +295,15 @@ const formattedResult = totalRevenueTrend.map((row,index, arr ) => {
         StockRate,
         compareRevenue,
         ProfitvsRevenueEachMonth,
-        thisWeekEnd,
         ThisweekSellingProduct,
         combinewholesalesGraphData,
         Lastweek,
         Thisweek,
         formattedResult,
-        totalRevenueTrend
+        totalRevenueTrend, 
+        thisWeekEnd,
+        thisWeekStart,
+
       },
     };
   }
