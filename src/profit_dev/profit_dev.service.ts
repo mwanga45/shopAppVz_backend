@@ -266,14 +266,16 @@ export class ProfitDevService {
 
     const totalRevenueTrend = await this.ProfitsummaryRepo.createQueryBuilder('p')
   .select('DATE(p.CreatedAt)', 'date')
-  .addSelect('SUM(CAST(p.total_revenue AS DECIMAL(15,2)))', 'rate')
+  .addSelect('SUM(CAST(p.total_revenue AS DECIMAL(15,2)))', 'total_revenue')
   .groupBy('DATE(p.CreatedAt)')
   .orderBy('DATE(p.CreatedAt)', 'ASC')
   .getRawMany();
 
 // Convert each date string into a JS Date object
 const formattedResult = totalRevenueTrend.map((row,index, arr ) => {
-  
+  const current = row.total_revenue
+  const previous = index > 0 ? arr[index - 1].total_revenue : current
+  const  Rate = previous === 0 ? 0: Math.abs(Number(current)-Number(previous)/Number(previous) * 100) 
 });
 
 ;
