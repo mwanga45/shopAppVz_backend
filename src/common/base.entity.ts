@@ -8,13 +8,13 @@ export abstract class baseEntity {
     @PrimaryGeneratedColumn('increment')
     id:number
     @CreateDateColumn({
-        type:"timestamptz",
+         type: 'timestamp',
         default: ()=>"CURRENT_TIMESTAMP"
 
     })
     CreatedAt:Date
     @UpdateDateColumn({
-        type:"timestamptz",
+         type: 'timestamp',
         default:()=>"CURRENT_TIMESTAMP"
     })
     UpdateAt:Date
