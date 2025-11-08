@@ -8,6 +8,7 @@ Total_Capital:number
 
 @Column({type:"decimal", precision:15, scale:2})
 BankCapital:number
-@Column()
+
+@Column({type:'decimal', precision:15, scale:2})
 OnhandCapital:number
 }
