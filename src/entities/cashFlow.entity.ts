@@ -15,12 +15,8 @@ export class CashFlow extends baseEntity {
   @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
   bankDebt: number;
 
-  @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
-  Electricity: number;
+  @Column({type:"decimal", precision:15, scale:1})
+  Withdraw:number;
 
-  @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
-  Salary: number;
-
-  @Column({ type: 'decimal', precision: 15, scale: 2 })
-  Food: number;
 }
+
