@@ -74,23 +74,23 @@ export class ProfitDevService {
   async GraphDataAndPeformanceRate(): Promise<ResponseType<any>> {
     const now = new Date();
 
-// Calculate THIS WEEK (Sunday to Saturday)
-const thisWeekStart = new Date(now);
-thisWeekStart.setDate(now.getDate() - now.getDay()); // Sunday
-thisWeekStart.setHours(0, 0, 0, 0);
+    // Calculate THIS WEEK (Sunday to Saturday)
+    const thisWeekStart = new Date(now);
+    thisWeekStart.setDate(now.getDate() - now.getDay()); // Sunday
+    thisWeekStart.setHours(0, 0, 0, 0);
 
-const thisWeekEnd = new Date(thisWeekStart);
-thisWeekEnd.setDate(thisWeekStart.getDate() + 6); // Saturday
-thisWeekEnd.setHours(23, 59, 59, 999);
+    const thisWeekEnd = new Date(thisWeekStart);
+    thisWeekEnd.setDate(thisWeekStart.getDate() + 6); // Saturday
+    thisWeekEnd.setHours(23, 59, 59, 999);
 
-// Calculate LAST WEEK (previous Sunday to Saturday)
-const lastWeekStart = new Date(thisWeekStart);
-lastWeekStart.setDate(thisWeekStart.getDate() - 7); // Previous Sunday
-lastWeekStart.setHours(0, 0, 0, 0);
+    // Calculate LAST WEEK (previous Sunday to Saturday)
+    const lastWeekStart = new Date(thisWeekStart);
+    lastWeekStart.setDate(thisWeekStart.getDate() - 7); // Previous Sunday
+    lastWeekStart.setHours(0, 0, 0, 0);
 
-const lastWeekEnd = new Date(lastWeekStart);
-lastWeekEnd.setDate(lastWeekStart.getDate() + 6); // Previous Saturday
-lastWeekEnd.setHours(23, 59, 59, 999);
+    const lastWeekEnd = new Date(lastWeekStart);
+    lastWeekEnd.setDate(lastWeekStart.getDate() + 6); // Previous Saturday
+    lastWeekEnd.setHours(23, 59, 59, 999);
     const lastweekSellingProduct = await this.WholesalesRepo.createQueryBuilder(
       'w',
     )
@@ -105,18 +105,19 @@ lastWeekEnd.setHours(23, 59, 59, 999);
         end: lastWeekEnd.toISOString(),
       })
       .groupBy('p.product_name')
-  .addGroupBy('p.id')
-  .addGroupBy('DATE(w.CreatedAt)') // Consistent grouping
-  .orderBy('DATE(w.CreatedAt)', 'ASC')
-  .getRawMany();
+      .addGroupBy('p.id')
+      .addGroupBy('DATE(w.CreatedAt)') // Consistent grouping
+      .orderBy('DATE(w.CreatedAt)', 'ASC')
+      .getRawMany();
     const summarizedLastweek = lastweekSellingProduct.reduce(
       (acc, curr) => {
         const datekey = new Date(curr.Date).toISOString().split('T')[0];
         if (!acc[datekey]) {
+          // const  fixedDatea = new Date()
           acc[datekey] = {
             Revenue: 0,
             Quantity: 0,
-            Date: datekey,
+            Date: datekey ,
             day: new Date(datekey).toDateString().slice(0, 3),
           };
         }
@@ -153,27 +154,25 @@ lastWeekEnd.setHours(23, 59, 59, 999);
       .addSelect('p.id', 'product_id')
       .addSelect('SUM(w.Revenue)', 'Revenue')
       .addSelect('SUM(w.Total_pc_pkg_litre)', 'Quantity')
-      .addSelect('DATE(w.CreatedAt)', 'Date') 
+      .addSelect('DATE(w.CreatedAt)', 'Date')
       .where('w.CreatedAt BETWEEN :start AND :end', {
         start: thisWeekStart,
         end: thisWeekEnd,
       })
-       .groupBy('p.product_name')
-  .addGroupBy('p.id')
-  .addGroupBy('DATE(w.CreatedAt)') // Consistent grouping
-  .orderBy('DATE(w.CreatedAt)', 'ASC')
-  .getRawMany();
+      .groupBy('p.product_name')
+      .addGroupBy('p.id')
+      .addGroupBy('DATE(w.CreatedAt)')
+      .orderBy('DATE(w.CreatedAt)', 'ASC')
+      .getRawMany();
 
     const SummarizedThisweek = ThisweekSellingProduct.reduce(
       (acc, curr) => {
-      
         const dateObj =
           curr.Date instanceof Date ? curr.Date : new Date(String(curr.Date));
 
-      
         if (isNaN(dateObj.valueOf())) return acc;
 
-        const datestr = dateObj.toISOString().split('T')[0]; // format YYYY-MM-DD
+        const datestr = dateObj.toISOString().split('T')[0];
         if (!acc[datestr]) {
           acc[datestr] = {
             Revenue: 0,
@@ -190,7 +189,6 @@ lastWeekEnd.setHours(23, 59, 59, 999);
       {} as Record<string, LastweeksellInterface>,
     );
 
-  
     const alldataThisweek: LastweeksellInterface[] = [];
     for (
       let d = new Date(thisWeekStart);
