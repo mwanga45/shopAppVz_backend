@@ -73,22 +73,24 @@ export class ProfitDevService {
   }
   async GraphDataAndPeformanceRate(): Promise<ResponseType<any>> {
     const now = new Date();
-    const lastWeekEnd = new Date(now);
-    lastWeekEnd.setDate(now.getDate() - now.getDay());
-    lastWeekEnd.setHours(0, 0, 0, 0);
 
-    const lastWeekStart = new Date(lastWeekEnd);
-    lastWeekStart.setDate(lastWeekEnd.getDate() - 6);
-    lastWeekStart.setHours(0, 0, 0, 0);
+// Calculate THIS WEEK (Sunday to Saturday)
+const thisWeekStart = new Date(now);
+thisWeekStart.setDate(now.getDate() - now.getDay()); // Sunday
+thisWeekStart.setHours(0, 0, 0, 0);
 
-    const currentDay = now.getDay(); // Sunday = 0
-    const thisWeekStart = new Date(now);
-    thisWeekStart.setDate(now.getDate() - currentDay);
-    thisWeekStart.setHours(0, 0, 0, 0);
+const thisWeekEnd = new Date(thisWeekStart);
+thisWeekEnd.setDate(thisWeekStart.getDate() + 6); // Saturday
+thisWeekEnd.setHours(23, 59, 59, 999);
 
-    const thisWeekEnd = new Date(thisWeekStart);
-    thisWeekEnd.setDate(thisWeekStart.getDate() + 6);
-    thisWeekEnd.setHours(23, 59, 59, 999);
+// Calculate LAST WEEK (previous Sunday to Saturday)
+const lastWeekStart = new Date(thisWeekStart);
+lastWeekStart.setDate(thisWeekStart.getDate() - 7); // Previous Sunday
+lastWeekStart.setHours(0, 0, 0, 0);
+
+const lastWeekEnd = new Date(lastWeekStart);
+lastWeekEnd.setDate(lastWeekStart.getDate() + 6); // Previous Saturday
+lastWeekEnd.setHours(23, 59, 59, 999);
     const lastweekSellingProduct = await this.WholesalesRepo.createQueryBuilder(
       'w',
     )
@@ -103,11 +105,10 @@ export class ProfitDevService {
         end: lastWeekEnd.toISOString(),
       })
       .groupBy('p.product_name')
-      .addGroupBy('p.id')
-      .addGroupBy('w.CreatedAt')
-      .addGroupBy('w.Total_pc_pkg_litre')
-      .orderBy('w.CreatedAt', 'ASC')
-      .getRawMany();
+  .addGroupBy('p.id')
+  .addGroupBy('DATE(w.CreatedAt)') // Consistent grouping
+  .orderBy('DATE(w.CreatedAt)', 'ASC')
+  .getRawMany();
     const summarizedLastweek = lastweekSellingProduct.reduce(
       (acc, curr) => {
         const datekey = new Date(curr.Date).toISOString().split('T')[0];
@@ -157,11 +158,11 @@ export class ProfitDevService {
         start: thisWeekStart,
         end: thisWeekEnd,
       })
-      .groupBy('p.product_name')
-      .addGroupBy('p.id')
-      .addGroupBy('DATE(w.CreatedAt)')
-      .orderBy('DATE(w.CreatedAt)', 'ASC')
-      .getRawMany();
+       .groupBy('p.product_name')
+  .addGroupBy('p.id')
+  .addGroupBy('DATE(w.CreatedAt)') // Consistent grouping
+  .orderBy('DATE(w.CreatedAt)', 'ASC')
+  .getRawMany();
 
     const SummarizedThisweek = ThisweekSellingProduct.reduce(
       (acc, curr) => {
