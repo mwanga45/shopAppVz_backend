@@ -5,8 +5,9 @@ import {
   IsOptional,
   Max,
   Min,
+  IsEnum,
 } from 'class-validator';
-import { paymentstatus, StockStatus, override } from 'src/type/type.interface';
+import { paymentstatus, StockStatus, override, paymentvia } from 'src/type/type.interface';
 
 export class CreateSaleDto {
   @IsNumber()
@@ -54,6 +55,10 @@ export class CreateSaleDto {
   @IsString()
   @IsOptional()
   override: override;
+
+  @IsEnum(paymentvia)
+  @IsNotEmpty()
+  payment_via: paymentvia;
 }
 
 export class SalesResponseDto {
@@ -68,4 +73,5 @@ export class SalesResponseDto {
   @IsNotEmpty()
   @IsNumber()
   Total_product: number;
+
 }

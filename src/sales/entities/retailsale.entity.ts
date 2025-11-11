@@ -4,7 +4,7 @@ import { IsNumber, IsString } from 'class-validator';
 import { Product } from 'src/product/entities/product.entity';
 import { ManyToOne, JoinColumn } from 'typeorm';
 import { User } from 'src/entities/user.entity';
-import { paymentstatus } from 'src/type/type.interface';
+import { paymentstatus, paymentvia } from 'src/type/type.interface';
 @Entity()
 export class RetailSales extends baseEntity {
   @Column('decimal', { precision: 10, scale: 4, nullable: true })
@@ -30,6 +30,9 @@ export class RetailSales extends baseEntity {
 
   @Column({ default: paymentstatus.Paid })
   paymentstatus: paymentstatus;
+
+  @Column({ default: paymentvia.Cash })
+  payment_via: paymentvia;
 
   @Column({ default: 'direct' })
   sale_origin: 'direct' | 'debt_payment';

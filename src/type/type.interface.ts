@@ -12,6 +12,10 @@ export enum paymentstatus{
     Parctial = 'partialpaid' ,
     Dept = 'dept'
 }  
+export enum paymentvia{
+  Bank = 'bank',
+  Cash = 'cash'
+}
 
 export enum StockStatus{
   Enough = 'Enough',
