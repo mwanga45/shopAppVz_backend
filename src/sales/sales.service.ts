@@ -11,6 +11,7 @@ import {
   ChangeType,
   override,
   paymentstatus,
+  paymentvia,
   ResponseType,
 } from 'src/type/type.interface';
 import { StockStatus } from 'src/type/type.interface';
@@ -268,11 +269,14 @@ export class SalesService {
     manager: EntityManager,
     total_profit: number,
     total_revenue: number,
+    payVia?:string
+
   ): Promise<ResponseType<any>> {
     const now = new Date();
     const dateoftoday = now.toISOString().split('T')[0];
     const profit = String(total_profit);
     const Revenue = String(total_revenue);
+  
 
     const DailyProfitsummaryRepo = manager.getRepository(
       this.ProfitsummaryRepo.target,
@@ -287,6 +291,8 @@ export class SalesService {
         const createProfit = DailyProfitsummaryRepo.create({
           total_profit: profit,
           total_revenue: Revenue,
+          bankTotal_Revenue: payVia === paymentvia.Bank? Revenue :'0',
+          bankTotal_profit: payVia ===paymentvia.Bank  ? profit :"0"
         });
         await manager.save(createProfit);
         return {
@@ -313,10 +319,6 @@ export class SalesService {
         success: false,
       };
     }
-    return {
-      message: 'successfuly',
-      success: true,
-    };
   }
   async SaleRecord(
     dto: CreateSaleDto,
@@ -393,11 +395,14 @@ export class SalesService {
           );
           if (!stockupdate.success)
             throw new Error(String(stockupdate.message) || 'Unknown Error');
-          const Profitrecord = await this.Profitupdatesummary(
+            const Profitrecord = await this.Profitupdatesummary(
             manager,
             dto.Net_profit,
             dto.Revenue,
+            dto.payment_via
           );
+          
+    
           if (!Profitrecord.success) {
             throw new Error(String(Profitrecord.message));
           }
