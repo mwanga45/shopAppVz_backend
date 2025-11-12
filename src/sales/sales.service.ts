@@ -22,6 +22,7 @@ import { Stock } from 'src/stock/entities/stock.entity';
 import { DataSource } from 'typeorm';
 import { SaleSummary, MostProfit } from 'src/type/type.interface';
 import { DailyProfitsummary } from './entities/profitsummary.entity';
+import { Capital } from 'src/entities/capital.entity';
 
 @Injectable()
 export class SalesService {
@@ -37,6 +38,8 @@ export class SalesService {
     private readonly ProductDiscrepo: Repository<Product_discount>,
     @InjectRepository(DailyProfitsummary)
     private readonly ProfitsummaryRepo: Repository<DailyProfitsummary>,
+    @InjectRepository(Capital)
+    private readonly CapitalRepo: Repository<Capital>,
     private readonly Stockserv: StockService,
     private readonly Datasource: DataSource,
   ) {}
@@ -267,6 +270,23 @@ export class SalesService {
     };
   }
 
+  networthUpdate = async (
+    manager: EntityManager,
+    payVia?: paymentvia,
+  ): Promise<ResponseType<any>> => {
+    const CapitalRepository = manager.getRepository(this.CapitalRepo.target);
+    try {
+      return {
+        message: '',
+        success: true,
+      };
+    } catch (err) {
+      return {
+        message: `failed to update capital ${err}`,
+        success: false,
+      };
+    }
+  };
   async Profitupdatesummary(
     manager: EntityManager,
     total_profit: number,
@@ -277,7 +297,6 @@ export class SalesService {
     const dateoftoday = now.toISOString().split('T')[0];
     const profit = String(total_profit);
     const Revenue = String(total_revenue);
-  
 
     const DailyProfitsummaryRepo = manager.getRepository(
       this.ProfitsummaryRepo.target,
@@ -414,14 +433,13 @@ export class SalesService {
           if (!stockupdate.success)
             throw new Error(String(stockupdate.message) || 'Unknown Error');
 
-            const Profitrecord = await this.Profitupdatesummary(
+          const Profitrecord = await this.Profitupdatesummary(
             manager,
             dto.Net_profit,
             dto.Revenue,
-            dto.payment_via
+            dto.payment_via,
           );
-          
-    
+
           if (!Profitrecord.success) {
             throw new Error(String(Profitrecord.message));
           }
@@ -491,7 +509,7 @@ export class SalesService {
             manager,
             dto.Net_profit,
             dto.Revenue,
-            dto.payment_via
+            dto.payment_via,
           );
           if (!Profitrecord.success) {
             throw new Error(String(Profitrecord.message));

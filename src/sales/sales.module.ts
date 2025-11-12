@@ -8,10 +8,11 @@ import { ProductModule } from 'src/product/product.module';
 import { StockModule } from 'src/stock/stock.module';
 import { Stock,Stock_transaction } from 'src/stock/entities/stock.entity';
 import { DailyProfitsummary } from './entities/profitsummary.entity';
+import { Capital } from 'src/entities/capital.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([WholeSales, RetailSales,Stock,Stock_transaction, DailyProfitsummary]),
+    TypeOrmModule.forFeature([WholeSales, RetailSales,Stock,Stock_transaction, DailyProfitsummary, Capital]),
     ProductModule,
     StockModule,
   ],
