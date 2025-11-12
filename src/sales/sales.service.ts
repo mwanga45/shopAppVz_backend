@@ -270,14 +270,15 @@ export class SalesService {
     };
   }
 
-  networthUpdate = async (
+  CapitalUpdate = async (
     manager: EntityManager,
     payVia?: paymentvia,
   ): Promise<ResponseType<any>> => {
     const CapitalRepository = manager.getRepository(this.CapitalRepo.target);
     try {
+      
       return {
-        message: '',
+        message: 'successfuly update ',
         success: true,
       };
     } catch (err) {
