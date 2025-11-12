@@ -83,6 +83,25 @@ export class ProfitDevService {
     thisWeekEnd.setDate(thisWeekStart.getDate() + 6); // Saturday
     thisWeekEnd.setHours(23, 59, 59, 999);
 
+    const toLocalDateKey = (input: Date | string): string => {
+      const base =
+        input instanceof Date ? new Date(input) : new Date(String(input));
+      if (Number.isNaN(base.valueOf())) {
+        return '';
+      }
+      const local = new Date(base.getTime() - base.getTimezoneOffset() * 60000);
+      return local.toISOString().split('T')[0];
+    };
+
+    const toWeekday = (dateKey: string): string => {
+      if (!dateKey) return '';
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        weekday: 'short',
+        timeZone: 'UTC',
+      });
+      return formatter.format(new Date(`${dateKey}T00:00:00Z`));
+    };
+
     // Calculate LAST WEEK (previous Sunday to Saturday)
     const lastWeekStart = new Date(thisWeekStart);
     lastWeekStart.setDate(thisWeekStart.getDate() - 7); // Previous Sunday
@@ -91,49 +110,137 @@ export class ProfitDevService {
     const lastWeekEnd = new Date(lastWeekStart);
     lastWeekEnd.setDate(lastWeekStart.getDate() + 6); // Previous Saturday
     lastWeekEnd.setHours(23, 59, 59, 999);
-    const lastweekSellingProduct = await this.WholesalesRepo.createQueryBuilder(
-      'w',
-    )
-      .leftJoin('w.product', 'p')
-      .select('p.product_name', 'product_name')
-      .addSelect('p.id', 'product_id')
-      .addSelect('SUM(w.Total_pc_pkg_litre)', 'Quantity')
-      .addSelect('DATE(w.CreatedAt)', 'Date')
-      .addSelect('SUM(w.Revenue)', 'Revenue')
-      .where('w.CreatedAt BETWEEN :start AND :end', {
-        start: lastWeekStart.toISOString(),
-        end: lastWeekEnd.toISOString(),
-      })
-      .groupBy('p.product_name')
-      .addGroupBy('p.id')
-      .addGroupBy('DATE(w.CreatedAt)') // Consistent grouping
-      .orderBy('DATE(w.CreatedAt)', 'ASC')
-      .getRawMany();
-    const summarizedLastweek = lastweekSellingProduct.reduce(
-      (acc, curr) => {
-        const datekey = new Date(curr.Date).toISOString().split('T')[0];
+    const fetchDailySales = async (
+      repo: Repository<WholeSales | RetailSales>,
+      alias: string,
+      start: Date,
+      end: Date,
+    ) => {
+      return repo
+        .createQueryBuilder(alias)
+        .select(`DATE(${alias}."CreatedAt")`, 'date')
+        .addSelect(`SUM(${alias}."Revenue")`, 'revenue')
+        .addSelect(`SUM(${alias}."Total_pc_pkg_litre")`, 'quantity')
+        .where(`${alias}."CreatedAt" BETWEEN :start AND :end`, { start, end })
+        .groupBy(`DATE(${alias}."CreatedAt")`)
+        .orderBy(`DATE(${alias}."CreatedAt")`, 'ASC')
+        .getRawMany();
+    };
+
+    const mergeDailySales = (
+      sources: Array<{ date: string; revenue: string; quantity: string }>,
+    ): Record<string, LastweeksellInterface> => {
+      return sources.reduce((acc, curr) => {
+        const datekey = toLocalDateKey(curr.date);
+        if (!datekey) return acc;
         if (!acc[datekey]) {
-          // const  fixedDatea = new Date()
           acc[datekey] = {
             Revenue: 0,
             Quantity: 0,
-            Date: datekey ,
-            day: new Date(datekey).toDateString().slice(0, 3),
+            Date: datekey,
+            day: toWeekday(datekey),
           };
         }
-        acc[datekey].Revenue += Number(curr.Revenue);
-        acc[datekey].Quantity += Number(curr.Quantity);
+        acc[datekey].Revenue += Number(curr.revenue ?? 0);
+        acc[datekey].Quantity += Number(curr.quantity ?? 0);
         return acc;
-      },
-      {} as Record<string, LastweeksellInterface>,
+      }, {} as Record<string, LastweeksellInterface>);
+    };
+
+    const fetchProductSales = async (
+      repo: Repository<WholeSales | RetailSales>,
+      alias: string,
+      start: Date,
+      end: Date,
+    ) => {
+      return repo
+        .createQueryBuilder(alias)
+        .leftJoin(`${alias}.product`, 'p')
+        .select('p.product_name', 'product_name')
+        .addSelect('p.id', 'product_id')
+        .addSelect(`SUM(${alias}."Total_pc_pkg_litre")`, 'quantity')
+        .addSelect(`SUM(${alias}."Revenue")`, 'revenue')
+        .where(`${alias}."CreatedAt" BETWEEN :start AND :end`, { start, end })
+        .groupBy('p.product_name')
+        .addGroupBy('p.id')
+        .orderBy('p.product_name', 'ASC')
+        .getRawMany();
+    };
+
+    const mergeProductSales = (
+      sources: Array<{
+        product_id: string | number;
+        product_name: string;
+        quantity: string;
+        revenue: string;
+      }>,
+    ) => {
+      const map = new Map<
+        number,
+        { product_id: number; product_name: string; Quantity: number; Revenue: number }
+      >();
+      for (const item of sources) {
+        const product_id = Number(item.product_id);
+        if (Number.isNaN(product_id)) continue;
+        const product_name = item.product_name;
+        const existing =
+          map.get(product_id) ??
+          {
+            product_id,
+            product_name,
+            Quantity: 0,
+            Revenue: 0,
+          };
+        existing.Quantity += Number(item.quantity ?? 0);
+        existing.Revenue += Number(item.revenue ?? 0);
+        map.set(product_id, existing);
+      }
+      return Array.from(map.values());
+    };
+
+    const lastWeekWholesale = await fetchDailySales(
+      this.WholesalesRepo,
+      'w',
+      lastWeekStart,
+      lastWeekEnd,
     );
+    const lastWeekRetail = await fetchDailySales(
+      this.Retailrepo,
+      'r',
+      lastWeekStart,
+      lastWeekEnd,
+    );
+
+    const summarizedLastweek = mergeDailySales([
+      ...lastWeekWholesale,
+      ...lastWeekRetail,
+    ]);
+
+    const lastWeekWholesaleProducts = await fetchProductSales(
+      this.WholesalesRepo,
+      'w',
+      lastWeekStart,
+      lastWeekEnd,
+    );
+    const lastWeekRetailProducts = await fetchProductSales(
+      this.Retailrepo,
+      'r',
+      lastWeekStart,
+      lastWeekEnd,
+    );
+
+    const lastweekSellingProduct = mergeProductSales([
+      ...lastWeekWholesaleProducts,
+      ...lastWeekRetailProducts,
+    ]);
+
     const allData: LastweeksellInterface[] = [];
     for (
       let d = new Date(lastWeekStart);
       d <= lastWeekEnd;
       d.setDate(d.getDate() + 1)
     ) {
-      const datestr = d.toISOString().split('T')[0];
+      const datestr = toLocalDateKey(d);
       if (summarizedLastweek[datestr]) {
         allData.push(summarizedLastweek[datestr]);
       } else {
@@ -141,53 +248,46 @@ export class ProfitDevService {
           Revenue: 0,
           Quantity: 0,
           Date: datestr,
-          day: d.toDateString().slice(0, 3),
+          day: toWeekday(datestr),
         });
       }
     }
     const Lastweek: LastweeksellInterface[] = allData;
-    const ThisweekSellingProduct = await this.WholesalesRepo.createQueryBuilder(
+    const thisWeekWholesale = await fetchDailySales(
+      this.WholesalesRepo,
       'w',
-    )
-      .leftJoin('w.product', 'p')
-      .select('p.product_name', 'product_name')
-      .addSelect('p.id', 'product_id')
-      .addSelect('SUM(w.Revenue)', 'Revenue')
-      .addSelect('SUM(w.Total_pc_pkg_litre)', 'Quantity')
-      .addSelect('DATE(w.CreatedAt)', 'Date')
-      .where('w.CreatedAt BETWEEN :start AND :end', {
-        start: thisWeekStart,
-        end: thisWeekEnd,
-      })
-      .groupBy('p.product_name')
-      .addGroupBy('p.id')
-      .addGroupBy('DATE(w.CreatedAt)')
-      .orderBy('DATE(w.CreatedAt)', 'ASC')
-      .getRawMany();
-
-    const SummarizedThisweek = ThisweekSellingProduct.reduce(
-      (acc, curr) => {
-        const dateObj =
-          curr.Date instanceof Date ? curr.Date : new Date(String(curr.Date));
-
-        if (isNaN(dateObj.valueOf())) return acc;
-
-        const datestr = dateObj.toISOString().split('T')[0];
-        if (!acc[datestr]) {
-          acc[datestr] = {
-            Revenue: 0,
-            Quantity: 0,
-            Date: datestr,
-            day: new Date(datestr).toDateString().slice(0, 3),
-          };
-        }
-
-        acc[datestr].Revenue += Number(curr.Revenue ?? 0);
-        acc[datestr].Quantity += Number(curr.Quantity ?? 0);
-        return acc;
-      },
-      {} as Record<string, LastweeksellInterface>,
+      thisWeekStart,
+      thisWeekEnd,
     );
+    const thisWeekRetail = await fetchDailySales(
+      this.Retailrepo,
+      'r',
+      thisWeekStart,
+      thisWeekEnd,
+    );
+
+    const SummarizedThisweek = mergeDailySales([
+      ...thisWeekWholesale,
+      ...thisWeekRetail,
+    ]);
+
+    const thisWeekWholesaleProducts = await fetchProductSales(
+      this.WholesalesRepo,
+      'w',
+      thisWeekStart,
+      thisWeekEnd,
+    );
+    const thisWeekRetailProducts = await fetchProductSales(
+      this.Retailrepo,
+      'r',
+      thisWeekStart,
+      thisWeekEnd,
+    );
+
+    const ThisweekSellingProduct = mergeProductSales([
+      ...thisWeekWholesaleProducts,
+      ...thisWeekRetailProducts,
+    ]);
 
     const alldataThisweek: LastweeksellInterface[] = [];
     for (
@@ -195,7 +295,7 @@ export class ProfitDevService {
       d <= thisWeekEnd;
       d.setDate(d.getDate() + 1)
     ) {
-      const datestr = d.toISOString().split('T')[0];
+      const datestr = toLocalDateKey(d);
       if (SummarizedThisweek[datestr]) {
         alldataThisweek.push(SummarizedThisweek[datestr]);
       } else {
@@ -203,7 +303,7 @@ export class ProfitDevService {
           Revenue: 0,
           Quantity: 0,
           Date: datestr,
-          day: new Date(datestr).toDateString().slice(0, 3),
+          day: toWeekday(datestr),
         });
       }
     }

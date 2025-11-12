@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { CreateSaleDto, SalesResponseDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
 import { WholeSales } from './entities/wholesale.entity';
@@ -40,6 +40,8 @@ export class SalesService {
     private readonly Stockserv: StockService,
     private readonly Datasource: DataSource,
   ) {}
+
+  private readonly logger = new Logger(SalesService.name);
 
   StockCheck = async (
     id: number,
@@ -269,8 +271,7 @@ export class SalesService {
     manager: EntityManager,
     total_profit: number,
     total_revenue: number,
-    payVia?:string
-
+    payVia?: paymentvia,
   ): Promise<ResponseType<any>> {
     const now = new Date();
     const dateoftoday = now.toISOString().split('T')[0];
@@ -291,10 +292,13 @@ export class SalesService {
         const createProfit = DailyProfitsummaryRepo.create({
           total_profit: profit,
           total_revenue: Revenue,
-          bankTotal_Revenue: payVia === paymentvia.Bank? Revenue :'0',
-          bankTotal_profit: payVia === paymentvia.Bank  ? profit :"0"
+          bankTotal_Revenue: payVia === paymentvia.Bank ? Revenue : '0',
+          bankTotal_profit: payVia === paymentvia.Bank ? profit : '0',
         });
         await manager.save(createProfit);
+        this.logger.debug(
+          `Profit sheet created for ${dateoftoday}. payment_via=${payVia} revenue=${Revenue} profit=${profit}`,
+        );
         return {
           message: 'successfuly create profit column',
           success: true,
@@ -303,16 +307,25 @@ export class SalesService {
 
       const profit_sum = Number(checkdate.total_profit) + total_profit;
       const totalRevenue = Number(checkdate.total_revenue) + total_revenue;
-      const total_bank = payVia === paymentvia.Bank ? Number(checkdate.bankTotal_Revenue) + totalRevenue : Number(checkdate.bankTotal_Revenue)
-      const total_bankProfit = payVia === paymentvia.Bank ? Number(checkdate.bankTotal_profit) + totalRevenue : Number(checkdate.bankTotal_profit)
+      const total_bank =
+        payVia === paymentvia.Bank
+          ? Number(checkdate.bankTotal_Revenue) + total_revenue
+          : Number(checkdate.bankTotal_Revenue);
+      const total_bankProfit =
+        payVia === paymentvia.Bank
+          ? Number(checkdate.bankTotal_profit) + total_profit
+          : Number(checkdate.bankTotal_profit);
       await DailyProfitsummaryRepo.update(
         { id: checkdate.id },
         {
           total_profit: String(profit_sum),
           total_revenue: String(totalRevenue),
-          bankTotal_profit:String(total_bankProfit),
-          bankTotal_Revenue:String(total_bank)
+          bankTotal_profit: String(total_bankProfit),
+          bankTotal_Revenue: String(total_bank),
         },
+      );
+      this.logger.debug(
+        `Profit sheet updated for ${dateoftoday}. payment_via=${payVia} -> bank revenue now ${total_bank}, bank profit ${total_bankProfit}`,
       );
       return {
         message: 'successfuly update profit table',
