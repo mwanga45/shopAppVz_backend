@@ -292,7 +292,7 @@ export class SalesService {
           total_profit: profit,
           total_revenue: Revenue,
           bankTotal_Revenue: payVia === paymentvia.Bank? Revenue :'0',
-          bankTotal_profit: payVia ===paymentvia.Bank  ? profit :"0"
+          bankTotal_profit: payVia === paymentvia.Bank  ? profit :"0"
         });
         await manager.save(createProfit);
         return {
@@ -300,13 +300,18 @@ export class SalesService {
           success: true,
         };
       }
+
       const profit_sum = Number(checkdate.total_profit) + total_profit;
       const totalRevenue = Number(checkdate.total_revenue) + total_revenue;
+      const total_bank = payVia === paymentvia.Bank ? Number(checkdate.bankTotal_Revenue) + totalRevenue : Number(checkdate.bankTotal_Revenue)
+      const total_bankProfit = payVia === paymentvia.Bank ? Number(checkdate.bankTotal_profit) + totalRevenue : Number(checkdate.bankTotal_profit)
       await DailyProfitsummaryRepo.update(
         { id: checkdate.id },
         {
           total_profit: String(profit_sum),
           total_revenue: String(totalRevenue),
+          bankTotal_profit:String(total_bankProfit),
+          bankTotal_Revenue:String(total_bank)
         },
       );
       return {
@@ -395,6 +400,7 @@ export class SalesService {
           );
           if (!stockupdate.success)
             throw new Error(String(stockupdate.message) || 'Unknown Error');
+
             const Profitrecord = await this.Profitupdatesummary(
             manager,
             dto.Net_profit,
@@ -472,6 +478,7 @@ export class SalesService {
             manager,
             dto.Net_profit,
             dto.Revenue,
+            dto.payment_via
           );
           if (!Profitrecord.success) {
             throw new Error(String(Profitrecord.message));
