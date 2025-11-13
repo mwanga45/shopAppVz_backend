@@ -272,11 +272,21 @@ export class SalesService {
 
   CapitalUpdate = async (
     manager: EntityManager,
+    total_revenue:number,
     payVia?: paymentvia,
   ): Promise<ResponseType<any>> => {
     const CapitalRepository = manager.getRepository(this.CapitalRepo.target);
     try {
-      
+      const findrow = await CapitalRepository.findOne({
+        where:{id:1}
+      })
+      const finalRevenue = findrow?.Total_Capital ? Number(findrow.Total_Capital) + total_revenue: 0  + total_revenue
+      const finalBankRevenue =  payVia === paymentvia.Bank ? findrow?.BankCapital ? Number(findrow.BankCapital) + total_revenue : 0 : 0
+      const updateCapital = CapitalRepository.update({
+        where:{id:1},
+        Total_Capital:finalRevenue,
+        BankCapital:
+      })
       return {
         message: 'successfuly update ',
         success: true,
