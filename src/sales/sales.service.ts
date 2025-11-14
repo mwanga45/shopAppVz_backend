@@ -281,11 +281,12 @@ export class SalesService {
         where:{id:1}
       })
       const finalRevenue = findrow?.Total_Capital ? Number(findrow.Total_Capital) + total_revenue: 0  + total_revenue
-      const finalBankRevenue =  payVia === paymentvia.Bank ? findrow?.BankCapital ? Number(findrow.BankCapital) + total_revenue : 0 : 0
-      const updateCapital = CapitalRepository.update({
-        where:{id:1},
+      const finalBankRevenue = payVia === paymentvia.Bank ? (findrow?.BankCapital ? Number(findrow.BankCapital) : 0) + total_revenue: findrow?.BankCapital;
+      const finalOnhand = payVia !==paymentvia.Bank ? (findrow?.OnhandCapital ? Number(findrow.OnhandCapital) : 0 ) + total_revenue : findrow ?.OnhandCapital
+      const updateCapital = CapitalRepository.update({id:1}, {
         Total_Capital:finalRevenue,
-        BankCapital:
+        BankCapital:finalBankRevenue,
+        OnhandCapital:finalOnhand
       })
       return {
         message: 'successfuly update ',
