@@ -20,6 +20,7 @@ export class ManagementService {
   async CapitalRegistration ():Promise<ResponseType<any>>{
    return await this.Datasource.transaction(async (manager)=>{
       try{
+      
        return{
         message:"successfuly",
         success:true
