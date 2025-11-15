@@ -5,6 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Capital } from 'src/entities/capital.entity';
 import { CashFlow } from 'src/entities/cashFlow.entity';
 import { Repository } from 'typeorm';
+import { ResponseType } from 'src/type/type.interface';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class ManagementService {
@@ -13,7 +15,23 @@ export class ManagementService {
     private readonly Capitalrepo: Repository<Capital>,
     @InjectRepository(CashFlow)
     private readonly CashflowRepo: Repository<CashFlow>,
+    private readonly Datasource:DataSource
   ) {}
+  async CapitalRegistration ():Promise<ResponseType<any>>{
+   return await this.Datasource.transaction(async (manager)=>{
+      try{
+       return{
+        message:"successfuly",
+        success:true
+       }
+      }catch(err){
+        return{
+          message:`failed to Register the Capital`,
+          success:false
+        }
+      }
+    })
+  }
   create(createManagementDto: CreateManagementDto) {
     return 'This action adds a new management';
   }
