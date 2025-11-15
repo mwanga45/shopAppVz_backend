@@ -7,6 +7,7 @@ import { CashFlow } from 'src/entities/cashFlow.entity';
 import { Repository } from 'typeorm';
 import { ResponseType } from 'src/type/type.interface';
 import { DataSource } from 'typeorm';
+import { capitalTimes } from 'src/type/type.interface';
 
 @Injectable()
 export class ManagementService {
@@ -17,10 +18,12 @@ export class ManagementService {
     private readonly CashflowRepo: Repository<CashFlow>,
     private readonly Datasource:DataSource
   ) {}
-  async CapitalRegistration ():Promise<ResponseType<any>>{
+  async CapitalRegistration (dto:CreateManagementDto):Promise<ResponseType<any>>{
    return await this.Datasource.transaction(async (manager)=>{
       try{
-      
+      if(dto.registerTime === capitalTimes.Firsttimes){
+        
+      }
        return{
         message:"successfuly",
         success:true
