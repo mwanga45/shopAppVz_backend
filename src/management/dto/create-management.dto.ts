@@ -9,13 +9,14 @@ export class CreateManagementDto {
     cash_capital:number
 
     @IsNumber()
-    onHand_capital:number
+    Bank_capital:number
 
     @IsString()
     code:string
 
     @IsString()
     registerTime:capitalTimes
+
     
 
 }

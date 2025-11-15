@@ -8,6 +8,8 @@ import { Repository } from 'typeorm';
 import { ResponseType } from 'src/type/type.interface';
 import { DataSource } from 'typeorm';
 import { capitalTimes } from 'src/type/type.interface';
+import { hash } from 'bcryptjs';
+import bcrypt from 'node_modules/bcryptjs/umd/types';
 
 @Injectable()
 export class ManagementService {
@@ -22,8 +24,29 @@ export class ManagementService {
    return await this.Datasource.transaction(async (manager)=>{
       try{
       if(dto.registerTime === capitalTimes.Firsttimes){
-        
+        const hashedcode = await bcrypt.hash(dto.code, 10) 
+        const registeCapital =  manager.create(Capital,{
+          Total_Capital:dto.total_capital,
+          OnhandCapital:dto.cash_capital,
+          BankCapital:dto.Bank_capital,
+          code:hashedcode
+        })
+        await manager.save(registeCapital)
+        return{
+          message:"successuly register capital",
+          success:true
+        }
       }
+      const findCode = await manager.findOne(Capital,{
+        where:{id: 1}
+      })
+      if(!findCode){
+       return{
+        message:"no data available",
+        success:true
+       }
+      }
+      const compare_code = await bcrypt.compare(dto.code, findCode.code)
        return{
         message:"successfuly",
         success:true
