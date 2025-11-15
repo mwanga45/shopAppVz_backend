@@ -8,8 +8,7 @@ import { Repository } from 'typeorm';
 import { ResponseType } from 'src/type/type.interface';
 import { DataSource } from 'typeorm';
 import { capitalTimes } from 'src/type/type.interface';
-import { hash } from 'bcryptjs';
-import bcrypt from 'node_modules/bcryptjs/umd/types';
+import bcrypt from 'bcrypt';
 
 @Injectable()
 export class ManagementService {
@@ -53,6 +52,9 @@ export class ManagementService {
           success:false
         }
       }
+      const updateCapital = await manager.update(Capital,
+        {id:1}, {Total_Capital:dto.total_capital, BankCapital:dto.Bank_capital,OnhandCapital:dto.cash_capital}
+      )
        return{
         message:"successfuly",
         success:true
