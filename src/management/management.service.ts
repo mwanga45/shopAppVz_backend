@@ -38,7 +38,7 @@ export class ManagementService {
         }
       }
       const findCode = await manager.findOne(Capital,{
-        where:{id: 1}
+        where:{id:1}
       })
       if(!findCode){
        return{
@@ -47,6 +47,12 @@ export class ManagementService {
        }
       }
       const compare_code = await bcrypt.compare(dto.code, findCode.code)
+      if(!compare_code){
+        return{
+          message:"failed the code not match",
+          success:false
+        }
+      }
        return{
         message:"successfuly",
         success:true
