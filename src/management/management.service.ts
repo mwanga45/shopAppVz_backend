@@ -30,7 +30,13 @@ export class ManagementService {
           BankCapital:dto.Bank_capital,
           code:hashedcode
         })
-        await manager.save(registeCapital)
+        await manager.save(registeCapital) 
+        const registerCashflow = await manager.create(CashFlow,{
+          Total_Capital:dto.total_capital,
+          Bank_Capital:dto.Bank_capital,
+          OnHand_Capital:dto.cash_capital,
+          Withdraw:0
+        })
         return{
           message:"successuly register capital",
           success:true
