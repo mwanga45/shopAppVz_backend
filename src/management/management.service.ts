@@ -37,6 +37,7 @@ export class ManagementService {
           OnHand_Capital:dto.cash_capital,
           Withdraw:0
         })
+        await manager.save(registerCashflow)
         return{
           message:"successuly register capital",
           success:true
@@ -61,6 +62,15 @@ export class ManagementService {
       const updateCapital = await manager.update(Capital,
         {id:1}, {Total_Capital:dto.total_capital, BankCapital:dto.Bank_capital,OnhandCapital:dto.cash_capital}
       )
+      const checklastRecord = await manager.findOne(CashFlow,{
+        order:{Withdraw:'DESC'}
+      })
+      const UpdateCashflow = manager.create(CashFlow, {
+        Total_Capital: dto.total_capital,
+        OnHand_Capital: dto.Bank_capital,
+        Bank_Capital: dto.Bank_capital,
+        Withdraw: dto.withdraw ? dto.withdraw : checklastRecord?.Withdraw ? checklastRecord.Withdraw :0 
+      })
        return{
         message:"successfuly",
         success:true
