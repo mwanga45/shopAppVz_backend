@@ -9,7 +9,7 @@ import {
   ResponseType,
   TodayRevenue,
 } from 'src/type/type.interface';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { WholeSales } from 'src/sales/entities/wholesale.entity';
 import { RetailSales } from 'src/sales/entities/retailsale.entity';
 import { Debt_track } from 'src/debt/entities/debt.entity';
@@ -35,8 +35,26 @@ export class ProfitDevService {
     private readonly Stockrepo: Repository<Stock>,
     @InjectRepository(Stock_transaction)
     private readonly StockTrnasrepo: Repository<Stock_transaction>,
+    private readonly Datasource:DataSource
   ) {}
 
+  async CapitalRegister():Promise<ResponseType<any>>{
+    return await this.Datasource.transaction(async (manager)=>{
+      try{
+        
+        return{
+          message:"successfuly",
+          success:true
+        }
+
+      }catch(err){
+        return{
+          message:`failed to the register capital`,
+          success:false
+        }
+      }
+    })
+  }
   async AdminAnalysis(): Promise<ResponseType<any>> {
     const now = new Date();
     const dateOfToday = now.toISOString().split('T')[0];
