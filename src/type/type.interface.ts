@@ -17,6 +17,10 @@ export enum paymentvia{
   Cash = 'cash'
 }
 
+export enum capitalTimes{
+  Firsttimes = 'firstTimes',
+  MoreThanOne = 'moreThanOne'
+}
 export enum StockStatus{
   Enough = 'Enough',
   NotEnough = 'NotEnough'
