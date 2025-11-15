@@ -38,23 +38,6 @@ export class ProfitDevService {
     private readonly Datasource:DataSource
   ) {}
 
-  async CapitalRegister():Promise<ResponseType<any>>{
-    return await this.Datasource.transaction(async (manager)=>{
-      try{
-        
-        return{
-          message:"successfuly",
-          success:true
-        }
-
-      }catch(err){
-        return{
-          message:`failed to the register capital`,
-          success:false
-        }
-      }
-    })
-  }
   async AdminAnalysis(): Promise<ResponseType<any>> {
     const now = new Date();
     const dateOfToday = now.toISOString().split('T')[0];
