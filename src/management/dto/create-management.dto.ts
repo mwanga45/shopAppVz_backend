@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsNumber,  IsString } from "class-validator";
 
 export class CreateManagementDto {
     @IsNumber()
@@ -12,4 +12,9 @@ export class CreateManagementDto {
 
     @IsString()
     code:string
+
+    @IsString()
+    registerTime:string
+    
+
 }
