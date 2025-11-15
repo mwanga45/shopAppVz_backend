@@ -65,12 +65,13 @@ export class ManagementService {
       const checklastRecord = await manager.findOne(CashFlow,{
         order:{Withdraw:'DESC'}
       })
-      const UpdateCashflow = manager.create(CashFlow, {
+      const CreateCashflow = manager.create(CashFlow, {
         Total_Capital: dto.total_capital,
         OnHand_Capital: dto.Bank_capital,
         Bank_Capital: dto.Bank_capital,
         Withdraw: dto.withdraw ? dto.withdraw : checklastRecord?.Withdraw ? checklastRecord.Withdraw :0 
       })
+      await manager.save(CreateCashflow)
        return{
         message:"successfuly",
         success:true
