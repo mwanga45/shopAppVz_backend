@@ -12,6 +12,11 @@ export class ManagementController {
     return this.managementService.create(createManagementDto);
   }
 
+  @Get('checkcapitalinfo')
+  CheckCapitalInfo(){
+    return this.managementService.CheckCapital()
+  }
+
   @Get()
   findAll() {
     return this.managementService.findAll();

@@ -85,7 +85,13 @@ export class ManagementService {
     })
   }
   async CheckCapital ():Promise<ResponseType<any>>{
-    
+    const checkdataexist = await this.Capitalrepo.find()
+    if(checkdataexist.length > 0){
+      return{
+        message:'Please make sure your fill this details',
+        success:false
+      }
+    }
     return{
       message:'Capital present',
       success:true
