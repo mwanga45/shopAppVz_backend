@@ -18,6 +18,8 @@ export class ManagementService {
     private readonly Capitalrepo: Repository<Capital>,
     @InjectRepository(CashFlow)
     private readonly CashflowRepo: Repository<CashFlow>,
+    @InjectRepository(BusinessService)
+    private readonly BUsinessServiceRepo:Repository<BusinessService>,
     private readonly Datasource:DataSource
   ) {}
   async CapitalRegistration (dto:CreateManagementDto):Promise<ResponseType<any>>{
@@ -134,8 +136,13 @@ export class ManagementService {
     return 'This action adds a new management';
   }
 
-  findAll() {
-    return `This action returns all management`;
+  async findAll():Promise<ResponseType<any>> {
+    const find = await this.BUsinessServiceRepo.find()
+    return {
+      message:`This action returns all management`,
+      success:true,
+      data:find
+    }
   }
 
   findOne(id: number) {
