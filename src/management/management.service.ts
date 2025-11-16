@@ -40,7 +40,8 @@ export class ManagementService {
         await manager.save(registerCashflow)
         return{
           message:"successuly register capital",
-          success:true
+          success:true,
+          
         }
       }
       const findCode = await manager.findOne(Capital,{
@@ -88,13 +89,14 @@ export class ManagementService {
     const checkdataexist = await this.Capitalrepo.find()
     if(checkdataexist.length > 0){
       return{
-        message:'Please make sure your fill this details',
-        success:false
+        message:'capital present',
+        success:true,
+        data:checkdataexist
       }
     }
     return{
-      message:'Capital present',
-      success:true
+      message:'Please make sure your fill this details',
+      success:false
 
     }
   }

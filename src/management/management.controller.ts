@@ -7,8 +7,8 @@ import { UpdateManagementDto } from './dto/update-management.dto';
 export class ManagementController {
   constructor(private readonly managementService: ManagementService) {}
 
-  @Post()
-  create(@Body('create&update') createManagementDto: CreateManagementDto) {
+  @Post('create&update')
+  create(@Body() createManagementDto: CreateManagementDto) {
     return this.managementService.CapitalRegistration(createManagementDto);
   }
 
