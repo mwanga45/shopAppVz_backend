@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { ResponseType } from 'src/type/type.interface';
 import { DataSource } from 'typeorm';
 import { capitalTimes } from 'src/type/type.interface';
+import { BusinessService } from 'src/entities/businessService.entity';
 import bcrypt from 'bcrypt';
 
 @Injectable()
@@ -99,6 +100,22 @@ export class ManagementService {
       success:false
 
     }
+  }
+  async CreateService():Promise<ResponseType<any>>{
+    return this.Datasource.transaction(async(manager)=>{
+      try{
+      
+      return{
+        message:"successfuly create new service",
+        success:true
+      }
+      }catch(err){
+        return{
+          message:`failed to create data ${err}`,
+          success:false
+        }
+      }
+    })
   }
   create(createManagementDto: CreateManagementDto) {
     return 'This action adds a new management';

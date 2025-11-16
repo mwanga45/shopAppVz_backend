@@ -18,5 +18,8 @@ export class CashFlow extends baseEntity {
   @Column({type:"decimal", precision:15, scale:1})
   Withdraw:number;
 
+  @Column({default:"none"})
+  servicename:string
+
 }
 
