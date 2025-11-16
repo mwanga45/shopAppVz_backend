@@ -31,7 +31,7 @@ export class ManagementService {
           code:hashedcode
         })
         await manager.save(registeCapital) 
-        const registerCashflow = await manager.create(CashFlow,{
+        const registerCashflow =  manager.create(CashFlow,{
           Total_Capital:dto.total_capital,
           Bank_Capital:dto.Bank_capital,
           OnHand_Capital:dto.cash_capital,

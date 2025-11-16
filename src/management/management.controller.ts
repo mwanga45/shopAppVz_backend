@@ -8,8 +8,8 @@ export class ManagementController {
   constructor(private readonly managementService: ManagementService) {}
 
   @Post()
-  create(@Body() createManagementDto: CreateManagementDto) {
-    return this.managementService.create(createManagementDto);
+  create(@Body('create&update') createManagementDto: CreateManagementDto) {
+    return this.managementService.CapitalRegistration(createManagementDto);
   }
 
   @Get('checkcapitalinfo')
