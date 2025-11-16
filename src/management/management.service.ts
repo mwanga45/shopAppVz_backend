@@ -84,6 +84,14 @@ export class ManagementService {
       }
     })
   }
+  async CheckCapital ():Promise<ResponseType<any>>{
+    
+    return{
+      message:'Capital present',
+      success:true
+
+    }
+  }
   create(createManagementDto: CreateManagementDto) {
     return 'This action adds a new management';
   }
