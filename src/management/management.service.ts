@@ -112,12 +112,12 @@ export class ManagementService {
           message:`service named ${dto.service_name} is already exist`,
           success:false
         }
-      const create_service =  manager.create(BusinessService,{
+      }
+       const create_service =  manager.create(BusinessService,{
         service_name:dto.service_name,
         icon_name:dto.icon_name
       })
       await manager.save(create_service)
-      }
       return{
         message:"successfuly create new service",
         success:true
