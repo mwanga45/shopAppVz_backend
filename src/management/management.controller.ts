@@ -1,6 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ManagementService } from './management.service';
-import { CreateManagementDto, CreateServiceDto } from './dto/create-management.dto';
+import {
+  CreateManagementDto,
+  CreateServiceDto,
+} from './dto/create-management.dto';
 import { UpdateManagementDto } from './dto/update-management.dto';
 
 @Controller('management')
@@ -11,13 +22,13 @@ export class ManagementController {
   create(@Body() createManagementDto: CreateManagementDto) {
     return this.managementService.CapitalRegistration(createManagementDto);
   }
- @Post('createservice')
- Createservice(@Body() CreateServiceDto:CreateServiceDto){
-  return this.managementService.CreateService(CreateServiceDto)
- }
+  @Post('createservice')
+  Createservice(@Body() CreateServiceDto: CreateServiceDto) {
+    return this.managementService.CreateService(CreateServiceDto);
+  }
   @Get('checkcapitalinfo')
-  CheckCapitalInfo(){
-    return this.managementService.CheckCapital()
+  CheckCapitalInfo() {
+    return this.managementService.CheckCapital();
   }
 
   @Get()
@@ -31,7 +42,10 @@ export class ManagementController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateManagementDto: UpdateManagementDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateManagementDto: UpdateManagementDto,
+  ) {
     return this.managementService.update(+id, updateManagementDto);
   }
 
