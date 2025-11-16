@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateManagementDto } from './dto/create-management.dto';
+import { CreateManagementDto, CreateServiceDto } from './dto/create-management.dto';
 import { UpdateManagementDto } from './dto/update-management.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Capital } from 'src/entities/capital.entity';
@@ -101,10 +101,23 @@ export class ManagementService {
 
     }
   }
-  async CreateService():Promise<ResponseType<any>>{
+  async CreateService(dto:CreateServiceDto):Promise<ResponseType<any>>{
     return this.Datasource.transaction(async(manager)=>{
       try{
-      
+      const checkserviname = await manager.findOne(BusinessService,{
+        where:{service_name:dto.service_name}
+      })
+      if (checkserviname){
+        return{
+          message:`service named ${dto.service_name} is already exist`,
+          success:false
+        }
+      const create_service =  manager.create(BusinessService,{
+        service_name:dto.service_name,
+        icon_name:dto.icon_name
+      })
+      await manager.save(create_service)
+      }
       return{
         message:"successfuly create new service",
         success:true

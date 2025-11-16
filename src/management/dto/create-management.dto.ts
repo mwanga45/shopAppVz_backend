@@ -1,4 +1,4 @@
-import { IsNumber,  IsOptional,  IsString } from "class-validator";
+import { IsNumber,  IsOptional,  IsString, Length} from "class-validator";
 import { capitalTimes } from "src/type/type.interface";
 
 export class CreateManagementDto {
@@ -22,5 +22,12 @@ export class CreateManagementDto {
     withdraw:number
 
     
+}
+export class CreateServiceDto{
+    @IsString()
+    @Length(5, 8)
+    service_name:string
 
+    @IsString()
+    icon_name:string
 }
