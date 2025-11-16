@@ -10,10 +10,11 @@ import { Debt } from 'src/debt/entities/debt.entity';
 import { Stock } from 'src/stock/entities/stock.entity';
 import { Stock_transaction } from 'src/stock/entities/stock.entity';
 import { CashFlow } from 'src/entities/cashFlow.entity';
+import { Capital } from 'src/entities/capital.entity';
 
 @Module({
     imports:[
-        TypeOrmModule.forFeature([DailyProfitsummary, WholeSales, RetailSales, Debt_track, Debt, Stock,Stock_transaction, CashFlow])
+        TypeOrmModule.forFeature([DailyProfitsummary, WholeSales, RetailSales, Debt_track, Debt, Stock,Stock_transaction, CashFlow, Capital])
     ],
     providers:[ProfitDevService],
     controllers:[ProfitDevController]
