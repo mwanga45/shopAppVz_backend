@@ -30,6 +30,10 @@ export class ManagementController {
   CheckCapitalInfo() {
     return this.managementService.CheckCapital();
   }
+  @Get('transactionInfo')
+  TransactionInfo(){
+    return this.managementService.TransactionInfo()
+  }
 
   @Get()
   findAll() {

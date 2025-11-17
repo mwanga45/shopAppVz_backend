@@ -19,7 +19,7 @@ export class ManagementService {
     @InjectRepository(CashFlow)
     private readonly CashflowRepo: Repository<CashFlow>,
     @InjectRepository(BusinessService)
-    private readonly BUsinessServiceRepo:Repository<BusinessService>,
+    private readonly BusinessServiceRepo:Repository<BusinessService>,
     private readonly Datasource:DataSource
   ) {}
   async CapitalRegistration (dto:CreateManagementDto):Promise<ResponseType<any>>{
@@ -138,18 +138,36 @@ export class ManagementService {
 
 
   async TransactionInfo():Promise<ResponseType<any>>{
-    const selectservice = await this.BUsinessServiceRepo.createQueryBuilder('s')
+const now = new Date();
+
+// Get Monday of this week
+const thisweek = new Date(now);
+const day = thisweek.getDay() === 0 ? 7 : thisweek.getDay(); // convert Sunday(0) → 7
+thisweek.setDate(thisweek.getDate() - (day - 1));
+thisweek.setHours(0, 0, 0, 0);
+
+// Get Sunday of this week
+const thisweekend = new Date(thisweek);
+thisweekend.setDate(thisweek.getDate() + 6);
+thisweekend.setHours(23, 59, 59, 999);
+
+
+    const selectservice = await this.BusinessServiceRepo.createQueryBuilder('s')
     .select('s.service_name', 'service_name')
     .addSelect('s.icon_name', 'icon_name')
     .orderBy('s.CreatedAt')
     .getRawMany()
+
+    const count_service = selectservice.length
+    // const serviceRecord = await this.CashflowRepo.createQueryBuilder('c')
     return{
       message:"successfuly ",
-      success:true
+      success:true,
+      data:{count_service, selectservice, thisweek, thisweekend}
     }
   }
   async findAll():Promise<ResponseType<any>> {
-    const find = await this.BUsinessServiceRepo.find()
+    const find = await this.BusinessServiceRepo.find()
     return {
       message:`This action returns all management`,
       success:true,
