@@ -9,6 +9,7 @@ import { ResponseType } from 'src/type/type.interface';
 import { DataSource } from 'typeorm';
 import { capitalTimes } from 'src/type/type.interface';
 import { BusinessService } from 'src/entities/businessService.entity';
+import { Timeformat } from 'src/common/helper/timeformat.helper';
 import bcrypt from 'bcrypt';
 
 @Injectable()
@@ -159,11 +160,16 @@ thisweekend.setHours(23, 59, 59, 999);
     .getRawMany()
 
     const count_service = selectservice.length
-    // const serviceRecord = await this.CashflowRepo.createQueryBuilder('c')
+    const thisWeekStart =  Timeformat.formatLocal(thisweek)
+    const  thisWeekEnd = Timeformat.formatLocal(thisweekend)
+    const serviceRecord = await this.CashflowRepo.createQueryBuilder('s')
+    .select('s.service_name', 'service_name')
+    .addSelect('s.CreatedAt', 'createdAt')
+    
     return{
       message:"successfuly ",
       success:true,
-      data:{count_service, selectservice, thisweek, thisweekend}
+      data:{count_service, selectservice, thisWeekStart,thisWeekEnd}
     }
   }
   async findAll():Promise<ResponseType<any>> {
