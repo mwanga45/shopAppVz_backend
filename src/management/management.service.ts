@@ -67,13 +67,13 @@ export class ManagementService {
         {id:1}, {Total_Capital:dto.total_capital, BankCapital:dto.Bank_capital,OnhandCapital:dto.cash_capital}
       )
       const checklastRecord = await manager.findOne(CashFlow,{
-        order:{Withdraw:'DESC'}
+        order:{bankDebt:'DESC'}
       })
       const CreateCashflow = manager.create(CashFlow, {
         Total_Capital: dto.total_capital,
         OnHand_Capital: dto.Bank_capital,
         Bank_Capital: dto.Bank_capital,
-        Withdraw: dto.withdraw ? dto.withdraw : checklastRecord?.Withdraw ? checklastRecord.Withdraw :0 
+        Withdraw: dto.bankdebt ? dto.bankdebt : checklastRecord?.bankDebt ? checklastRecord.bankDebt :0 
       })
       await manager.save(CreateCashflow)
        return{
@@ -136,6 +136,18 @@ export class ManagementService {
     return 'This action adds a new management';
   }
 
+
+  async TransactionInfo():Promise<ResponseType<any>>{
+    const selectservice = await this.BUsinessServiceRepo.createQueryBuilder('s')
+    .select('s.service_name', 'service_name')
+    .addSelect('s.icon_name', 'icon_name')
+    .orderBy('s.CreatedAt')
+    .getRawMany()
+    return{
+      message:"successfuly ",
+      success:true
+    }
+  }
   async findAll():Promise<ResponseType<any>> {
     const find = await this.BUsinessServiceRepo.find()
     return {
@@ -144,6 +156,7 @@ export class ManagementService {
       data:find
     }
   }
+
 
   findOne(id: number) {
     return `This action returns a #${id} management`;

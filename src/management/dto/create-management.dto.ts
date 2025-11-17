@@ -19,13 +19,13 @@ export class CreateManagementDto {
 
     @IsNumber()
     @IsOptional()
-    withdraw:number
+    bankdebt:number
 
     
 }
 export class CreateServiceDto{
     @IsString()
-    @Length(5, 8)
+    @Length(5, 30)
     service_name:string
 
     @IsString()
