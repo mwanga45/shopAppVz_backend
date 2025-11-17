@@ -196,7 +196,7 @@ export class StockService {
         },
       );
       const QueryStockTrans = await this.recstockRepo
-        .createQueryBuilder('S')
+        .createQueryBuilder('S') 
         .select(['S.new_stock', 'S.prev_stock'])
         .where('S.product_id = :product_id', {
           product_id: updateStockDto.product_id,

@@ -1,5 +1,6 @@
 import { baseEntity } from "src/common/base.entity";
-import { Column, Entity } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { serviceRecord } from "./servicer_record.entity";
 
 @Entity()
 export class BusinessService extends baseEntity{
@@ -8,5 +9,8 @@ export class BusinessService extends baseEntity{
     
     @Column()
     icon_name:string
+
+    @OneToMany(()=> serviceRecord,sr => sr.sr)
+    sr:serviceRecord[]
     
 }

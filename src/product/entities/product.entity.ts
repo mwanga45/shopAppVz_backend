@@ -42,15 +42,15 @@ export class Product extends baseEntity{
      stock:Stock[]
      
      @OneToMany(()=> WholeSales, (wholesales)=> wholesales.product)
-     @JoinColumn({name:"product_id"})
+     // @JoinColumn({name:"product_id"})
      wholesales:WholeSales[]
 
      @OneToMany(()=> Product_discount, disc => disc.product)
-     @JoinColumn({name:'product_id'})
+     // @JoinColumn({name:'product_id'})
      disc:Product_discount[]
 
      @ManyToOne(()=> Debt, (debt)=> debt.product)
-     @JoinColumn({ name: 'product_id' })
+     // @JoinColumn({ name: 'product_id' })
      debt:Debt[]
      
 }

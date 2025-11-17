@@ -9,7 +9,9 @@ import { ResponseType } from 'src/type/type.interface';
 import { DataSource } from 'typeorm';
 import { capitalTimes } from 'src/type/type.interface';
 import { BusinessService } from 'src/entities/businessService.entity';
+import { serviceRecord } from 'src/entities/servicer_record.entity';
 import { Timeformat } from 'src/common/helper/timeformat.helper';
+
 import bcrypt from 'bcrypt';
 
 @Injectable()
@@ -21,6 +23,8 @@ export class ManagementService {
     private readonly CashflowRepo: Repository<CashFlow>,
     @InjectRepository(BusinessService)
     private readonly BusinessServiceRepo:Repository<BusinessService>,
+    @InjectRepository(serviceRecord)
+    private readonly serviceRecoRepo: Repository<serviceRecord>,
     private readonly Datasource:DataSource
   ) {}
   async CapitalRegistration (dto:CreateManagementDto):Promise<ResponseType<any>>{
@@ -162,14 +166,20 @@ thisweekend.setHours(23, 59, 59, 999);
     const count_service = selectservice.length
     const thisWeekStart =  Timeformat.formatLocal(thisweek)
     const  thisWeekEnd = Timeformat.formatLocal(thisweekend)
-    const serviceRecord = await this.CashflowRepo.createQueryBuilder('s')
-    .select('s.service_name', 'service_name')
+    const serviceRecord = await this.serviceRecoRepo.createQueryBuilder('s')
+    .leftJoin('s.sr', 'b')
+    .select('b.service_name', 'service_name')
+    .addSelect('b.icon_name', 'icon_name')
+    .addSelect('s.price', 'price')
     .addSelect('s.CreatedAt', 'createdAt')
-    
+    .where('s.CreatedAt BETWEEN :start AND :end', {start:thisWeekStart, end:thisWeekEnd})
+    .orderBy('s.CreatedAt', 'DESC')
+    .getRawMany()
+
     return{
       message:"successfuly ",
       success:true,
-      data:{count_service, selectservice, thisWeekStart,thisWeekEnd}
+      data:{count_service, selectservice, thisWeekStart,thisWeekEnd, serviceRecord}
     }
   }
   async findAll():Promise<ResponseType<any>> {
