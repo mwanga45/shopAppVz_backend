@@ -470,6 +470,9 @@ const onHandCash =
       DebtMoney.length > 0
         ? Number(DebtMoney[0].Revenue) - Number(DebtMoney[0].TotalPaid)
         : 0;
+    const capital_amount = Number(CapitalAmount?.Total_Capital ?? 0)
+    const bank_Capital = Number(CapitalAmount?.BankCapital ?? 0)
+    const cash_capital = Number(CapitalAmount?.Total_Capital ?? 0) - bank_Capital
     let networth = 0;
     networth = (StockWorth + Number(CapitalAmount?.Total_Capital ?? 0)) - CustomerDebt;
     const cashStored = { MoneyDistribution, onHandCash };
@@ -485,7 +488,9 @@ const onHandCash =
         DebtMoney,
         CustomerDebt,
         networth,
-        onHandCash
+        bank_Capital,
+        cash_capital,
+        capital_amount
       },
     };
   }
