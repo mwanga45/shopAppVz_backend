@@ -478,12 +478,17 @@ const onHandCash =
     let networth = 0;
     networth = (StockWorth + Number(CapitalAmount?.Total_Capital ?? 0)) - CustomerDebt;
     const cashStored = { MoneyDistribution, onHandCash };
+
     const Capital_Result = await  this.CashflowRespo.createQueryBuilder('c')
-    .select('SUM(c.total_revenue)', 'total_revenue')
+    .select('SUM(c.Total_Capital)', 'total_revenue')
     .orderBy('c.CreatedAt', 'DESC')
     .groupBy('c.CreatedAt')
     .limit(2)
     .getRawMany()
+    
+    let rate = 0
+     
+  
     return {
       message: 'successfuly',
       success: true,
@@ -497,7 +502,8 @@ const onHandCash =
         networth,
         bank_Capital,
         cash_capital,
-        capital_amount
+        capital_amount,
+        Capital_Result
       },
     };
   }
