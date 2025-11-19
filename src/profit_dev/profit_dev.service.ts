@@ -33,6 +33,8 @@ export class ProfitDevService {
     private readonly DebtRepo: Repository<Debt>,
     @InjectRepository(Stock)
     private readonly Stockrepo: Repository<Stock>,
+    @InjectRepository(CashFlow)
+    private readonly CashflowRespo:Repository<CashFlow>,
     @InjectRepository(Capital)
     private readonly CapitalRepo:Repository<Capital>,
     @InjectRepository(Stock_transaction)
@@ -476,7 +478,12 @@ const onHandCash =
     let networth = 0;
     networth = (StockWorth + Number(CapitalAmount?.Total_Capital ?? 0)) - CustomerDebt;
     const cashStored = { MoneyDistribution, onHandCash };
-
+    const Capital_Result = await  this.CashflowRespo.createQueryBuilder('c')
+    .select('SUM(c.total_revenue)', 'total_revenue')
+    .orderBy('c.CreatedAt', 'DESC')
+    .groupBy('c.CreatedAt')
+    .limit(2)
+    .getRawMany()
     return {
       message: 'successfuly',
       success: true,
