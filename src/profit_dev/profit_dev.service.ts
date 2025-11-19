@@ -18,6 +18,7 @@ import { Stock } from 'src/stock/entities/stock.entity';
 import { Stock_transaction } from 'src/stock/entities/stock.entity';
 import { CashFlow } from 'src/entities/cashFlow.entity';
 import { Capital } from 'src/entities/capital.entity';
+import { BusinessGrowthLogic } from 'src/common/helper/rate.helper';
 @Injectable()
 export class ProfitDevService {
   constructor(
@@ -39,7 +40,9 @@ export class ProfitDevService {
     private readonly CapitalRepo:Repository<Capital>,
     @InjectRepository(Stock_transaction)
     private readonly StockTrnasrepo: Repository<Stock_transaction>,
-    private readonly Datasource:DataSource
+    private readonly Datasource:DataSource,
+    private readonly businesslogic:BusinessGrowthLogic
+
   ) {}
 
   async AdminAnalysis(): Promise<ResponseType<any>> {
@@ -485,8 +488,23 @@ const onHandCash =
     .groupBy('c.CreatedAt')
     .limit(2)
     .getRawMany()
-    
-    let rate = 0
+
+    let firstData = 0;
+let secondData = 0;
+let Revenue_Rate: any;
+
+if (Capital_Result.length === 0) {
+    Revenue_Rate = this.businesslogic.RateCalculation(firstData, secondData);
+} else if (Capital_Result.length === 1) {
+    firstData = Number(Capital_Result[0].total_revenue);
+    secondData = Number(Capital_Result[0].total_revenue);
+    Revenue_Rate = this.businesslogic.RateCalculation(firstData, secondData);
+} else {
+    firstData = Number(Capital_Result[0].total_revenue);
+    secondData = Number(Capital_Result[1].total_revenue);
+    Revenue_Rate = this.businesslogic.RateCalculation(firstData, secondData);
+}
+
      
   
     return {
@@ -503,7 +521,8 @@ const onHandCash =
         bank_Capital,
         cash_capital,
         capital_amount,
-        Capital_Result
+        Capital_Result,
+        Revenue_Rate,
       },
     };
   }

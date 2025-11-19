@@ -1,34 +1,27 @@
-import { Injectable, Res } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ResponseType } from 'src/type/type.interface';
 
 @Injectable()
 export class BusinessGrowthLogic {
-  RateCalculation(firstdata: number, secondData: number): ResponseType<any> {
+  RateCalculation(firstData: number, secondData: number): ResponseType<any> {
     let rate_status: string;
     let rate: number;
-    let Result: any;
 
-    if (firstdata > secondData) {
+    if (firstData > secondData) {
       rate_status = 'up';
-      rate = ((firstdata - secondData) / (firstdata + secondData)) * 100;
-      Result = { rate, rate_status };
-      
-    } else if (secondData - firstdata) {
+      rate = ((firstData - secondData) / (secondData || 1)) * 100; // avoid divide by zero
+    } else if (firstData < secondData) {  // <-- FIXED CONDITION
       rate_status = 'down';
-      rate = ((secondData - firstdata) / (secondData + firstdata)) * 100;
-      Result;
-    
+      rate = ((secondData - firstData) / (firstData || 1)) * 100;
     } else {
-      rate = 0;
       rate_status = 'equal';
-      Result = { rate, rate_status };
-    }
-    Result = { rate , rate_status}
-    return{
-        message:"successfuly returned",
-        success:true, 
-        data:Result
+      rate = 0;
     }
 
+    return {
+      message: "successfully returned",
+      success: true,
+      data: { rate, rate_status }
+    };
   }
 }
