@@ -17,7 +17,7 @@ import { Debt } from 'src/debt/entities/debt.entity';
 import { Stock } from 'src/stock/entities/stock.entity';
 import { Stock_transaction } from 'src/stock/entities/stock.entity';
 import { CashFlow } from 'src/entities/cashFlow.entity';
-
+import { Capital } from 'src/entities/capital.entity';
 @Injectable()
 export class ProfitDevService {
   constructor(
@@ -33,6 +33,8 @@ export class ProfitDevService {
     private readonly DebtRepo: Repository<Debt>,
     @InjectRepository(Stock)
     private readonly Stockrepo: Repository<Stock>,
+    @InjectRepository(Capital)
+    private readonly CapitalRepo:Repository<Capital>,
     @InjectRepository(Stock_transaction)
     private readonly StockTrnasrepo: Repository<Stock_transaction>,
     private readonly Datasource:DataSource
@@ -447,9 +449,18 @@ export class ProfitDevService {
       .orderBy('c.id', 'DESC')
       .limit(1)
       .getRawOne();
-    const onHandCash =
-      Number(MoneyDistribution.total_revenue) -
-      Number(MoneyDistribution.bank_revenue);
+const safeMoney = MoneyDistribution ?? {
+  total_revenue: 0,
+  bank_revenue: 0,
+};
+
+const onHandCash =
+  Number(safeMoney.total_revenue) - Number(safeMoney.bank_revenue);
+  const CapitalAmount = await this.CapitalRepo.findOne({
+  where:{},
+  order: { id: 'DESC' },
+});
+  
     const DebtMoney = await this.DebtRepo.createQueryBuilder('d')
       .select('SUM(d.Revenue)', 'Revenue')
       .addSelect('SUM(d. paidmoney)', 'TotalPaid')
@@ -460,7 +471,7 @@ export class ProfitDevService {
         ? Number(DebtMoney[0].Revenue) - Number(DebtMoney[0].TotalPaid)
         : 0;
     let networth = 0;
-    networth = StockWorth - CustomerDebt;
+    networth = (StockWorth + Number(CapitalAmount?.Total_Capital ?? 0)) - CustomerDebt;
     const cashStored = { MoneyDistribution, onHandCash };
 
     return {
@@ -474,6 +485,7 @@ export class ProfitDevService {
         DebtMoney,
         CustomerDebt,
         networth,
+        onHandCash
       },
     };
   }
