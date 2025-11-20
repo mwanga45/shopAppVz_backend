@@ -1,8 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { ResponseType } from 'src/type/type.interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { paymentvia, ResponseType } from 'src/type/type.interface';
+import { DataSource, EntityManager, Repository } from 'typeorm';
+import { Capital } from 'src/entities/capital.entity';
+import { CashFlow } from 'src/entities/cashFlow.entity';
+
 
 @Injectable()
 export class BusinessGrowthLogic {
+  constructor(
+    @InjectRepository(Capital)
+    private readonly CapitalRepo:Repository<CashFlow>,
+    @InjectRepository(CashFlow)
+    private readonly Cashflow:Repository<Capital>,
+    private readonly Datasource:DataSource,
+
+  ){}
   RateCalculation(firstData: number, secondData: number): ResponseType<any> {
     let rate_status: string;
     let rate: number;
@@ -23,5 +36,26 @@ export class BusinessGrowthLogic {
       success: true,
       data: { rate, rate_status }
     };
+  }
+   async UpdateCapital(manager:EntityManager,paymentVia:paymentvia, Revenue:number ):Promise<ResponseType<any>>{
+
+    const CashFlow = manager.getRepository(
+      this.CapitalRepo.target
+    )
+    try{
+      return{
+        message:"successfuly",
+        success:true
+      }
+    }catch(err){
+      return{
+        message:`failed to update capital ${err}`,
+        success:false
+
+
+      }
+    }
+   
+
   }
 }

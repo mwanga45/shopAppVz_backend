@@ -311,7 +311,7 @@ export class SalesService {
     const Revenue = String(total_revenue);
 
     const DailyProfitsummaryRepo = manager.getRepository(
-      this.ProfitsummaryRepo.target,
+      this.ProfitsummaryRepo.target
     );
     try {
       const checkdate = await DailyProfitsummaryRepo.findOne({
