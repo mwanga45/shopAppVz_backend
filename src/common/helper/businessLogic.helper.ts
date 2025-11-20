@@ -42,7 +42,21 @@ export class BusinessGrowthLogic {
     const CashFlow = manager.getRepository(
       this.CapitalRepo.target
     )
+  const Capital = manager.getRepository(
+    this.CapitalRepo.target
+  )
     try{
+      const Capital_Result = await Capital.findOne({
+        where:{},
+        order:{id:'DESC'}
+      })
+      const UpdateCapital = await Capital.update({id:1}, {
+        
+      })
+      const Cashflow_Result = await CashFlow.findOne({
+        where:{},
+        order:{id:'DESC'}
+      })
       return{
         message:"successfuly",
         success:true
