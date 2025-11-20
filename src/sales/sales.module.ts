@@ -9,15 +9,17 @@ import { StockModule } from 'src/stock/stock.module';
 import { Stock,Stock_transaction } from 'src/stock/entities/stock.entity';
 import { DailyProfitsummary } from './entities/profitsummary.entity';
 import { Capital } from 'src/entities/capital.entity';
+import { BusinessGrowthLogic } from 'src/common/helper/businessLogic.helper';
+import { CashFlow } from 'src/entities/cashFlow.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([WholeSales, RetailSales,Stock,Stock_transaction, DailyProfitsummary, Capital]),
+    TypeOrmModule.forFeature([WholeSales, RetailSales,Stock,Stock_transaction, DailyProfitsummary, Capital, CashFlow]),
     ProductModule,
     StockModule,
   ],
   controllers: [SalesController],
-  providers: [SalesService],
-  exports:[SalesService]
+  providers: [SalesService,BusinessGrowthLogic],
+  exports:[SalesService, BusinessGrowthLogic]
 })
 export class SalesModule {}

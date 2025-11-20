@@ -23,6 +23,7 @@ import { DataSource } from 'typeorm';
 import { SaleSummary, MostProfit } from 'src/type/type.interface';
 import { DailyProfitsummary } from './entities/profitsummary.entity';
 import { Capital } from 'src/entities/capital.entity';
+import { BusinessGrowthLogic } from 'src/common/helper/businessLogic.helper';
 
 @Injectable()
 export class SalesService {
@@ -41,6 +42,7 @@ export class SalesService {
     @InjectRepository(Capital)
     private readonly CapitalRepo: Repository<Capital>,
     private readonly Stockserv: StockService,
+    private readonly BusinessGrowthLogic:BusinessGrowthLogic,
     private readonly Datasource: DataSource,
   ) {}
 
@@ -451,6 +453,8 @@ export class SalesService {
             dto.Revenue,
             dto.payment_via,
           );
+                    const Revunue = Number(dto.Revenue)
+          const CapitalRec = await this.BusinessGrowthLogic.UpdateCapital(manager,dto.payment_via, Revunue ) 
 
           if (!Profitrecord.success) {
             throw new Error(String(Profitrecord.message));
@@ -514,7 +518,6 @@ export class SalesService {
             UpdateStockDto,
             userId,
           );
-
           if (!stockupdate.success)
             throw new Error(String(stockupdate.message));
           const Profitrecord = await this.Profitupdatesummary(
@@ -526,6 +529,8 @@ export class SalesService {
           if (!Profitrecord.success) {
             throw new Error(String(Profitrecord.message));
           }
+                    const Revunue = Number(dto.Revenue)
+          const CapitalRec = await this.BusinessGrowthLogic.UpdateCapital(manager,dto.payment_via, Revunue ) 
           return {
             message: 'Successfuly  return data',
             success: true,
