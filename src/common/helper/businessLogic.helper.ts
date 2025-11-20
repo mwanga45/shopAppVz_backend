@@ -44,6 +44,7 @@ export class BusinessGrowthLogic {
     let Total_Capital: number;
     let BankCapital: number;
     let OnhandCapital: number;
+    let Withdraw:number
     const CashFlow = manager.getRepository(this.CapitalRepo.target);
     const Capital = manager.getRepository(this.CapitalRepo.target);
     try {
@@ -60,6 +61,7 @@ export class BusinessGrowthLogic {
       let pre_OnhandCapital = Capital_Result?.OnHand_Capital
         ? Number(Capital_Result.OnHand_Capital)
         : 0;
+      
       Total_Capital = pre_TotalCapital + Revenue;
       BankCapital =
         paymentVia === paymentvia.Bank
@@ -76,10 +78,20 @@ export class BusinessGrowthLogic {
         Bank_Capital: BankCapital,
         OnHand_Capital: OnhandCapital,
       });
+
       const Cashflow_Result = await CashFlow.findOne({
         where: {},
         order: { id: 'DESC' },
       });
+        Withdraw = Cashflow_Result?.Withdraw ? Cashflow_Result.Withdraw : 0
+        const InsertCashflow =  CashFlow.create({
+        Total_Capital:Total_Capital,
+        Bank_Capital:BankCapital,
+        OnHand_Capital:OnhandCapital,
+        servicename:'none',
+        Withdraw:Withdraw
+
+      })
       return {
         message: 'successfuly',
         success: true,
