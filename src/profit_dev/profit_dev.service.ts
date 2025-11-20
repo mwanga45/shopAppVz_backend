@@ -18,7 +18,7 @@ import { Stock } from 'src/stock/entities/stock.entity';
 import { Stock_transaction } from 'src/stock/entities/stock.entity';
 import { CashFlow } from 'src/entities/cashFlow.entity';
 import { Capital } from 'src/entities/capital.entity';
-import { BusinessGrowthLogic } from 'src/common/helper/rate.helper';
+import { BusinessGrowthLogic } from 'src/common/helper/businessLogic.helper';
 @Injectable()
 export class ProfitDevService {
   constructor(
