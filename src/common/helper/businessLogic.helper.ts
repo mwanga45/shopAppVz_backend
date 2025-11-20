@@ -9,9 +9,9 @@ import { CashFlow } from 'src/entities/cashFlow.entity';
 export class BusinessGrowthLogic {
   constructor(
     @InjectRepository(Capital)
-    private readonly CapitalRepo: Repository<CashFlow>,
+    private readonly CapitalRepo: Repository<Capital>,
     @InjectRepository(CashFlow)
-    private readonly Cashflow: Repository<Capital>,
+    private readonly CashflowRepo: Repository<CashFlow>,
     private readonly Datasource: DataSource,
   ) {}
   RateCalculation(firstData: number, secondData: number): ResponseType<any> {
@@ -45,22 +45,18 @@ export class BusinessGrowthLogic {
     let BankCapital: number;
     let OnhandCapital: number;
     let Withdraw:number
-    const CashFlow = manager.getRepository(this.CapitalRepo.target);
+    const CashFlow = manager.getRepository(this.CashflowRepo.target);
     const Capital = manager.getRepository(this.CapitalRepo.target);
     try {
       const Capital_Result = await Capital.findOne({
-        where: {},
+        where:{},
         order: { id: 'DESC' },
+        
       });
-      let pre_TotalCapital = Capital_Result?.Total_Capital
-        ? Number(Capital_Result.Total_Capital)
-        : 0;
-      let pre_BankCapital = Capital_Result?.Bank_Capital
-        ? Number(Capital_Result.Bank_Capital)
-        : 0;
-      let pre_OnhandCapital = Capital_Result?.OnHand_Capital
-        ? Number(Capital_Result.OnHand_Capital)
-        : 0;
+const pre_TotalCapital = Number(Capital_Result?.Total_Capital ?? 0);
+const pre_BankCapital = Number(Capital_Result?.BankCapital ?? 0);
+const pre_OnhandCapital = Number(Capital_Result?.OnhandCapital ?? 0);
+
       
       Total_Capital = pre_TotalCapital + Revenue;
       BankCapital =
@@ -90,8 +86,8 @@ export class BusinessGrowthLogic {
         OnHand_Capital:OnhandCapital,
         servicename:'none',
         Withdraw:Withdraw
-
       })
+      await manager.save(InsertCashflow)
       return {
         message: 'successfuly',
         success: true,
