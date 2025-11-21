@@ -82,13 +82,13 @@ export class ProfitDevService {
   async GraphDataAndPeformanceRate(): Promise<ResponseType<any>> {
     const now = new Date();
 
-    // Calculate THIS WEEK (Sunday to Saturday)
+    
     const thisWeekStart = new Date(now);
-    thisWeekStart.setDate(now.getDate() - now.getDay()); // Sunday
+    thisWeekStart.setDate(now.getDate() - now.getDay());
     thisWeekStart.setHours(0, 0, 0, 0);
 
     const thisWeekEnd = new Date(thisWeekStart);
-    thisWeekEnd.setDate(thisWeekStart.getDate() + 6); // Saturday
+    thisWeekEnd.setDate(thisWeekStart.getDate() + 6); 
     thisWeekEnd.setHours(23, 59, 59, 999);
 
     const toLocalDateKey = (input: Date | string): string => {
@@ -110,9 +110,9 @@ export class ProfitDevService {
       return formatter.format(new Date(`${dateKey}T00:00:00Z`));
     };
 
-    // Calculate LAST WEEK (previous Sunday to Saturday)
+    
     const lastWeekStart = new Date(thisWeekStart);
-    lastWeekStart.setDate(thisWeekStart.getDate() - 7); // Previous Sunday
+    lastWeekStart.setDate(thisWeekStart.getDate() - 7); 
     lastWeekStart.setHours(0, 0, 0, 0);
 
     const lastWeekEnd = new Date(lastWeekStart);
