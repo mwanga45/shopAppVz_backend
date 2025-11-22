@@ -11,13 +11,13 @@ export class WholeSales extends baseEntity {
   @Column('decimal', { precision: 10, scale: 4, nullable: true })
   Total_pc_pkg_litre: number | null;
 
-  @Column('decimal', { precision: 12, scale: 2, default: 0 })
+  @Column('decimal', { precision: 15, scale: 2, default: 0 })
   Revenue: number;
 
-  @Column('decimal', { precision: 12, scale: 2, default: 0 })
+  @Column('decimal', { precision: 15, scale: 2, default: 0 })
   Net_profit: number;
 
-  @Column('decimal', { precision: 12, scale: 2, default: 0 })
+  @Column('decimal', { precision: 15, scale: 2, default: 0 })
   Expected_Profit: number;
 
   @Column('decimal', { precision: 12, scale: 2, default: 0 })

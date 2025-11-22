@@ -12,6 +12,7 @@ import {
   override,
   paymentstatus,
   paymentvia,
+  PendingReturnResult,
   ResponseType,
 } from 'src/type/type.interface';
 import { StockStatus } from 'src/type/type.interface';
@@ -710,17 +711,17 @@ export class SalesService {
         .leftJoin('r.product', 'p')
         .leftJoin('r.user', 'u')
         .select([
+           'r.id AS id',
           'p.id AS product_id',
           'p.product_name AS product_name',
           'u.fullname AS seller',
           'r.Revenue AS Revenue',
           'r.Total_pc_pkg_litre AS total_quantity',
-          'r.Net_profit AS total_profit',
-          'r.CreateAt AS CreatedAt',
+          'r.CreatedAt AS CreatedAt',
           'p. product_category AS Category',
         ])
-        .where('r.paymentstatus :paymentstatus', {
-          paymentstatus: paymentstatus.Pending,
+        .where('r.paymentstatus  = :status', {
+          status: paymentstatus.Pending,
         })
         .getRawMany();
 
@@ -729,20 +730,20 @@ export class SalesService {
         .leftJoin('w.product', 'p')
         .leftJoin('w.user', 'u')
         .select([
+          'w.id AS id',
           'p.id AS product_id',
           'p.product_name AS product_name',
           'u.fullname AS seller',
           'w.Revenue AS Revenue',
           'w.Total_pc_pkg_litre AS total_quantity',
-          'w.Net_profit AS total_profit',
-          'w.CreateAt AS CreatedAt',
+          'w.CreatedAt AS CreatedAt',
           'p. product_category AS Category',
         ])
-        .where('r.paymentstatus :paymentstatus', {
+        .where('w.paymentstatus =:paymentstatus', {
           paymentstatus: paymentstatus.Pending,
         })
         .getRawMany();
-
+const PendingcombineResult :PendingReturnResult[] = [...WholesalependingResult, ...RetailpendingResult]
     const Retailpending = await this.RetailsalesRepository.createQueryBuilder(
       'r',
     )
@@ -810,6 +811,7 @@ export class SalesService {
         totolRetailRevenue,
         AllcombinedPending,
         Retailpending,
+        PendingcombineResult
         
       },
     };
