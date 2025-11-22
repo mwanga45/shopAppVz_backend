@@ -35,14 +35,13 @@ export class ProfitDevService {
     @InjectRepository(Stock)
     private readonly Stockrepo: Repository<Stock>,
     @InjectRepository(CashFlow)
-    private readonly CashflowRespo:Repository<CashFlow>,
+    private readonly CashflowRespo: Repository<CashFlow>,
     @InjectRepository(Capital)
-    private readonly CapitalRepo:Repository<Capital>,
+    private readonly CapitalRepo: Repository<Capital>,
     @InjectRepository(Stock_transaction)
     private readonly StockTrnasrepo: Repository<Stock_transaction>,
-    private readonly Datasource:DataSource,
-    private readonly businesslogic:BusinessGrowthLogic
-
+    private readonly Datasource: DataSource,
+    private readonly businesslogic: BusinessGrowthLogic,
   ) {}
 
   async AdminAnalysis(): Promise<ResponseType<any>> {
@@ -82,13 +81,12 @@ export class ProfitDevService {
   async GraphDataAndPeformanceRate(): Promise<ResponseType<any>> {
     const now = new Date();
 
-    
     const thisWeekStart = new Date(now);
     thisWeekStart.setDate(now.getDate() - now.getDay());
     thisWeekStart.setHours(0, 0, 0, 0);
 
     const thisWeekEnd = new Date(thisWeekStart);
-    thisWeekEnd.setDate(thisWeekStart.getDate() + 6); 
+    thisWeekEnd.setDate(thisWeekStart.getDate() + 6);
     thisWeekEnd.setHours(23, 59, 59, 999);
 
     const toLocalDateKey = (input: Date | string): string => {
@@ -110,9 +108,8 @@ export class ProfitDevService {
       return formatter.format(new Date(`${dateKey}T00:00:00Z`));
     };
 
-    
     const lastWeekStart = new Date(thisWeekStart);
-    lastWeekStart.setDate(thisWeekStart.getDate() - 7); 
+    lastWeekStart.setDate(thisWeekStart.getDate() - 7);
     lastWeekStart.setHours(0, 0, 0, 0);
 
     const lastWeekEnd = new Date(lastWeekStart);
@@ -138,21 +135,24 @@ export class ProfitDevService {
     const mergeDailySales = (
       sources: Array<{ date: string; revenue: string; quantity: string }>,
     ): Record<string, LastweeksellInterface> => {
-      return sources.reduce((acc, curr) => {
-        const datekey = toLocalDateKey(curr.date);
-        if (!datekey) return acc;
-        if (!acc[datekey]) {
-          acc[datekey] = {
-            Revenue: 0,
-            Quantity: 0,
-            Date: datekey,
-            day: toWeekday(datekey),
-          };
-        }
-        acc[datekey].Revenue += Number(curr.revenue ?? 0);
-        acc[datekey].Quantity += Number(curr.quantity ?? 0);
-        return acc;
-      }, {} as Record<string, LastweeksellInterface>);
+      return sources.reduce(
+        (acc, curr) => {
+          const datekey = toLocalDateKey(curr.date);
+          if (!datekey) return acc;
+          if (!acc[datekey]) {
+            acc[datekey] = {
+              Revenue: 0,
+              Quantity: 0,
+              Date: datekey,
+              day: toWeekday(datekey),
+            };
+          }
+          acc[datekey].Revenue += Number(curr.revenue ?? 0);
+          acc[datekey].Quantity += Number(curr.quantity ?? 0);
+          return acc;
+        },
+        {} as Record<string, LastweeksellInterface>,
+      );
     };
 
     const fetchProductSales = async (
@@ -185,20 +185,23 @@ export class ProfitDevService {
     ) => {
       const map = new Map<
         number,
-        { product_id: number; product_name: string; Quantity: number; Revenue: number }
+        {
+          product_id: number;
+          product_name: string;
+          Quantity: number;
+          Revenue: number;
+        }
       >();
       for (const item of sources) {
         const product_id = Number(item.product_id);
         if (Number.isNaN(product_id)) continue;
         const product_name = item.product_name;
-        const existing =
-          map.get(product_id) ??
-          {
-            product_id,
-            product_name,
-            Quantity: 0,
-            Revenue: 0,
-          };
+        const existing = map.get(product_id) ?? {
+          product_id,
+          product_name,
+          Quantity: 0,
+          Revenue: 0,
+        };
         existing.Quantity += Number(item.quantity ?? 0);
         existing.Revenue += Number(item.revenue ?? 0);
         map.set(product_id, existing);
@@ -454,18 +457,18 @@ export class ProfitDevService {
       .orderBy('c.id', 'DESC')
       .limit(1)
       .getRawOne();
-const safeMoney = MoneyDistribution ?? {
-  total_revenue: 0,
-  bank_revenue: 0,
-};
+    const safeMoney = MoneyDistribution ?? {
+      total_revenue: 0,
+      bank_revenue: 0,
+    };
 
-const onHandCash =
-  Number(safeMoney.total_revenue) - Number(safeMoney.bank_revenue);
-  const CapitalAmount = await this.CapitalRepo.findOne({
-  where:{},
-  order: { id: 'DESC' },
-});
-  
+    const onHandCash =
+      Number(safeMoney.total_revenue) - Number(safeMoney.bank_revenue);
+    const CapitalAmount = await this.CapitalRepo.findOne({
+      where: {},
+      order: { id: 'DESC' },
+    });
+
     const DebtMoney = await this.DebtRepo.createQueryBuilder('d')
       .select('SUM(d.Revenue)', 'Revenue')
       .addSelect('SUM(d. paidmoney)', 'TotalPaid')
@@ -475,38 +478,38 @@ const onHandCash =
       DebtMoney.length > 0
         ? Number(DebtMoney[0].Revenue) - Number(DebtMoney[0].TotalPaid)
         : 0;
-    const capital_amount = Number(CapitalAmount?.Total_Capital ?? 0)
-    const bank_Capital = Number(CapitalAmount?.BankCapital ?? 0)
-    const cash_capital = Number(CapitalAmount?.Total_Capital ?? 0) - bank_Capital
+    const capital_amount = Number(CapitalAmount?.Total_Capital ?? 0);
+    const bank_Capital = Number(CapitalAmount?.BankCapital ?? 0);
+    const cash_capital =
+      Number(CapitalAmount?.Total_Capital ?? 0) - bank_Capital;
     let networth = 0;
-    networth = (StockWorth + Number(CapitalAmount?.Total_Capital ?? 0)) - CustomerDebt;
+    networth =
+      StockWorth + Number(CapitalAmount?.Total_Capital ?? 0) - CustomerDebt;
     const cashStored = { MoneyDistribution, onHandCash };
 
-    const Capital_Result = await  this.CashflowRespo.createQueryBuilder('c')
-    .select('SUM(c.Total_Capital)', 'total_revenue')
-    .orderBy('c.CreatedAt', 'DESC')
-    .groupBy('c.CreatedAt')
-    .limit(2)
-    .getRawMany()
+    const Capital_Result = await this.CashflowRespo.createQueryBuilder('c')
+      .select('SUM(c.Total_Capital)', 'total_revenue')
+      .orderBy('c.CreatedAt', 'DESC')
+      .groupBy('c.CreatedAt')
+      .limit(2)
+      .getRawMany();
 
     let firstData = 0;
-let secondData = 0;
-let Revenue_Rate: any;
+    let secondData = 0;
+    let Revenue_Rate: any;
 
-if (Capital_Result.length === 0) {
-    Revenue_Rate = this.businesslogic.RateCalculation(firstData, secondData);
-} else if (Capital_Result.length === 1) {
-    firstData = Number(Capital_Result[0].total_revenue);
-    secondData = Number(Capital_Result[0].total_revenue);
-    Revenue_Rate = this.businesslogic.RateCalculation(firstData, secondData);
-} else {
-    firstData = Number(Capital_Result[0].total_revenue);
-    secondData = Number(Capital_Result[1].total_revenue);
-    Revenue_Rate = this.businesslogic.RateCalculation(firstData, secondData);
-}
+    if (Capital_Result.length === 0) {
+      Revenue_Rate = this.businesslogic.RateCalculation(firstData, secondData);
+    } else if (Capital_Result.length === 1) {
+      firstData = Number(Capital_Result[0].total_revenue);
+      secondData = Number(Capital_Result[0].total_revenue);
+      Revenue_Rate = this.businesslogic.RateCalculation(firstData, secondData);
+    } else {
+      firstData = Number(Capital_Result[0].total_revenue);
+      secondData = Number(Capital_Result[1].total_revenue);
+      Revenue_Rate = this.businesslogic.RateCalculation(firstData, secondData);
+    }
 
-     
-  
     return {
       message: 'successfuly',
       success: true,
