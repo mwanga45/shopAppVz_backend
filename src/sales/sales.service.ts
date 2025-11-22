@@ -42,7 +42,7 @@ export class SalesService {
     @InjectRepository(Capital)
     private readonly CapitalRepo: Repository<Capital>,
     private readonly Stockserv: StockService,
-    private readonly BusinessGrowthLogic:BusinessGrowthLogic,
+    private readonly BusinessGrowthLogic: BusinessGrowthLogic,
     private readonly Datasource: DataSource,
   ) {}
 
@@ -274,22 +274,35 @@ export class SalesService {
 
   CapitalUpdate = async (
     manager: EntityManager,
-    total_revenue:number,
+    total_revenue: number,
     payVia?: paymentvia,
   ): Promise<ResponseType<any>> => {
     const CapitalRepository = manager.getRepository(this.CapitalRepo.target);
     try {
       const findrow = await CapitalRepository.findOne({
-        where:{id:1}
-      })
-      const finalRevenue = findrow?.Total_Capital ? Number(findrow.Total_Capital) + total_revenue: 0  + total_revenue
-      const finalBankRevenue = payVia === paymentvia.Bank ? (findrow?.BankCapital ? Number(findrow.BankCapital) : 0) + total_revenue: findrow?.BankCapital;
-      const finalOnhand = payVia !==paymentvia.Bank ? (findrow?.OnhandCapital ? Number(findrow.OnhandCapital) : 0 ) + total_revenue : findrow ?.OnhandCapital
-      const updateCapital = CapitalRepository.update({id:1}, {
-        Total_Capital:finalRevenue,
-        BankCapital:finalBankRevenue,
-        OnhandCapital:finalOnhand
-      })
+        where: { id: 1 },
+      });
+      const finalRevenue = findrow?.Total_Capital
+        ? Number(findrow.Total_Capital) + total_revenue
+        : 0 + total_revenue;
+      const finalBankRevenue =
+        payVia === paymentvia.Bank
+          ? (findrow?.BankCapital ? Number(findrow.BankCapital) : 0) +
+            total_revenue
+          : findrow?.BankCapital;
+      const finalOnhand =
+        payVia !== paymentvia.Bank
+          ? (findrow?.OnhandCapital ? Number(findrow.OnhandCapital) : 0) +
+            total_revenue
+          : findrow?.OnhandCapital;
+      const updateCapital = CapitalRepository.update(
+        { id: 1 },
+        {
+          Total_Capital: finalRevenue,
+          BankCapital: finalBankRevenue,
+          OnhandCapital: finalOnhand,
+        },
+      );
       return {
         message: 'successfuly update ',
         success: true,
@@ -313,7 +326,7 @@ export class SalesService {
     const Revenue = String(total_revenue);
 
     const DailyProfitsummaryRepo = manager.getRepository(
-      this.ProfitsummaryRepo.target
+      this.ProfitsummaryRepo.target,
     );
     try {
       const checkdate = await DailyProfitsummaryRepo.findOne({
@@ -453,8 +466,12 @@ export class SalesService {
             dto.Revenue,
             dto.payment_via,
           );
-                    const Revunue = Number(dto.Revenue)
-          const CapitalRec = await this.BusinessGrowthLogic.UpdateCapital(manager,dto.payment_via, Revunue ) 
+          const Revunue = Number(dto.Revenue);
+          const CapitalRec = await this.BusinessGrowthLogic.UpdateCapital(
+            manager,
+            dto.payment_via,
+            Revunue,
+          );
 
           if (!Profitrecord.success) {
             throw new Error(String(Profitrecord.message));
@@ -529,8 +546,12 @@ export class SalesService {
           if (!Profitrecord.success) {
             throw new Error(String(Profitrecord.message));
           }
-                    const Revunue = Number(dto.Revenue)
-          const CapitalRec = await this.BusinessGrowthLogic.UpdateCapital(manager,dto.payment_via, Revunue ) 
+          const Revunue = Number(dto.Revenue);
+          const CapitalRec = await this.BusinessGrowthLogic.UpdateCapital(
+            manager,
+            dto.payment_via,
+            Revunue,
+          );
           return {
             message: 'Successfuly  return data',
             success: true,
@@ -684,6 +705,44 @@ export class SalesService {
 
         .groupBy('p.id, p.product_name, p.product_category, u.fullname')
         .getRawMany();
+    const RetailpendingResult =
+      await this.RetailsalesRepository.createQueryBuilder('r')
+        .leftJoin('r.product', 'p')
+        .leftJoin('r.user', 'u')
+        .select([
+          'p.id AS product_id',
+          'p.product_name AS product_name',
+          'u.fullname AS seller',
+          'r.Revenue AS Revenue',
+          'r.Total_pc_pkg_litre AS total_quantity',
+          'r.Net_profit AS total_profit',
+          'r.CreateAt AS CreatedAt',
+          'p. product_category AS Category',
+        ])
+        .where('r.paymentstatus :paymentstatus', {
+          paymentstatus: paymentstatus.Pending,
+        })
+        .getRawMany();
+
+    const WholesalependingResult =
+      await this.WholesalesRepository.createQueryBuilder('w')
+        .leftJoin('w.product', 'p')
+        .leftJoin('w.user', 'u')
+        .select([
+          'p.id AS product_id',
+          'p.product_name AS product_name',
+          'u.fullname AS seller',
+          'w.Revenue AS Revenue',
+          'w.Total_pc_pkg_litre AS total_quantity',
+          'w.Net_profit AS total_profit',
+          'w.CreateAt AS CreatedAt',
+          'p. product_category AS Category',
+        ])
+        .where('r.paymentstatus :paymentstatus', {
+          paymentstatus: paymentstatus.Pending,
+        })
+        .getRawMany();
+
     const Retailpending = await this.RetailsalesRepository.createQueryBuilder(
       'r',
     )
@@ -751,6 +810,7 @@ export class SalesService {
         totolRetailRevenue,
         AllcombinedPending,
         Retailpending,
+        
       },
     };
   }

@@ -104,3 +104,13 @@ export interface LastweeksellInterface{
         Revenue: number,
         day:string
 }
+export interface WholesalePendingItem {
+  product_id: number;
+  product_name: string;
+  seller: string;
+  Revenue: string; 
+  total_quantity: string; 
+  total_profit: string; 
+  CreatedAt: Date;
+  Category: string;
+}
