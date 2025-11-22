@@ -572,6 +572,21 @@ export class SalesService {
       }
     });
   }
+  async UpdateSales():Promise<ResponseType<any>> {
+    return await this.Datasource.transaction(async(manager) =>{
+      try{
+        return{
+          message:"successfuly update sales",
+          success:true
+        }
+      }catch(err){
+        return{
+          message:`failed to update the sales`,
+          success:false
+        }
+      }
+    })
+  } 
   async TodaySaleAnalysis(): Promise<ResponseType<any>> {
     return await this.Datasource.transaction(async (manager) => {
       try {
