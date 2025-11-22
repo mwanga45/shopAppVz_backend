@@ -575,6 +575,7 @@ export class SalesService {
   async UpdateSales():Promise<ResponseType<any>> {
     return await this.Datasource.transaction(async(manager) =>{
       try{
+        
         return{
           message:"successfuly update sales",
           success:true

@@ -7,7 +7,7 @@ import {
   Min,
   IsEnum,
 } from 'class-validator';
-import { paymentstatus, StockStatus, override, paymentvia } from 'src/type/type.interface';
+import { paymentstatus, StockStatus, override, paymentvia, updatetype } from 'src/type/type.interface';
 
 export class CreateSaleDto {
   @IsNumber()
@@ -74,4 +74,12 @@ export class SalesResponseDto {
   @IsNumber()
   Total_product: number;
 
+}
+
+export class UpdatesalesDto {
+  @IsNumber()
+  sales_id:number
+
+  @IsString()
+  updatetype:updatetype
 }

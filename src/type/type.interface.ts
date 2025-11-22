@@ -114,3 +114,8 @@ export interface PendingReturnResult {
   CreatedAt: string;
   Category: string;
 }
+
+export enum  updatetype {
+  Updatesales = 'updatesales',
+  addTodebt = 'addTodebt' 
+} 
