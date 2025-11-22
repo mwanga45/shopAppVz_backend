@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { CreateSaleDto, SalesResponseDto } from './dto/create-sale.dto';
+import { CreateSaleDto, SalesResponseDto, Updatesales_Dto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
 import { WholeSales } from './entities/wholesale.entity';
 import { EntityManager, Raw, Repository } from 'typeorm';
@@ -14,6 +14,7 @@ import {
   paymentvia,
   PendingReturnResult,
   ResponseType,
+  updatetype,
 } from 'src/type/type.interface';
 import { StockStatus } from 'src/type/type.interface';
 import { DeviationInput } from 'src/type/type.interface';
@@ -572,10 +573,18 @@ export class SalesService {
       }
     });
   }
-  async UpdateSales():Promise<ResponseType<any>> {
+  async UpdateSales(dto:Updatesales_Dto):Promise<ResponseType<any>> {
     return await this.Datasource.transaction(async(manager) =>{
+      const findCategory = await manager.findOne(Product, {where:{id:dto.product_id}})
       try{
-        
+        if(dto.updatetype === updatetype.Updatesales){
+          if(findCategory?.product_category === 'wholesales'){
+            const updatesales = await manager.update()
+          }else{
+            const updatesales   = await manager.update(RetailSales,{})
+          }
+        }
+
         return{
           message:"successfuly update sales",
           success:true

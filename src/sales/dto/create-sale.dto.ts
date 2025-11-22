@@ -76,9 +76,12 @@ export class SalesResponseDto {
 
 }
 
-export class UpdatesalesDto {
+export class Updatesales_Dto {
   @IsNumber()
   sales_id:number
+
+  @IsNumber()
+  product_id:number
 
   @IsString()
   updatetype:updatetype
