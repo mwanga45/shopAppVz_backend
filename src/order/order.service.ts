@@ -92,7 +92,7 @@ export class OrderService {
       }
     });
   }
-  // create an  function  that  will Automatic make sure is cancelled after ten days
+  
   // after status stays pending for that time and then send are message  as record of
   // automatic  cancellation of order(Automatic invoke functuion)
 
