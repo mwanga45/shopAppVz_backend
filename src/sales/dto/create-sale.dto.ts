@@ -85,4 +85,8 @@ export class Updatesales_Dto {
 
   @IsString()
   updatetype:updatetype
+  
+  
+  @IsString()
+  PaymentVia:paymentvia
 }

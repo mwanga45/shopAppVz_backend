@@ -579,9 +579,13 @@ export class SalesService {
       try{
         if(dto.updatetype === updatetype.Updatesales){
           if(findCategory?.product_category === 'wholesales'){
-            const updatesales = await manager.update()
+            const updatesales = await manager.update(WholeSales,{id:dto.sales_id}, {paymentstatus:paymentstatus.Paid, payment_via:dto.PaymentVia})
           }else{
-            const updatesales   = await manager.update(RetailSales,{})
+            const updatesales   = await manager.update(RetailSales,{id:dto.sales_id}, {payment_via:dto.PaymentVia, paymentstatus:paymentstatus.Paid})
+          }
+          return{
+            message:"successfuky to update sales",
+            success:true
           }
         }
 
