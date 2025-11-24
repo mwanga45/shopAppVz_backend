@@ -119,3 +119,8 @@ export enum  updatetype {
   Updatesales = 'updatesales',
   addTodebt = 'addTodebt' 
 } 
+
+export enum Confirmatory{
+  REMOVE  = 'Removed',
+  ADD    = 'Added'
+}

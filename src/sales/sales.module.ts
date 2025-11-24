@@ -11,10 +11,12 @@ import { DailyProfitsummary } from './entities/profitsummary.entity';
 import { Capital } from 'src/entities/capital.entity';
 import { BusinessGrowthLogic } from 'src/common/helper/businessLogic.helper';
 import { CashFlow } from 'src/entities/cashFlow.entity';
+import { Debt } from 'src/debt/entities/debt.entity';
+import { Debt_track } from 'src/debt/entities/debt.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([WholeSales, RetailSales,Stock,Stock_transaction, DailyProfitsummary, Capital, CashFlow]),
+    TypeOrmModule.forFeature([WholeSales, RetailSales,Stock,Stock_transaction, DailyProfitsummary, Capital, CashFlow, Debt, Debt_track]),
     ProductModule,
     StockModule,
   ],

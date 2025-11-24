@@ -24,6 +24,8 @@ import { Stock } from 'src/stock/entities/stock.entity';
 import { DataSource } from 'typeorm';
 import { SaleSummary, MostProfit } from 'src/type/type.interface';
 import { DailyProfitsummary } from './entities/profitsummary.entity';
+import { Debt } from 'src/debt/entities/debt.entity';
+import { Debt_track } from 'src/debt/entities/debt.entity';
 import { Capital } from 'src/entities/capital.entity';
 import { BusinessGrowthLogic } from 'src/common/helper/businessLogic.helper';
 
@@ -588,6 +590,7 @@ export class SalesService {
             success:true
           }
         }
+        
         
         return{
           message:"successfuly update the sales to debt",

@@ -4,7 +4,7 @@ import { IsNumber, IsString } from 'class-validator';
 import { Product } from 'src/product/entities/product.entity';
 import { ManyToOne, JoinColumn } from 'typeorm';
 import { User } from 'src/entities/user.entity';
-import { paymentstatus, paymentvia } from 'src/type/type.interface';
+import { Confirmatory, paymentstatus, paymentvia } from 'src/type/type.interface';
 
 @Entity()
 export class WholeSales extends baseEntity {
@@ -38,6 +38,8 @@ export class WholeSales extends baseEntity {
   @Column({ default: 'direct' })
   sale_origin: 'direct' | 'debt_payment';
 
+  @Column({default:Confirmatory.ADD})
+    confimatory:Confirmatory
 
   @ManyToOne(() => User, (user) => user.wholesales)
   @JoinColumn({ name: 'userId' })
