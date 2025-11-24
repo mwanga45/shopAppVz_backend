@@ -29,6 +29,7 @@ import { Debt } from 'src/debt/entities/debt.entity';
 import { Debt_track } from 'src/debt/entities/debt.entity';
 import { Capital } from 'src/entities/capital.entity';
 import { BusinessGrowthLogic } from 'src/common/helper/businessLogic.helper';
+import { dialValidate } from 'src/common/helper/phone.helper';
 
 @Injectable()
 export class SalesService {
@@ -49,6 +50,7 @@ export class SalesService {
     private readonly Stockserv: StockService,
     private readonly BusinessGrowthLogic: BusinessGrowthLogic,
     private readonly Datasource: DataSource,
+    private readonly Dialvalidate:dialValidate
   ) {}
 
   private readonly logger = new Logger(SalesService.name);
@@ -576,7 +578,7 @@ export class SalesService {
       }
     });
   }
-  async UpdateSales(dto:Updatesales_Dto):Promise<ResponseType<any>> {
+  async UpdateSales(dto:Updatesales_Dto, userId:any):Promise<ResponseType<any>> {
     return await this.Datasource.transaction(async(manager) =>{
       const findCategory = await manager.findOne(Product, {where:{id:dto.product_id}})
       try{
@@ -592,20 +594,22 @@ export class SalesService {
           }
         }
         if(findCategory?.product_category === 'wholesales'){
+          const findRecordsales = await manager.findOne(WholeSales,{where:{id:dto.sales_id}}) 
           const Removedsales =   await manager.update(WholeSales,{id:dto.product_id}, {confimatory:Confirmatory.REMOVE})
+          const Phone_number =  this.Dialvalidate.CheckDialformat(dto.phone_number)
           const CreateDebt =   await manager.create(Debt,{
-            paidmoney: dto. | 0,
-            Debtor_name: dto.Debtor_name,
-            Net_profit: dto.Net_profit,
-            Expected_profit: dto.Expected_profit,
-            Phone_number: dto.Phone_number,
-            Revenue: dto.Revenue,
-            Percentage_deviation: dto.Percentage_deviation,
-            profit_deviation: dto.profit_deviation,
-            Total_pc_pkg_litre: dto.Total_pc_pkg_litre,
-            Discount_percentage: dto.Discount_percentage,
-            paymentstatus: dto.paymentstatus,
-            PaymentDateAt: dto.PaymentDateAt,
+            paidmoney: dto.paidAmount | 0,
+            Debtor_name: dto.debtorname,
+            Net_profit: findRecordsales?.Net_profit ?? 0,
+            Expected_profit: findRecordsales?.Expected_Profit ?? 0 ,
+            Phone_number: Phone_number,
+            Revenue: findRecordsales?.Revenue ?? 0,
+            Percentage_deviation:findRecordsales?.percentage_deviation ?? 0,
+            profit_deviation:findRecordsales?.profit_deviation ?? 0,
+            Total_pc_pkg_litre:findRecordsales?.Total_pc_pkg_litre ?? 0,
+            Discount_percentage: findRecordsales?.percentage_deviation ?? 0,
+            paymentstatus:dto.paidAmount <= 0 ? paymentstatus.Dept: dto.paidAmount === null || dto.paidAmount == undefined ? paymentstatus.Dept :paymentstatus.Parctial ,
+            PaymentDateAt: dto.dateofReturn,
             location: dto.location,
             user: { id: userId },
           })

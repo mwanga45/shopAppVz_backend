@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Req, HttpCode } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { AuthGuard } from '@nestjs/passport';
-import { CreateSaleDto, SalesResponseDto } from './dto/create-sale.dto';
+import { CreateSaleDto, SalesResponseDto, Updatesales_Dto } from './dto/create-sale.dto';
 
 @Controller('sales')
 export class SalesController {
@@ -12,6 +12,12 @@ export class SalesController {
 async Addsales(@Request() req,  @Body () dto:CreateSaleDto){
   const userId  = req.user.userId
   return await this.salesService.SaleRecord(dto, userId)
+}
+@UseGuards(AuthGuard('jwt'))
+@Post('updatesales')
+async UpdatesalesPending(@Request() req, @Body() dto:Updatesales_Dto){
+  const userId  = req.user.userId
+  return await this.salesService.UpdateSales(dto,userId)
 }
 
 @Post('salesInfo')
@@ -33,7 +39,6 @@ async SaleToday(){
 @Get(':id')
 async Getproduct(@Param('id')productId:string){
   const id = Number(productId)
-  
   return this.salesService.CheckDiscountCalculate(id,20)
 }
 

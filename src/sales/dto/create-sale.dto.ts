@@ -97,7 +97,7 @@ export class Updatesales_Dto {
   @IsOptional()
   @IsString()
   paidAmount:number
-  
+
   @IsOptional()
   @IsString()
   phone_number:string
@@ -105,4 +105,8 @@ export class Updatesales_Dto {
   @IsOptional()
   @IsString()
   dateofReturn:string
+
+  @IsString()
+  @IsOptional()
+  location:string
 }

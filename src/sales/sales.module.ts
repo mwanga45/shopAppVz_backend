@@ -13,6 +13,7 @@ import { BusinessGrowthLogic } from 'src/common/helper/businessLogic.helper';
 import { CashFlow } from 'src/entities/cashFlow.entity';
 import { Debt } from 'src/debt/entities/debt.entity';
 import { Debt_track } from 'src/debt/entities/debt.entity';
+import { dialValidate } from 'src/common/helper/phone.helper';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { Debt_track } from 'src/debt/entities/debt.entity';
     StockModule,
   ],
   controllers: [SalesController],
-  providers: [SalesService,BusinessGrowthLogic],
-  exports:[SalesService, BusinessGrowthLogic]
+  providers: [SalesService,BusinessGrowthLogic,dialValidate],
+  exports:[SalesService, BusinessGrowthLogic, dialValidate]
 })
 export class SalesModule {}
