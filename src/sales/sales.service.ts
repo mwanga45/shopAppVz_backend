@@ -588,9 +588,9 @@ export class SalesService {
             success:true
           }
         }
-
+        
         return{
-          message:"successfuly update sales",
+          message:"successfuly update the sales to debt",
           success:true
         }
       }catch(err){
