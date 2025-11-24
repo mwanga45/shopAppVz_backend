@@ -9,6 +9,7 @@ import { RetailSales } from './entities/retailsale.entity';
 import { Product_discount } from 'src/product/entities/discount.entity';
 import {
   ChangeType,
+  Confirmatory,
   override,
   paymentstatus,
   paymentvia,
@@ -589,6 +590,26 @@ export class SalesService {
             message:"successfuky to update sales",
             success:true
           }
+        }
+        if(findCategory?.product_category === 'wholesales'){
+          const Removedsales =   await manager.update(WholeSales,{id:dto.product_id}, {confimatory:Confirmatory.REMOVE})
+          const CreateDebt =   await manager.create(Debt,{
+            paidmoney: dto. | 0,
+            Debtor_name: dto.Debtor_name,
+            Net_profit: dto.Net_profit,
+            Expected_profit: dto.Expected_profit,
+            Phone_number: dto.Phone_number,
+            Revenue: dto.Revenue,
+            Percentage_deviation: dto.Percentage_deviation,
+            profit_deviation: dto.profit_deviation,
+            Total_pc_pkg_litre: dto.Total_pc_pkg_litre,
+            Discount_percentage: dto.Discount_percentage,
+            paymentstatus: dto.paymentstatus,
+            PaymentDateAt: dto.PaymentDateAt,
+            location: dto.location,
+            user: { id: userId },
+          })
+
         }
         
         

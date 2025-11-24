@@ -39,7 +39,7 @@ export class WholeSales extends baseEntity {
   sale_origin: 'direct' | 'debt_payment';
 
   @Column({default:Confirmatory.ADD})
-    confimatory:Confirmatory
+  confimatory:Confirmatory
 
   @ManyToOne(() => User, (user) => user.wholesales)
   @JoinColumn({ name: 'userId' })

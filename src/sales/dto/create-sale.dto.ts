@@ -86,7 +86,7 @@ export class Updatesales_Dto {
   @IsString()
   updatetype:updatetype
   
-
+  @IsOptional()
   @IsString()
   PaymentVia:paymentvia
 
@@ -94,6 +94,10 @@ export class Updatesales_Dto {
   @IsString()
   debtorname:string
 
+  @IsOptional()
+  @IsString()
+  paidAmount:number
+  
   @IsOptional()
   @IsString()
   phone_number:string
