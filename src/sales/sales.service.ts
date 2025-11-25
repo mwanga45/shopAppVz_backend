@@ -463,7 +463,6 @@ export class SalesService {
             Reasons: 'Sold',
             product_category: findProduct_cat.product_category,
           };
-
           const stockupdate = await this.Stockserv.updateStockTransactional(
             manager,
             UpdateStockDto,
@@ -549,6 +548,7 @@ export class SalesService {
           );
           if (!stockupdate.success)
             throw new Error(String(stockupdate.message));
+          
           const Profitrecord = await this.Profitupdatesummary(
             manager,
             dto.Net_profit,
@@ -559,11 +559,20 @@ export class SalesService {
             throw new Error(String(Profitrecord.message));
           }
           const Revunue = Number(dto.Revenue);
+        if(dto.paymentstatus === paymentstatus.Pending){
+          return {
+            message: 'Successfuly  add new sales but  waiting for payment',
+            success: true,
+            data: fetchlastRec,
+          };
+          }
           const CapitalRec = await this.BusinessGrowthLogic.UpdateCapital(
             manager,
             dto.payment_via,
             Revunue,
           );
+          if(!CapitalRec)
+            throw new Error('failed to update capital')
           return {
             message: 'Successfuly  return data',
             success: true,
@@ -621,8 +630,7 @@ export class SalesService {
           const findRecordsales = await manager.findOne(WholeSales, {
             where: { id: dto.sales_id },
           });
-          if(!findRecordsales)
-            throw new Error('sales is not exist')
+          if (!findRecordsales) throw new Error('sales is not exist');
           const Removedsales = await manager.update(
             WholeSales,
             { id: dto.product_id },
@@ -635,15 +643,13 @@ export class SalesService {
             paidmoney: Number(dto.paidAmount ?? 0),
             Debtor_name: dto.debtorname,
             Phone_number: Phone_number.data,
-            Total_pc_pkg_litre:Number(findRecordsales.Total_pc_pkg_litre),
+            Total_pc_pkg_litre: Number(findRecordsales.Total_pc_pkg_litre),
             Revenue: Number(findRecordsales.Revenue),
             Net_profit: Number(findRecordsales.Net_profit),
             Expected_profit: Number(findRecordsales.Expected_Profit),
             profit_deviation: Number(findRecordsales.profit_deviation),
-            Percentage_deviation: Number(
-            findRecordsales.percentage_deviation ),
-            Discount_percentage: String(
-            findRecordsales.percentage_deviation),
+            Percentage_deviation: Number(findRecordsales.percentage_deviation),
+            Discount_percentage: String(findRecordsales.percentage_deviation),
             paymentstatus:
               dto.paidAmount == null || dto.paidAmount <= 0
                 ? paymentstatus.Dept
@@ -653,65 +659,63 @@ export class SalesService {
             user: { id: userId },
           });
           const savedDebt = await manager.save(CreateDebt);
-          if(!savedDebt || savedDebt.id)
-            throw new Error('failed to add Debt record')
-          const CreateDebtTrack = manager.create(Debt_track,{
-            debt:{id:savedDebt.id},
-            paidmoney:Number(savedDebt.paidmoney),
-            user:{id:userId}
-          })
-          await manager.save(CreateDebtTrack)
+          if (!savedDebt || savedDebt.id)
+            throw new Error('failed to add Debt record');
+          const CreateDebtTrack = manager.create(Debt_track, {
+            debt: { id: savedDebt.id },
+            paidmoney: Number(savedDebt.paidmoney),
+            user: { id: userId },
+          });
+          await manager.save(CreateDebtTrack);
           return {
-          message: 'successfuly move  the sales to debt',
+            message: 'successfuly move  the sales to debt',
+            success: true,
+          };
+        }
+        const findRecordsales = await manager.findOne(RetailSales, {
+          where: { id: dto.sales_id },
+        });
+        if (!findRecordsales) throw new Error('the sales is not exist');
+        const Removedsales = await manager.update(
+          RetailSales,
+          { id: dto.product_id },
+          { confimatory: Confirmatory.REMOVE },
+        );
+        const Phone_number = this.Dialvalidate.CheckDialformat(
+          dto.phone_number,
+        );
+        const CreateDebt = manager.create(Debt, {
+          paidmoney: Number(dto.paidAmount ?? 0),
+          Debtor_name: dto.debtorname,
+          Phone_number: Phone_number.data,
+          Total_pc_pkg_litre: Number(findRecordsales.Total_pc_pkg_litre),
+          Revenue: Number(findRecordsales.Revenue),
+          Net_profit: Number(findRecordsales.Net_profit),
+          Expected_profit: Number(findRecordsales.Expected_Profit),
+          profit_deviation: Number(findRecordsales.profit_deviation),
+          Percentage_deviation: Number(findRecordsales.percentage_deviation),
+          Discount_percentage: String(findRecordsales.percentage_deviation),
+          paymentstatus:
+            dto.paidAmount == null || dto.paidAmount <= 0
+              ? paymentstatus.Dept
+              : paymentstatus.Parctial,
+          PaymentDateAt: dto.dateofReturn,
+          location: dto.location,
+          user: { id: userId },
+        });
+        const savedDebt = await manager.save(CreateDebt);
+        if (!savedDebt || savedDebt.id)
+          throw new Error('failed to add Debt record');
+        const CreateDebtTrack = manager.create(Debt_track, {
+          debt: { id: savedDebt.id },
+          paidmoney: Number(savedDebt.paidmoney),
+          user: { id: userId },
+        });
+        await manager.save(CreateDebtTrack);
+        return {
+          message: 'successuly remove  sales and add new debt ',
           success: true,
         };
-      
-        }
-        const findRecordsales = await manager.findOne(RetailSales,{where:{id:dto.sales_id}})
-        if(!findRecordsales)
-          throw new Error('the sales is not exist')
-            const Removedsales = await manager.update(
-            RetailSales,
-            { id: dto.product_id },
-            { confimatory: Confirmatory.REMOVE },
-          );
-           const Phone_number = this.Dialvalidate.CheckDialformat(
-            dto.phone_number,
-          );
-          const CreateDebt = manager.create(Debt, {
-            paidmoney: Number(dto.paidAmount ?? 0),
-            Debtor_name: dto.debtorname,
-            Phone_number: Phone_number.data,
-            Total_pc_pkg_litre:Number(findRecordsales.Total_pc_pkg_litre),
-            Revenue: Number(findRecordsales.Revenue),
-            Net_profit: Number(findRecordsales.Net_profit),
-            Expected_profit: Number(findRecordsales.Expected_Profit),
-            profit_deviation: Number(findRecordsales.profit_deviation),
-            Percentage_deviation: Number(
-            findRecordsales.percentage_deviation ),
-            Discount_percentage: String(
-            findRecordsales.percentage_deviation),
-            paymentstatus:
-              dto.paidAmount == null || dto.paidAmount <= 0
-                ? paymentstatus.Dept
-                : paymentstatus.Parctial,
-            PaymentDateAt: dto.dateofReturn,
-            location: dto.location,
-            user: { id: userId },
-          });
-          const savedDebt = await manager.save(CreateDebt);
-          if(!savedDebt || savedDebt.id)
-            throw new Error('failed to add Debt record')
-          const CreateDebtTrack = manager.create(Debt_track,{
-            debt:{id:savedDebt.id},
-            paidmoney:Number(savedDebt.paidmoney),
-            user:{id:userId}
-          })
-          await manager.save(CreateDebt)
-        return{
-          message:"successuly remove  sales and add new debt",
-          success:true
-        }
       } catch (err) {
         return {
           message: `${err} failed to update the sales`,
