@@ -470,19 +470,18 @@ export class SalesService {
           );
           if (!stockupdate.success)
             throw new Error(String(stockupdate.message) || 'Unknown Error');
-               const Revunue = Number(dto.Revenue);
+          const Revunue = Number(dto.Revenue);
           const CapitalRec = await this.BusinessGrowthLogic.UpdateCapital(
             manager,
             dto.payment_via,
             Revunue,
           );
-          if(!CapitalRec)
-            throw new Error('failed to update capital')
-          if(dto.paymentstatus === paymentstatus.Pending){
-              return{
-                 message: 'Successfuly  add new sales but  waiting for payment',
-                 success:true
-              }
+          if (!CapitalRec) throw new Error('failed to update capital');
+          if (dto.paymentstatus === paymentstatus.Pending) {
+            return {
+              message: 'Successfuly  add new sales but  waiting for payment',
+              success: true,
+            };
           }
           const Profitrecord = await this.Profitupdatesummary(
             manager,
@@ -552,15 +551,14 @@ export class SalesService {
           );
           if (!stockupdate.success)
             throw new Error(String(stockupdate.message));
-          
-              if (dto.paymentstatus === paymentstatus.Pending) {
+
+          if (dto.paymentstatus === paymentstatus.Pending) {
             return {
-               message: 'Successfuly  add new sales but  waiting for payment',
+              message: 'Successfuly  add new sales but  waiting for payment',
               success: true,
               data: fetchlastRec,
             };
           }
-
           const Profitrecord = await this.Profitupdatesummary(
             manager,
             dto.Net_profit,
@@ -570,7 +568,7 @@ export class SalesService {
           if (!Profitrecord.success) {
             throw new Error(String(Profitrecord.message));
           }
-          const Revunue = Number(dto.Revenue)
+          const Revunue = Number(dto.Revenue);
           const CapitalRec = await this.BusinessGrowthLogic.UpdateCapital(
             manager,
             dto.payment_via,
@@ -583,7 +581,6 @@ export class SalesService {
             data: fetchlastRec,
           };
         }
-
         return {
           message: 'Failed',
           success: false,
@@ -615,7 +612,31 @@ export class SalesService {
                 payment_via: dto.PaymentVia,
               },
             );
+            const findsalesdetails = await manager.findOne(WholeSales,{where:{id:dto.sales_id}})
+            if(!findsalesdetails)
+              throw new Error('sales record is not found')
+            if(!updatesales)
+              throw new Error('failed to update record')
+
+            const updateprofit =  await this.Profitupdatesummary(manager,findsalesdetails.Net_profit,findsalesdetails.Revenue)
+            if(!updateprofit.success)
+              throw new Error(String(updateprofit.message))
+            
+            const UpdateCapital =  await this.BusinessGrowthLogic.UpdateCapital(manager,dto.PaymentVia,findsalesdetails.Revenue)
+            if(!UpdateCapital.success)
+              throw new Error(String(UpdateCapital.message))
           } else {
+            const findsalesdetails = await manager.findOne(RetailSales,{where:{id:dto.sales_id}})
+            if(!findsalesdetails)
+              throw new Error('sales Record is not found')
+
+            const updateprofit = await this.Profitupdatesummary(manager,findsalesdetails.Net_profit,findsalesdetails.Revenue )
+            if(!updateprofit.success)
+              throw new Error(String(updateprofit.message))
+
+            const UpdateCapital = await this.BusinessGrowthLogic.UpdateCapital(manager,dto.PaymentVia, findsalesdetails.Revenue)
+            if(!UpdateCapital.success)
+              throw new Error(String(UpdateCapital.message))
             const updatesales = await manager.update(
               RetailSales,
               { id: dto.sales_id },
