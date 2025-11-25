@@ -470,20 +470,26 @@ export class SalesService {
           );
           if (!stockupdate.success)
             throw new Error(String(stockupdate.message) || 'Unknown Error');
-
+               const Revunue = Number(dto.Revenue);
+          const CapitalRec = await this.BusinessGrowthLogic.UpdateCapital(
+            manager,
+            dto.payment_via,
+            Revunue,
+          );
+          if(!CapitalRec)
+            throw new Error('failed to update capital')
+          if(dto.paymentstatus === paymentstatus.Pending){
+              return{
+                 message: 'Successfuly  add new sales but  waiting for payment',
+                 success:true
+              }
+          }
           const Profitrecord = await this.Profitupdatesummary(
             manager,
             dto.Net_profit,
             dto.Revenue,
             dto.payment_via,
           );
-          const Revunue = Number(dto.Revenue);
-          const CapitalRec = await this.BusinessGrowthLogic.UpdateCapital(
-            manager,
-            dto.payment_via,
-            Revunue,
-          );
-
           if (!Profitrecord.success) {
             throw new Error(String(Profitrecord.message));
           }
@@ -530,9 +536,7 @@ export class SalesService {
             .orderBy('w.id', 'DESC')
             .limit(1)
             .getOne();
-
           if (!fetchlastRec) throw new Error('failed to return  sales');
-
           const UpdateStockDto: any = {
             product_id: dto.ProductId,
             total_stock: dto.Total_pc_pkg_litre,
@@ -549,6 +553,14 @@ export class SalesService {
           if (!stockupdate.success)
             throw new Error(String(stockupdate.message));
           
+              if (dto.paymentstatus === paymentstatus.Pending) {
+            return {
+               message: 'Successfuly  add new sales but  waiting for payment',
+              success: true,
+              data: fetchlastRec,
+            };
+          }
+
           const Profitrecord = await this.Profitupdatesummary(
             manager,
             dto.Net_profit,
@@ -558,21 +570,13 @@ export class SalesService {
           if (!Profitrecord.success) {
             throw new Error(String(Profitrecord.message));
           }
-          const Revunue = Number(dto.Revenue);
-        if(dto.paymentstatus === paymentstatus.Pending){
-          return {
-            message: 'Successfuly  add new sales but  waiting for payment',
-            success: true,
-            data: fetchlastRec,
-          };
-          }
+          const Revunue = Number(dto.Revenue)
           const CapitalRec = await this.BusinessGrowthLogic.UpdateCapital(
             manager,
             dto.payment_via,
             Revunue,
           );
-          if(!CapitalRec)
-            throw new Error('failed to update capital')
+          if (!CapitalRec) throw new Error('failed to update capital');
           return {
             message: 'Successfuly  return data',
             success: true,
