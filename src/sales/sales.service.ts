@@ -1,5 +1,9 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { CreateSaleDto, SalesResponseDto, Updatesales_Dto } from './dto/create-sale.dto';
+import {
+  CreateSaleDto,
+  SalesResponseDto,
+  Updatesales_Dto,
+} from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
 import { WholeSales } from './entities/wholesale.entity';
 import { EntityManager, Raw, Repository } from 'typeorm';
@@ -30,6 +34,7 @@ import { Debt_track } from 'src/debt/entities/debt.entity';
 import { Capital } from 'src/entities/capital.entity';
 import { BusinessGrowthLogic } from 'src/common/helper/businessLogic.helper';
 import { dialValidate } from 'src/common/helper/phone.helper';
+import { waitForDebugger } from 'inspector';
 
 @Injectable()
 export class SalesService {
@@ -50,7 +55,7 @@ export class SalesService {
     private readonly Stockserv: StockService,
     private readonly BusinessGrowthLogic: BusinessGrowthLogic,
     private readonly Datasource: DataSource,
-    private readonly Dialvalidate:dialValidate
+    private readonly Dialvalidate: dialValidate,
   ) {}
 
   private readonly logger = new Logger(SalesService.name);
@@ -578,57 +583,110 @@ export class SalesService {
       }
     });
   }
-  async UpdateSales(dto:Updatesales_Dto, userId:any):Promise<ResponseType<any>> {
-    return await this.Datasource.transaction(async(manager) =>{
-      const findCategory = await manager.findOne(Product, {where:{id:dto.product_id}})
-      try{
-        if(dto.updatetype === updatetype.Updatesales){
-          if(findCategory?.product_category === 'wholesales'){
-            const updatesales = await manager.update(WholeSales,{id:dto.sales_id}, {paymentstatus:paymentstatus.Paid, payment_via:dto.PaymentVia})
-          }else{
-            const updatesales   = await manager.update(RetailSales,{id:dto.sales_id}, {payment_via:dto.PaymentVia, paymentstatus:paymentstatus.Paid})
+  async UpdateSales(
+    dto: Updatesales_Dto,
+    userId: any,
+  ): Promise<ResponseType<any>> {
+    return await this.Datasource.transaction(async (manager) => {
+      const findCategory = await manager.findOne(Product, {
+        where: { id: dto.product_id },
+      });
+      try {
+        if (dto.updatetype === updatetype.Updatesales) {
+          if (findCategory?.product_category === 'wholesales') {
+            const updatesales = await manager.update(
+              WholeSales,
+              { id: dto.sales_id },
+              {
+                paymentstatus: paymentstatus.Paid,
+                payment_via: dto.PaymentVia,
+              },
+            );
+          } else {
+            const updatesales = await manager.update(
+              RetailSales,
+              { id: dto.sales_id },
+              {
+                payment_via: dto.PaymentVia,
+                paymentstatus: paymentstatus.Paid,
+              },
+            );
           }
-          return{
-            message:"successfuky to update sales",
-            success:true
-          }
+          return {
+            message: 'successfuky to update sales',
+            success: true,
+          };
         }
-        if(findCategory?.product_category === 'wholesales'){
-          const findRecordsales = await manager.findOne(WholeSales,{where:{id:dto.sales_id}}) 
-          const Removedsales =   await manager.update(WholeSales,{id:dto.product_id}, {confimatory:Confirmatory.REMOVE})
-          const Phone_number =  this.Dialvalidate.CheckDialformat(dto.phone_number)
-          const CreateDebt =   await manager.create(Debt,{
-            paidmoney: dto.paidAmount | 0,
+        if (findCategory?.product_category === 'wholesales') {
+          const findRecordsales = await manager.findOne(WholeSales, {
+            where: { id: dto.sales_id },
+          });
+          if(!findRecordsales)
+            throw new Error('sales is not exist')
+          const Removedsales = await manager.update(
+            WholeSales,
+            { id: dto.product_id },
+            { confimatory: Confirmatory.REMOVE },
+          );
+          const Phone_number = this.Dialvalidate.CheckDialformat(
+            dto.phone_number,
+          );
+          const CreateDebt = manager.create(Debt, {
+            paidmoney: Number(dto.paidAmount ?? 0),
             Debtor_name: dto.debtorname,
-            Net_profit: findRecordsales?.Net_profit ?? 0,
-            Expected_profit: findRecordsales?.Expected_Profit ?? 0 ,
-            Phone_number: Phone_number,
-            Revenue: findRecordsales?.Revenue ?? 0,
-            Percentage_deviation:findRecordsales?.percentage_deviation ?? 0,
-            profit_deviation:findRecordsales?.profit_deviation ?? 0,
-            Total_pc_pkg_litre:findRecordsales?.Total_pc_pkg_litre ?? 0,
-            Discount_percentage: findRecordsales?.percentage_deviation ?? 0,
-            paymentstatus:dto.paidAmount <= 0 ? paymentstatus.Dept: dto.paidAmount === null || dto.paidAmount == undefined ? paymentstatus.Dept :paymentstatus.Parctial ,
+            Phone_number: Phone_number.data,
+            Total_pc_pkg_litre:Number(findRecordsales.Total_pc_pkg_litre),
+            Revenue: Number(findRecordsales.Revenue),
+            Net_profit: Number(findRecordsales.Net_profit),
+            Expected_profit: Number(findRecordsales.Expected_Profit),
+            profit_deviation: Number(findRecordsales.profit_deviation),
+            Percentage_deviation: Number(
+            findRecordsales.percentage_deviation ),
+            Discount_percentage: String(
+            findRecordsales.percentage_deviation),
+            paymentstatus:
+              dto.paidAmount == null || dto.paidAmount <= 0
+                ? paymentstatus.Dept
+                : paymentstatus.Parctial,
             PaymentDateAt: dto.dateofReturn,
             location: dto.location,
             user: { id: userId },
+          });
+          const savedDebt = await manager.save(CreateDebt);
+          if(!savedDebt || savedDebt.id)
+            throw new Error('failed to add Debt record')
+          const CreateDebtTrack = manager.create(Debt_track,{
+            debt:{id:savedDebt.id},
+            paidmoney:Number(savedDebt.paidmoney),
+            user:{id:userId}
           })
-
+          await manager.save(CreateDebtTrack)
+          return {
+          message: 'successfuly move  the sales to debt',
+          success: true,
+        };
+      
         }
-        
-        
+        const findsales = await manager.findOne(RetailSales,{where:{id:dto.sales_id}})
+        if(!findsales)
+          throw new Error('the sales is not exist')
+            const Removedsales = await manager.update(
+            RetailSales,
+            { id: dto.product_id },
+            { confimatory: Confirmatory.REMOVE },
+          );
         return{
-          message:"successfuly update the sales to debt",
+          message:"successuly remove  sales and add new debt",
           success:true
         }
-      }catch(err){
-        return{
-          message:`failed to update the sales`,
-          success:false
-        }
+      } catch (err) {
+        return {
+          message: `${err} failed to update the sales`,
+          success: false,
+        };
       }
-    })
-  } 
+    });
+  }
   async TodaySaleAnalysis(): Promise<ResponseType<any>> {
     return await this.Datasource.transaction(async (manager) => {
       try {
@@ -768,7 +826,7 @@ export class SalesService {
         .leftJoin('r.product', 'p')
         .leftJoin('r.user', 'u')
         .select([
-           'r.id AS id',
+          'r.id AS id',
           'p.id AS product_id',
           'p.product_name AS product_name',
           'u.fullname AS seller',
@@ -800,7 +858,10 @@ export class SalesService {
           paymentstatus: paymentstatus.Pending,
         })
         .getRawMany();
-const PendingcombineResult :PendingReturnResult[] = [...WholesalependingResult, ...RetailpendingResult]
+    const PendingcombineResult: PendingReturnResult[] = [
+      ...WholesalependingResult,
+      ...RetailpendingResult,
+    ];
     const Retailpending = await this.RetailsalesRepository.createQueryBuilder(
       'r',
     )
@@ -868,8 +929,7 @@ const PendingcombineResult :PendingReturnResult[] = [...WholesalependingResult, 
         totolRetailRevenue,
         AllcombinedPending,
         Retailpending,
-        PendingcombineResult
-        
+        PendingcombineResult,
       },
     };
   }
