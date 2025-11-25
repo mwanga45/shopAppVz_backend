@@ -667,14 +667,47 @@ export class SalesService {
         };
       
         }
-        const findsales = await manager.findOne(RetailSales,{where:{id:dto.sales_id}})
-        if(!findsales)
+        const findRecordsales = await manager.findOne(RetailSales,{where:{id:dto.sales_id}})
+        if(!findRecordsales)
           throw new Error('the sales is not exist')
             const Removedsales = await manager.update(
             RetailSales,
             { id: dto.product_id },
             { confimatory: Confirmatory.REMOVE },
           );
+           const Phone_number = this.Dialvalidate.CheckDialformat(
+            dto.phone_number,
+          );
+          const CreateDebt = manager.create(Debt, {
+            paidmoney: Number(dto.paidAmount ?? 0),
+            Debtor_name: dto.debtorname,
+            Phone_number: Phone_number.data,
+            Total_pc_pkg_litre:Number(findRecordsales.Total_pc_pkg_litre),
+            Revenue: Number(findRecordsales.Revenue),
+            Net_profit: Number(findRecordsales.Net_profit),
+            Expected_profit: Number(findRecordsales.Expected_Profit),
+            profit_deviation: Number(findRecordsales.profit_deviation),
+            Percentage_deviation: Number(
+            findRecordsales.percentage_deviation ),
+            Discount_percentage: String(
+            findRecordsales.percentage_deviation),
+            paymentstatus:
+              dto.paidAmount == null || dto.paidAmount <= 0
+                ? paymentstatus.Dept
+                : paymentstatus.Parctial,
+            PaymentDateAt: dto.dateofReturn,
+            location: dto.location,
+            user: { id: userId },
+          });
+          const savedDebt = await manager.save(CreateDebt);
+          if(!savedDebt || savedDebt.id)
+            throw new Error('failed to add Debt record')
+          const CreateDebtTrack = manager.create(Debt_track,{
+            debt:{id:savedDebt.id},
+            paidmoney:Number(savedDebt.paidmoney),
+            user:{id:userId}
+          })
+          await manager.save(CreateDebt)
         return{
           message:"successuly remove  sales and add new debt",
           success:true
