@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsNumber, IsNotEmpty, IsString, IsOptional, IsDate } from 'class-validator';
-import { StockStatus, paymentstatus, override } from 'src/type/type.interface';
+import { StockStatus, paymentstatus, override, paymentvia } from 'src/type/type.interface';
 
 export class CreateDebtDto {
   @IsNumber()
@@ -63,6 +63,10 @@ export class CreateDebtDto {
   @Type(() => Date) 
   @IsDate()
   PaymentDateAt: Date;
+
+  @IsOptional()
+  @IsString()
+  payment_via:paymentvia
 
 }
 

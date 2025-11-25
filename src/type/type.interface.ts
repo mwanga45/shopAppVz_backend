@@ -10,7 +10,7 @@ export enum paymentstatus{
     Paid = 'paid',
     Pending = 'pending',
     Parctial = 'partialpaid' ,
-    Dept = 'dept'
+    Dept = 'debt'
 }  
 export enum paymentvia{
   Bank = 'bank',
