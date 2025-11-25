@@ -481,6 +481,7 @@ export class SalesService {
             return {
               message: 'Successfuly  add new sales but  waiting for payment',
               success: true,
+              data:fetchlastRec
             };
           }
           const Profitrecord = await this.Profitupdatesummary(
@@ -664,6 +665,8 @@ export class SalesService {
           const Phone_number = this.Dialvalidate.CheckDialformat(
             dto.phone_number,
           );
+          if(!Phone_number.success)
+            throw new Error(String(Phone_number.message))
           const CreateDebt = manager.create(Debt, {
             paidmoney: Number(dto.paidAmount ?? 0),
             Debtor_name: dto.debtorname,
@@ -709,6 +712,8 @@ export class SalesService {
         const Phone_number = this.Dialvalidate.CheckDialformat(
           dto.phone_number,
         );
+        if(!Phone_number.success)
+          throw new Error(String(Phone_number.message))
         const CreateDebt = manager.create(Debt, {
           paidmoney: Number(dto.paidAmount ?? 0),
           Debtor_name: dto.debtorname,
