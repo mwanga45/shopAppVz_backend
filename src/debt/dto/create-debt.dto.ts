@@ -58,15 +58,16 @@ export class CreateDebtDto {
   @IsString()
   @IsOptional()
   location:string
+  
+  @IsOptional()
+  @IsString()
+  payment_via:paymentvia
 
   @IsOptional()
   @Type(() => Date) 
   @IsDate()
   PaymentDateAt: Date;
 
-  @IsOptional()
-  @IsString()
-  payment_via:paymentvia
 
 }
 

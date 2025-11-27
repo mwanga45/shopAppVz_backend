@@ -996,6 +996,7 @@ export class SalesService {
         totolRetailRevenue,
         AllcombinedPending,
         Retailpending,
+        Wholepending,
         PendingcombineResult,
       },
     };
