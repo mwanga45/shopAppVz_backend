@@ -486,6 +486,13 @@ export class ProfitDevService {
     networth =
       StockWorth + Number(CapitalAmount?.Total_Capital ?? 0) - CustomerDebt;
     const cashStored = { MoneyDistribution, onHandCash };
+    
+    const Withdraw_money = await this.CashflowRespo.createQueryBuilder('c')
+    .select('c.Withdraw', ' Withdraw')
+    .orderBy('c.CreatedAt', 'DESC')
+    .limit(1)
+    .getRawOne()
+
 
     const Capital_Result = await this.CashflowRespo.createQueryBuilder('c')
       .select('SUM(c.Total_Capital)', 'total_revenue')
@@ -526,6 +533,7 @@ export class ProfitDevService {
         capital_amount,
         Capital_Result,
         Revenue_Rate,
+        Withdraw_money
       },
     };
   }
