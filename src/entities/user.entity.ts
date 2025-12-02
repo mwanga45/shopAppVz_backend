@@ -14,6 +14,7 @@ import { Product_discount } from 'src/product/entities/discount.entity';
 import { Debt, Debt_track } from 'src/debt/entities/debt.entity';
 import { Order } from 'src/order/entities/order.entity';
 import { UnofficialProduct } from 'src/order/entities/Unofficialproduct.entity';
+import { serviceRecord } from './servicer_record.entity';
 
 export enum UserType {
   Admin = 'admin',
@@ -69,4 +70,7 @@ export class User extends baseEntity {
 
   @OneToMany(()=> UnofficialProduct, (unofficialproduct)=> unofficialproduct.user)
   unofficialproduct:UnofficialProduct[]
+
+  @OneToMany(()=> serviceRecord, (rec) => rec.user)
+  services: serviceRecord[]
 }

@@ -223,6 +223,13 @@ export class ManagementService {
           throw new Error('there is information on capital table')
         if(checkWithdrawAmount.Withdraw < Number(dto.payment_Amount))
           throw new Error('Withdraw first then make request of the service')
+        const CreateService =  manager.create(serviceRecord,{
+          price:dto.payment_Amount,
+          sr:{id:dto.service_id},
+          user:{id:userId},
+        })
+        await manager.save(CreateService)
+        
         return{
           message:"successfuly made the request",
           success:true
