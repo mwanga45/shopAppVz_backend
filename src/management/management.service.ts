@@ -211,6 +211,23 @@ export class ManagementService {
     };
   }
 
+  async ServiceRequest():Promise<ResponseType<any>>{
+    return this.Datasource.transaction(async(manager) =>{
+    
+      try{
+        return{
+          message:"successfuly made the request",
+          success:true
+        }
+
+      }catch(err){
+        return{
+          message:`something went wrong`,
+          success:false
+        }
+      }
+    })
+  }
   findOne(id: number) {
     return `This action returns a #${id} management`;
   }

@@ -31,11 +31,18 @@ export class CreateServiceDto{
     @IsString()
     icon_name:string
 }
-export class ServiceRequest{
+
+export class ServiceRequestDto{
+    
     @IsNumber()
     service_id:number
 
     @IsNumber()
     payment_Amount:number
-    
+
+}
+
+export class TransactionRequestDto{
+    @IsString()
+    service_name:string
 }
