@@ -228,8 +228,11 @@ export class ManagementService {
           sr:{id:dto.service_id},
           user:{id:userId},
         })
-        await manager.save(CreateService)
+        await manager.save(CreateService) 
+        const  updateCapital = await manager.update(Capital,{id:1}, {Withdraw:(Number(checkWithdrawAmount.Withdraw) - Number(dto.payment_Amount))
         
+        })
+
         return{
           message:"successfuly made the request",
           success:true
