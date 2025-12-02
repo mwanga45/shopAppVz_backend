@@ -18,6 +18,7 @@ import { Stock } from 'src/stock/entities/stock.entity';
 import { Stock_transaction } from 'src/stock/entities/stock.entity';
 import { CashFlow } from 'src/entities/cashFlow.entity';
 import { Capital } from 'src/entities/capital.entity';
+import { BusinessService } from 'src/entities/businessService.entity';
 import { BusinessGrowthLogic } from 'src/common/helper/businessLogic.helper';
 @Injectable()
 export class ProfitDevService {
@@ -38,6 +39,8 @@ export class ProfitDevService {
     private readonly CashflowRespo: Repository<CashFlow>,
     @InjectRepository(Capital)
     private readonly CapitalRepo: Repository<Capital>,
+    @InjectRepository(BusinessService)
+    private readonly businessServ: Repository<BusinessService>,
     @InjectRepository(Stock_transaction)
     private readonly StockTrnasrepo: Repository<Stock_transaction>,
     private readonly Datasource: DataSource,
@@ -429,8 +432,8 @@ export class ProfitDevService {
       },
     };
   }
-  async BusinessService():Promise<ResponseType<any>>{
-    
+  async BusinessServiceReturn():Promise<ResponseType<any>>{
+    const serviceInfo = await this
     return{
       message:'successfuly returned',
       success:false

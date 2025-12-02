@@ -12,6 +12,7 @@ import { Stock_transaction } from 'src/stock/entities/stock.entity';
 import { CashFlow } from 'src/entities/cashFlow.entity';
 import { Capital } from 'src/entities/capital.entity';
 import { BusinessGrowthLogic } from 'src/common/helper/businessLogic.helper';
+import { BusinessService } from 'src/entities/businessService.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -24,6 +25,8 @@ import { BusinessGrowthLogic } from 'src/common/helper/businessLogic.helper';
       Stock_transaction,
       CashFlow,
       Capital,
+      BusinessService
+
     ]),
   ],
   providers: [ProfitDevService, BusinessGrowthLogic],
