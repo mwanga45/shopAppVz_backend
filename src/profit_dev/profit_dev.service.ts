@@ -429,6 +429,13 @@ export class ProfitDevService {
       },
     };
   }
+  async BusinessService():Promise<ResponseType<any>>{
+    
+    return{
+      message:'successfuly returned',
+      success:false
+    }
+  }
   async Networthcalculate(): Promise<ResponseType<any>> {
     const Stockdata = await this.Stockrepo.createQueryBuilder('cal')
       .leftJoin('cal.product', 'p')
