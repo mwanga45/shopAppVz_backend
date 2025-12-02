@@ -433,10 +433,17 @@ export class ProfitDevService {
     };
   }
   async BusinessServiceReturn():Promise<ResponseType<any>>{
-    const serviceInfo = await this
+    const serviceInfo = await this.businessServ.createQueryBuilder('b')
+    .select('b.id')
+    .addSelect('b.service_name')
+    .addSelect('b.icon_name')
+    .getRawMany()
+
     return{
       message:'successfuly returned',
-      success:false
+      success:false,
+      data:serviceInfo
+
     }
   }
   async Networthcalculate(): Promise<ResponseType<any>> {
