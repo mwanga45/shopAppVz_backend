@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   CreateManagementDto,
   CreateServiceDto,
+  ServiceRequestDto,
 } from './dto/create-management.dto';
 import { UpdateManagementDto } from './dto/update-management.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -211,10 +212,17 @@ export class ManagementService {
     };
   }
 
-  async ServiceRequest():Promise<ResponseType<any>>{
+  async ServiceRequest(dto:ServiceRequestDto, userId:any):Promise<ResponseType<any>>{
     return this.Datasource.transaction(async(manager) =>{
-    
       try{
+        const CheckservId = await manager.exists(BusinessService,{where:{id:dto.service_id}})
+        if(!CheckservId)
+          throw new Error('The service does not exist');
+        const checkWithdrawAmount = await manager.findOne(Capital,{where:{}})
+        if(!checkWithdrawAmount)
+          throw new Error('there is information on capital table')
+        if(checkWithdrawAmount.Withdraw < Number(dto.payment_Amount))
+          throw new Error('Withdraw first then make request of the service')
         return{
           message:"successfuly made the request",
           success:true
