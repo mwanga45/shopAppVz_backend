@@ -21,4 +21,8 @@ export class ProfitDevController {
   GetghaphData(){
     return this.ProfitDevservice.GraphDataAndPeformanceRate()
   }
+  @Get('serviceInfo')
+  GentserviceInfo(){
+    return this.ProfitDevservice.BusinessServiceReturn()
+  }
 }

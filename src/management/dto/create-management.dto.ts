@@ -25,9 +25,17 @@ export class CreateManagementDto {
 }
 export class CreateServiceDto{
     @IsString()
-    @Length(5, 30)
+    @Length(3, 30)
     service_name:string
 
     @IsString()
     icon_name:string
+}
+export class ServiceRequest{
+    @IsNumber()
+    service_id:number
+
+    @IsNumber()
+    payment_Amount:number
+    
 }
