@@ -1,18 +1,22 @@
 import {
   Controller,
+  Request,
   Get,
   Post,
   Body,
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { ManagementService } from './management.service';
 import {
   CreateManagementDto,
   CreateServiceDto,
+  ServiceRequestDto,
 } from './dto/create-management.dto';
 import { UpdateManagementDto } from './dto/update-management.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('management')
 export class ManagementController {
@@ -25,6 +29,12 @@ export class ManagementController {
   @Post('createservice')
   Createservice(@Body() CreateServiceDto: CreateServiceDto) {
     return this.managementService.CreateService(CreateServiceDto);
+  }
+  @UseGuards(AuthGuard('jwt'))
+  @Post('servieRequest')
+  ServiceRequest(@Request() req,  @Body()   ServiceRequestDto:ServiceRequestDto){
+    const userId = req.user.userId
+    return this.managementService.ServiceRequest(ServiceRequestDto, userId)
   }
   @Get('checkcapitalinfo')
   CheckCapitalInfo() {
