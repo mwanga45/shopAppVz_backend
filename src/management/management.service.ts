@@ -212,48 +212,71 @@ export class ManagementService {
     };
   }
 
-  async ServiceRequest(dto:ServiceRequestDto, userId:any):Promise<ResponseType<any>>{
-    return this.Datasource.transaction(async(manager) =>{
-      try{
-        const CheckservId = await manager.exists(BusinessService,{where:{id:dto.service_id}})
+  async ServiceRequest(
+    dto: ServiceRequestDto,
+    userId: any,
+  ): Promise<ResponseType<any>> {
+    return this.Datasource.transaction(async (manager) => {
+      try {
+        const CheckservId = await manager.findOne(BusinessService, { where:{id:dto.service_id}})
         if(!CheckservId)
-          throw new Error('The service does not exist');
-        const checkWithdrawAmount = await manager.findOne(Capital,{where:{}})
-        if(!checkWithdrawAmount)
-          throw new Error('there is information on capital table')
-        if(checkWithdrawAmount.Withdraw < Number(dto.payment_Amount))
-          throw new Error('Withdraw first then make request of the service')
-        const CreateService =  manager.create(serviceRecord,{
-          price:dto.payment_Amount,
-          sr:{id:dto.service_id},
-          user:{id:userId},
-        })
-        await manager.save(CreateService) 
-        const  updateCapital = await manager.update(Capital,{id:1}, {Withdraw:(Number(checkWithdrawAmount.Withdraw) - Number(dto.payment_Amount))})
-        if(!updateCapital.affected)
-          throw new Error('failed to update capital')
-        const CreateCashflow = await manager.createQueryBuilder(CashFlow,'c')
-        .select('c.CreatedAt', 'CreatedAt')
-        .addSelect('c.Total_Capital', 'Total_Capital')
-        .addSelect('c.Bank_Capital', 'Bank_Capital')
-        .addSelect('c.OnHand_Capital', 'OnHand_Capital')
-        .addSelect('c.bankDebt', 'bankDebt')
-        .orderBy('c.CreatedAt', 'DESC')
-        .limit(1)
-        .getRawOne()
+          throw new Error('The service is exist')
+        const checkWithdrawAmount = await manager.findOne(Capital, {
+          where: {},
+        });
+        if (!checkWithdrawAmount)
+          throw new Error('there is information on capital table');
+        if (checkWithdrawAmount.Withdraw < Number(dto.payment_Amount))
+          throw new Error('Withdraw first then make request of the service');
+        const CreateService = manager.create(serviceRecord, {
+          price: dto.payment_Amount,
+          sr: { id: dto.service_id },
+          user: { id: userId },
+        });
+        await manager.save(CreateService);
+        const updateCapital = await manager.update(
+          Capital,
+          { id: 1 },
+          {
+            Withdraw:
+              Number(checkWithdrawAmount.Withdraw) - Number(dto.payment_Amount),
+          },
+        );
+        if (!updateCapital.affected)
+          throw new Error('failed to update capital');
+        const lastCashflowInfo = await manager
+          .createQueryBuilder(CashFlow, 'c')
+          .select('c.CreatedAt', 'CreatedAt')
+          .addSelect('c.Total_Capital', 'Total_Capital')
+          .addSelect('c.Bank_Capital', 'Bank_Capital')
+          .addSelect('c.OnHand_Capital', 'OnHand_Capital')
+          .addSelect('c.bankDebt', 'bankDebt')
+          .orderBy('c.CreatedAt', 'DESC')
+          .limit(1)
+          .getRawOne();
+        if(!lastCashflowInfo)
+          throw new Error('No cashflow is available data please make sure your register the infomation about your business')
         
-        return{
-          message:"successfuly made the request",
-          success:true
-        }
-
-      }catch(err){
-        return{
-          message:`something went wrong`,
-          success:false
-        }
+        const CreateCashflow = manager.create(CashFlow,{
+          Total_Capital:Number(lastCashflowInfo.Total_Capital),
+          Bank_Capital:Number(lastCashflowInfo.Bank_Capital),
+          OnHand_Capital:Number(lastCashflowInfo.OnHand_Capital),
+          bankDebt:Number(lastCashflowInfo.bankDebt),
+          Withdraw:Number(checkWithdrawAmount.Withdraw) - Number(dto.payment_Amount),
+          servicename:CheckservId.service_name
+        })
+        await manager.save(CreateCashflow)
+        return {
+          message: 'successfuly made the request',
+          success: true,
+        };
+      } catch (err) {
+        return {
+          message: `something went wrong`,
+          success: false,
+        };
       }
-    })
+    });
   }
   findOne(id: number) {
     return `This action returns a #${id} management`;
