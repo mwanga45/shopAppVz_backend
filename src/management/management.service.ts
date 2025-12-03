@@ -232,7 +232,16 @@ export class ManagementService {
         const  updateCapital = await manager.update(Capital,{id:1}, {Withdraw:(Number(checkWithdrawAmount.Withdraw) - Number(dto.payment_Amount))})
         if(!updateCapital.affected)
           throw new Error('failed to update capital')
-
+        const CreateCashflow = await manager.createQueryBuilder(CashFlow,'c')
+        .select('c.CreatedAt', 'CreatedAt')
+        .addSelect('c.Total_Capital', 'Total_Capital')
+        .addSelect('c.Bank_Capital', 'Bank_Capital')
+        .addSelect('c.OnHand_Capital', 'OnHand_Capital')
+        .addSelect('c.bankDebt', 'bankDebt')
+        .orderBy('c.CreatedAt', 'DESC')
+        .limit(1)
+        .getRawOne()
+        
         return{
           message:"successfuly made the request",
           success:true
