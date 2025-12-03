@@ -229,9 +229,9 @@ export class ManagementService {
           user:{id:userId},
         })
         await manager.save(CreateService) 
-        const  updateCapital = await manager.update(Capital,{id:1}, {Withdraw:(Number(checkWithdrawAmount.Withdraw) - Number(dto.payment_Amount))
-        
-        })
+        const  updateCapital = await manager.update(Capital,{id:1}, {Withdraw:(Number(checkWithdrawAmount.Withdraw) - Number(dto.payment_Amount))})
+        if(!updateCapital.affected)
+          throw new Error('failed to update capital')
 
         return{
           message:"successfuly made the request",
