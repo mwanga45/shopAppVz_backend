@@ -272,7 +272,7 @@ export class ManagementService {
         };
       } catch (err) {
         return {
-          message: `something went wrong`,
+          message: `something went wrong ${err}`,
           success: false,
         };
       }
