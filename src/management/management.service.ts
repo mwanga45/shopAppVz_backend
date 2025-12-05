@@ -211,7 +211,22 @@ export class ManagementService {
       data: find,
     };
   }
+  async OrgServiceRequest():Promise<ResponseType<any>>{
+    return this.Datasource.transaction(async(manager)=>{
+      try{
 
+       return{
+        message:"successfuly ",
+        success:true
+       }
+      }catch(err){
+        return{
+          message:`something went wrong ${err} `,
+          success:false
+        }
+      }
+    })
+  }
   async ServiceRequest(
     dto: ServiceRequestDto,
     userId: any,
