@@ -277,6 +277,23 @@ export class ManagementService {
               success:true 
             }
             }
+             if (Number(CapitaInfo.OnhandCapital) < Number(dto.payment_Amount))
+                throw new Error('OnhandCapital is not enough for this request');
+
+             const CapitalUpdate = await manager.update(
+                Capital,
+                { id: 1 },
+                {
+                  Total_Capital:
+                    Number(CapitaInfo.Total_Capital) -
+                    Number(dto.payment_Amount),
+                  BankCapital:
+                    Number(CapitaInfo.OnhandCapital) - Number(dto.payment_Amount),
+                  Withdraw:
+                    Number(CapitaInfo.Withdraw) + Number(dto.payment_Amount),
+                      bankDebt:Number(lastCashflowInfo.bankDebt)
+                },
+             )
 
           }
         }
