@@ -10,6 +10,9 @@ export class BusinessService extends baseEntity{
     @Column()
     icon_name:string
 
+    @Column({default:"created"})
+    service_origin:string
+
     @OneToMany(()=> serviceRecord,sr => sr.sr)
     sr:serviceRecord[]
     
