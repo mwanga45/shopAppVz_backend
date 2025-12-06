@@ -222,9 +222,20 @@ export class ManagementService {
         if(!CheckservId)
           throw new Error('The service is exist')
         if(CheckservId.service_origin === 'original'){
-           const CapitaInfo = await manager.findOne(Capital,{})
+           const CapitaInfo = await manager.findOne(Capital,{order:{id:"DESC"}})
+            if(!CapitaInfo)
+              throw new Error('there is no any data in capital table')
+
+           const lastCashflowInfo = await manager.findOne(CashFlow, {
+            order:{id:'DESC'},
+           })
+           if(!lastCashflowInfo)
+            throw new Error('There is no any data in cashflow')
           if(CheckservId.service_name === 'withdraw'){
-           
+           if(dto.withdrawFrom === 'bank'){
+            const CapitalUpdate = await manager.update(Capital, {id:1}, {Total_Capital:Number(CapitaInfo.Total_Capital)- Number(dto.payment_Amount), BankCapital:Number(CapitaInfo.BankCapital)-Number(dto.payment_Amount), Withdraw:Number(dto.payment_Amount)})
+
+           }
           }
         }
         const checkWithdrawAmount = await manager.findOne(Capital, {
