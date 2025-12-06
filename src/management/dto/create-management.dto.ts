@@ -40,6 +40,14 @@ export class ServiceRequestDto{
     @IsNumber()
     payment_Amount:number
 
+    @IsOptional()
+    @IsString()
+    withdrawFrom:string
+
+    @IsOptional()
+    @IsString()
+    depositTo:string
+
 }
 
 export class TransactionRequestDto{

@@ -217,9 +217,16 @@ export class ManagementService {
   ): Promise<ResponseType<any>> {
     return this.Datasource.transaction(async (manager) => {
       try {
+
         const CheckservId = await manager.findOne(BusinessService, { where:{id:dto.service_id}})
         if(!CheckservId)
           throw new Error('The service is exist')
+        if(CheckservId.service_origin === 'original'){
+           const CapitaInfo = await manager.findOne(Capital,{})
+          if(CheckservId.service_name === 'withdraw'){
+           
+          }
+        }
         const checkWithdrawAmount = await manager.findOne(Capital, {
           where: {},
         });
