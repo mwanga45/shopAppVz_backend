@@ -249,6 +249,7 @@ export class ManagementService {
                     Number(CapitaInfo.BankCapital) - Number(dto.payment_Amount),
                   Withdraw:
                     Number(CapitaInfo.Withdraw) + Number(dto.payment_Amount),
+                      bankDebt:Number(lastCashflowInfo.bankDebt)
                 },
               );
               const CreateCashflowdata = manager.create(CashFlow, {
@@ -262,6 +263,15 @@ export class ManagementService {
                 servicename: CheckservId.service_name,
                 bankDebt:Number(lastCashflowInfo.bankDebt)
               });
+              await manager.save(CreateCashflowdata)
+
+            const  CreateService = manager.create(serviceRecord,{
+              price:Number(dto.payment_Amount),
+              sr:{id:CheckservId.id},
+              user:{id:userId}
+
+            })
+            await manager.save(CreateService)
             }
           }
         }

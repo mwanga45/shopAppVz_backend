@@ -15,6 +15,9 @@ OnhandCapital:number
 @Column({type:'decimal', precision:15, scale:2, default:0.0})
 Withdraw:number
 
+@Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
+bankDebt: number;
+
 @Column()
 code:string
 }
