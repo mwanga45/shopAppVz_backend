@@ -6,12 +6,13 @@ import { CashFlow } from 'src/entities/cashFlow.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BusinessService } from 'src/entities/businessService.entity';
 import { serviceRecord } from 'src/entities/servicer_record.entity';
+import { ServiceSeeder } from './services.seeder';
 
 @Module({
   imports:[
    TypeOrmModule.forFeature([Capital, CashFlow, BusinessService, serviceRecord])
   ],
   controllers: [ManagementController],
-  providers: [ManagementService],
+  providers: [ManagementService, ServiceSeeder],
 })
 export class ManagementModule {}
