@@ -217,25 +217,52 @@ export class ManagementService {
   ): Promise<ResponseType<any>> {
     return this.Datasource.transaction(async (manager) => {
       try {
+        const CheckservId = await manager.findOne(BusinessService, {
+          where: { id: dto.service_id },
+        });
+        if (!CheckservId) throw new Error('The service is exist');
+        if (CheckservId.service_origin === 'original') {
+          const CapitaInfo = await manager.findOne(Capital, {
+            order: { id: 'DESC' },
+          });
+          if (!CapitaInfo)
+            throw new Error('there is no any data in capital table');
 
-        const CheckservId = await manager.findOne(BusinessService, { where:{id:dto.service_id}})
-        if(!CheckservId)
-          throw new Error('The service is exist')
-        if(CheckservId.service_origin === 'original'){
-           const CapitaInfo = await manager.findOne(Capital,{order:{id:"DESC"}})
-            if(!CapitaInfo)
-              throw new Error('there is no any data in capital table')
+          const lastCashflowInfo = await manager.findOne(CashFlow, {
+            order: { id: 'DESC' },
+          });
+          if (!lastCashflowInfo)
+            throw new Error('There is no any data in cashflow');
+          if (CheckservId.service_name === 'withdraw') {
+            if (dto.withdrawFrom === 'bank') {
+              if (Number(CapitaInfo.BankCapital) < Number(dto.payment_Amount))
+                throw new Error('Bankcapital is not enough for this request');
 
-           const lastCashflowInfo = await manager.findOne(CashFlow, {
-            order:{id:'DESC'},
-           })
-           if(!lastCashflowInfo)
-            throw new Error('There is no any data in cashflow')
-          if(CheckservId.service_name === 'withdraw'){
-           if(dto.withdrawFrom === 'bank'){
-            const CapitalUpdate = await manager.update(Capital, {id:1}, {Total_Capital:Number(CapitaInfo.Total_Capital)- Number(dto.payment_Amount), BankCapital:Number(CapitaInfo.BankCapital)-Number(dto.payment_Amount), Withdraw:Number(dto.payment_Amount)})
-
-           }
+              const CapitalUpdate = await manager.update(
+                Capital,
+                { id: 1 },
+                {
+                  Total_Capital:
+                    Number(CapitaInfo.Total_Capital) -
+                    Number(dto.payment_Amount),
+                  BankCapital:
+                    Number(CapitaInfo.BankCapital) - Number(dto.payment_Amount),
+                  Withdraw:
+                    Number(CapitaInfo.Withdraw) + Number(dto.payment_Amount),
+                },
+              );
+              const CreateCashflowdata = manager.create(CashFlow, {
+                Total_Capital:
+                  Number(lastCashflowInfo.Total_Capital) - Number(dto.payment_Amount),
+                BankCapital:
+                  Number(lastCashflowInfo.Bank_Capital) - Number(dto.payment_Amount),
+                Withdraw:
+                  Number(lastCashflowInfo.Withdraw) + Number(dto.payment_Amount),
+                OnHand_Capital: Number(lastCashflowInfo.OnHand_Capital),
+                servicename: CheckservId.service_name,
+                bankDebt:Number(lastCashflowInfo.bankDebt)
+              });
+            }
           }
         }
         const checkWithdrawAmount = await manager.findOne(Capital, {
@@ -271,18 +298,21 @@ export class ManagementService {
           .orderBy('c.CreatedAt', 'DESC')
           .limit(1)
           .getRawOne();
-        if(!lastCashflowInfo)
-          throw new Error('No cashflow is available data please make sure your register the infomation about your business')
-        
-        const CreateCashflow = manager.create(CashFlow,{
-          Total_Capital:Number(lastCashflowInfo.Total_Capital),
-          Bank_Capital:Number(lastCashflowInfo.Bank_Capital),
-          OnHand_Capital:Number(lastCashflowInfo.OnHand_Capital),
-          bankDebt:Number(lastCashflowInfo.bankDebt),
-          Withdraw:Number(checkWithdrawAmount.Withdraw) - Number(dto.payment_Amount),
-          servicename:CheckservId.service_name
-        })
-        await manager.save(CreateCashflow)
+        if (!lastCashflowInfo)
+          throw new Error(
+            'No cashflow is available data please make sure your register the infomation about your business',
+          );
+
+        const CreateCashflow = manager.create(CashFlow, {
+          Total_Capital: Number(lastCashflowInfo.Total_Capital),
+          Bank_Capital: Number(lastCashflowInfo.Bank_Capital),
+          OnHand_Capital: Number(lastCashflowInfo.OnHand_Capital),
+          bankDebt: Number(lastCashflowInfo.bankDebt),
+          Withdraw:
+            Number(checkWithdrawAmount.Withdraw) - Number(dto.payment_Amount),
+          servicename: CheckservId.service_name,
+        });
+        await manager.save(CreateCashflow);
         return {
           message: 'successfuly made the request',
           success: true,
