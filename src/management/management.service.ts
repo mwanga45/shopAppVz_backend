@@ -272,7 +272,12 @@ export class ManagementService {
 
             })
             await manager.save(CreateService)
+            return{
+              message: `successfuly withdraw the money from bank amount ${Number(dto.payment_Amount).toLocaleString()}` ,
+              success:true 
             }
+            }
+
           }
         }
         const checkWithdrawAmount = await manager.findOne(Capital, {
