@@ -223,14 +223,17 @@ export class ManagementService {
         if (!CheckservId) throw new Error('The service is exist');
         if (CheckservId.service_origin === 'original') {
           const CapitaInfo = await manager.findOne(Capital, {
+            where:{},
             order: { id: 'DESC' },
           });
           if (!CapitaInfo)
             throw new Error('there is no any data in capital table');
 
           const lastCashflowInfo = await manager.findOne(CashFlow, {
+            where:{},
             order: { id: 'DESC' },
           });
+          console.log(lastCashflowInfo)
           if (!lastCashflowInfo)
             throw new Error('There is no any data in cashflow');
           if (CheckservId.service_name === 'withdraw') {
@@ -249,78 +252,79 @@ export class ManagementService {
                     Number(CapitaInfo.BankCapital) - Number(dto.payment_Amount),
                   Withdraw:
                     Number(CapitaInfo.Withdraw) + Number(dto.payment_Amount),
-                      bankDebt:Number(lastCashflowInfo.bankDebt)
+                  bankDebt: Number(CapitaInfo.bankDebt),
                 },
               );
               const CreateCashflowdata = manager.create(CashFlow, {
                 Total_Capital:
-                  Number(lastCashflowInfo.Total_Capital) - Number(dto.payment_Amount),
+                  Number(lastCashflowInfo.Total_Capital) -
+                  Number(dto.payment_Amount),
                 BankCapital:
-                  Number(lastCashflowInfo.Bank_Capital) - Number(dto.payment_Amount),
+                  Number(lastCashflowInfo.Bank_Capital) -
+                  Number(dto.payment_Amount),
                 Withdraw:
-                  Number(lastCashflowInfo.Withdraw) + Number(dto.payment_Amount),
+                  Number(lastCashflowInfo.Withdraw) +
+                  Number(dto.payment_Amount),
                 OnHand_Capital: Number(lastCashflowInfo.OnHand_Capital),
                 servicename: CheckservId.service_name,
-                bankDebt:Number(lastCashflowInfo.bankDebt)
+                bankDebt: Number(lastCashflowInfo.bankDebt),
               });
-              await manager.save(CreateCashflowdata)
+              await manager.save(CreateCashflowdata);
 
-            const  CreateService = manager.create(serviceRecord,{
-              price:Number(dto.payment_Amount),
-              sr:{id:CheckservId.id},
-              user:{id:userId}
-
-            })
-            await manager.save(CreateService)
-            return{
-              message: `successfuly withdraw the money from bank amount ${Number(dto.payment_Amount).toLocaleString()}` ,
-              success:true 
+              const CreateService = manager.create(serviceRecord, {
+                price: Number(dto.payment_Amount),
+                sr: { id: CheckservId.id },
+                user: { id: userId },
+              });
+              await manager.save(CreateService);
+              return {
+                message: `successfuly withdraw the money from bank amount ${Number(dto.payment_Amount).toLocaleString()}`,
+                success: true,
+              };
             }
-            }
-             if (Number(CapitaInfo.OnhandCapital) < Number(dto.payment_Amount))
-                throw new Error('OnhandCapital is not enough for this request');
+            if (Number(CapitaInfo.OnhandCapital) < Number(dto.payment_Amount))
+              throw new Error('OnhandCapital is not enough for this request');
 
-             const CapitalUpdate = await manager.update(
-                Capital,
-                { id: 1 },
-                {
-                  Total_Capital:
-                    Number(CapitaInfo.Total_Capital) -
-                    Number(dto.payment_Amount),
-                  BankCapital:
-                    Number(CapitaInfo.OnhandCapital) - Number(dto.payment_Amount),
-                  Withdraw:
-                    Number(CapitaInfo.Withdraw) + Number(dto.payment_Amount),
-                      bankDebt:Number(lastCashflowInfo.bankDebt)
-                },
-             )
-
-              const CreateCashflowdata = manager.create(CashFlow, {
+            const CapitalUpdate = await manager.update(
+              Capital,
+              { id: 1 },
+              {
                 Total_Capital:
-                  Number(lastCashflowInfo.Total_Capital) - Number(dto.payment_Amount),
+                  Number(CapitaInfo.Total_Capital) - Number(dto.payment_Amount),
                 BankCapital:
-                  Number(lastCashflowInfo.OnHand_Capital) - Number(dto.payment_Amount),
+                  Number(CapitaInfo.OnhandCapital) - Number(dto.payment_Amount),
                 Withdraw:
-                  Number(lastCashflowInfo.Withdraw) + Number(dto.payment_Amount),
-                Bank_Capital: Number(lastCashflowInfo.Bank_Capital),
-                servicename: CheckservId.service_name,
-                bankDebt:Number(lastCashflowInfo.bankDebt)
-              });
-              await manager.save(CreateCashflowdata)
+                  Number(CapitaInfo.Withdraw) + Number(dto.payment_Amount),
+                bankDebt: Number(lastCashflowInfo.bankDebt),
+              },
+            );
+            const CreateCashflowdata = manager.create(CashFlow, {
+              Total_Capital:
+                Number(lastCashflowInfo.Total_Capital) -
+                Number(dto.payment_Amount),
+              BankCapital:
+                Number(lastCashflowInfo.OnHand_Capital) -
+                Number(dto.payment_Amount),
+              Withdraw:
+                Number(lastCashflowInfo.Withdraw) + Number(dto.payment_Amount),
+              Bank_Capital: Number(lastCashflowInfo.Bank_Capital),
+              servicename: CheckservId.service_name,
+              bankDebt: Number(lastCashflowInfo.bankDebt),
+            });
+            await manager.save(CreateCashflowdata);
 
-            const  CreateService = manager.create(serviceRecord,{
-              price:Number(dto.payment_Amount),
-              sr:{id:CheckservId.id},
-              user:{id:userId}
-
-            })
-            await manager.save(CreateService)
-            return{
-              message: `successfuly withdraw the money from cash(On hand) amount ${Number(dto.payment_Amount).toLocaleString()}` ,
-              success:true 
-            }
-
+            const CreateService = manager.create(serviceRecord, {
+              price: Number(dto.payment_Amount),
+              sr: { id: CheckservId.id },
+              user: { id: userId },
+            });
+            await manager.save(CreateService);
+            return {
+              message: `successfuly withdraw the money from cash(On hand) amount ${Number(dto.payment_Amount).toLocaleString()}`,
+              success: true,
+            };
           }
+
         }
         const checkWithdrawAmount = await manager.findOne(Capital, {
           where: {},
