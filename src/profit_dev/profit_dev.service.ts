@@ -516,11 +516,18 @@ export class ProfitDevService {
    .addSelect('c.CreatedAt', 'createdAt')
    .getRawMany()
 
-   const TodayservRecord = serviceRecord.filter((item) => {
+  const TodayservRecord = serviceRecord.filter((item) => {
   const recordDate = new Date(item.createdAt).toISOString().split('T')[0];
   const today = new Date().toISOString().split('T')[0];
   return recordDate === today;
+
 });
+const now =  new Date().toISOString().split('T')[0]
+const 
+
+ const ThisweekServRecord = serviceRecord.filter((item)=>{
+
+ })
     const Withdraw_money = await this.CapitalRepo.findOne({where:{}, order:{id:"DESC"}})
     const Capital_Result = await this.CashflowRespo.createQueryBuilder('c')
       .select('SUM(c.Total_Capital)', 'total_revenue')
