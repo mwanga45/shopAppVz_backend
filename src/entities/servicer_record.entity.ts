@@ -10,9 +10,10 @@ price:number
 
 
 
-@ManyToOne(() => BusinessService, (bs) => bs.sr)
+@ManyToOne(() => BusinessService, (bs) => bs.records)
 @JoinColumn({ name: "bs_id" })
-sr: BusinessService;
+service: BusinessService;
+
 
 @ManyToOne(()=> User,(user) => user.services )
 @JoinColumn({name:'userId'})

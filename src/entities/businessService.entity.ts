@@ -13,7 +13,8 @@ export class BusinessService extends baseEntity{
     @Column({default:"created"})
     service_origin:string
 
-    @OneToMany(()=> serviceRecord,sr => sr.sr)
-    sr:serviceRecord[]
+   @OneToMany(() => serviceRecord, (record) => record.service)
+   records: serviceRecord[];
+
     
 }

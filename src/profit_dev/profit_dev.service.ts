@@ -20,6 +20,7 @@ import { CashFlow } from 'src/entities/cashFlow.entity';
 import { Capital } from 'src/entities/capital.entity';
 import { BusinessService } from 'src/entities/businessService.entity';
 import { BusinessGrowthLogic } from 'src/common/helper/businessLogic.helper';
+import { serviceRecord } from 'src/entities/servicer_record.entity';
 @Injectable()
 export class ProfitDevService {
   constructor(
@@ -43,8 +44,11 @@ export class ProfitDevService {
     private readonly businessServ: Repository<BusinessService>,
     @InjectRepository(Stock_transaction)
     private readonly StockTrnasrepo: Repository<Stock_transaction>,
+    @InjectRepository(serviceRecord)
+    private readonly ServRecord:Repository<serviceRecord>,
     private readonly Datasource: DataSource,
     private readonly businesslogic: BusinessGrowthLogic,
+    
   ) {}
 
   async AdminAnalysis(): Promise<ResponseType<any>> {
@@ -504,13 +508,20 @@ export class ProfitDevService {
       StockWorth + Number(CapitalAmount?.Total_Capital ?? 0) - CustomerDebt;
     const cashStored = { MoneyDistribution, onHandCash };
     
-    const Withdraw_money = await this.CashflowRespo.createQueryBuilder('c')
-    .select('c.Withdraw', ' Withdraw')
-    .orderBy('c.CreatedAt', 'DESC')
-    .limit(1)
-    .getRawOne()
+   const serviceRecord = await this.ServRecord.createQueryBuilder('c')
+   .leftJoin('c.service','B')
+   .select('B.service_name', 'serviceName')
+   .addSelect('B.icon_name', 'icon_name')
+   .addSelect('c.price', 'price')
+   .addSelect('c.CreatedAt', 'createdAt')
+   .getRawMany()
 
-
+   const TodayservRecord = serviceRecord.filter((item) => {
+  const recordDate = new Date(item.createdAt).toISOString().split('T')[0];
+  const today = new Date().toISOString().split('T')[0];
+  return recordDate === today;
+});
+    const Withdraw_money = await this.CapitalRepo.findOne({where:{}, order:{id:"DESC"}})
     const Capital_Result = await this.CashflowRespo.createQueryBuilder('c')
       .select('SUM(c.Total_Capital)', 'total_revenue')
       .orderBy('c.CreatedAt', 'DESC')
@@ -550,7 +561,9 @@ export class ProfitDevService {
         capital_amount,
         Capital_Result,
         Revenue_Rate,
-        Withdraw_money
+        Withdraw_money,
+        serviceRecord,
+        TodayservRecord,
       },
     };
   }

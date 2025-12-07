@@ -223,19 +223,21 @@ export class ManagementService {
         if (!CheckservId) throw new Error('The service is exist');
         if (CheckservId.service_origin === 'original') {
           const CapitaInfo = await manager.findOne(Capital, {
-            where:{},
+            where: {},
             order: { id: 'DESC' },
           });
           if (!CapitaInfo)
             throw new Error('there is no any data in capital table');
-
+          
           const lastCashflowInfo = await manager.findOne(CashFlow, {
-            where:{},
+            where: {},
             order: { id: 'DESC' },
           });
-          console.log(lastCashflowInfo)
+         
+          console.log(lastCashflowInfo);
           if (!lastCashflowInfo)
             throw new Error('There is no any data in cashflow');
+        
           if (CheckservId.service_name === 'withdraw') {
             if (dto.withdrawFrom === 'bank') {
               if (Number(CapitaInfo.BankCapital) < Number(dto.payment_Amount))
@@ -259,12 +261,14 @@ export class ManagementService {
                 Total_Capital:
                   Number(lastCashflowInfo.Total_Capital) -
                   Number(dto.payment_Amount),
-                BankCapital:
+                Bank_Capital:
                   Number(lastCashflowInfo.Bank_Capital) -
                   Number(dto.payment_Amount),
                 Withdraw:
                   Number(lastCashflowInfo.Withdraw) +
                   Number(dto.payment_Amount),
+
+                // ✅ now it will not be undefined
                 OnHand_Capital: Number(lastCashflowInfo.OnHand_Capital),
                 servicename: CheckservId.service_name,
                 bankDebt: Number(lastCashflowInfo.bankDebt),
@@ -302,15 +306,16 @@ export class ManagementService {
               Total_Capital:
                 Number(lastCashflowInfo.Total_Capital) -
                 Number(dto.payment_Amount),
-              BankCapital:
+              Bank_Capital: Number(lastCashflowInfo.Bank_Capital),
+              OnHand_Capital:
                 Number(lastCashflowInfo.OnHand_Capital) -
                 Number(dto.payment_Amount),
               Withdraw:
                 Number(lastCashflowInfo.Withdraw) + Number(dto.payment_Amount),
-              Bank_Capital: Number(lastCashflowInfo.Bank_Capital),
               servicename: CheckservId.service_name,
               bankDebt: Number(lastCashflowInfo.bankDebt),
             });
+            console.log('Create object:', CreateCashflowdata);
             await manager.save(CreateCashflowdata);
 
             const CreateService = manager.create(serviceRecord, {
@@ -324,7 +329,6 @@ export class ManagementService {
               success: true,
             };
           }
-
         }
         const checkWithdrawAmount = await manager.findOne(Capital, {
           where: {},
