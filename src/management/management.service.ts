@@ -228,16 +228,16 @@ export class ManagementService {
           });
           if (!CapitaInfo)
             throw new Error('there is no any data in capital table');
-          
+
           const lastCashflowInfo = await manager.findOne(CashFlow, {
             where: {},
             order: { id: 'DESC' },
           });
-         
+
           console.log(lastCashflowInfo);
           if (!lastCashflowInfo)
             throw new Error('There is no any data in cashflow');
-        
+
           if (CheckservId.service_name === 'withdraw') {
             if (dto.withdrawFrom === 'bank') {
               if (Number(CapitaInfo.BankCapital) < Number(dto.payment_Amount))
@@ -267,8 +267,6 @@ export class ManagementService {
                 Withdraw:
                   Number(lastCashflowInfo.Withdraw) +
                   Number(dto.payment_Amount),
-
-                // ✅ now it will not be undefined
                 OnHand_Capital: Number(lastCashflowInfo.OnHand_Capital),
                 servicename: CheckservId.service_name,
                 bankDebt: Number(lastCashflowInfo.bankDebt),
@@ -329,49 +327,112 @@ export class ManagementService {
               success: true,
             };
           }
-          if(dto.Bankoption === 'Return'){
-            if(dto.BankoptionII === 'Bank'){
-              if(Number(CapitaInfo.BankCapital) <= Number(dto.payment_Amount))
-                throw new Error(`Money In bank Account is no Enough, you have only ${CapitaInfo.BankCapital}`)
-            }
-              if(dto.BankoptionII === 'Cash'){
-              if(Number(CapitaInfo.OnhandCapital) <= Number(dto.payment_Amount))
-                throw new Error(`Cash Money Account is no Enough your have only ${CapitaInfo.OnhandCapital}`)
-            }
-            const updateCapital  =  await manager.update(Capital,{id:1},{
-                Total_Capital:(
-                  Number(CapitaInfo.Total_Capital)-Number(dto.payment_Amount)),
-                OnhandCapital:
-                  (dto.BankoptionII === 'Bank'?Number(CapitaInfo.OnhandCapital):Number(CapitaInfo.OnhandCapital)-Number(dto.payment_Amount)),
-                BankCapital:
-                (dto.BankoptionII === 'Cash' ? Number(CapitaInfo.BankCapital)- Number(dto.payment_Amount): Number(CapitaInfo.BankCapital)),
-                Withdraw:
-                  Number(CapitaInfo.Withdraw),
-                bankDebt: Number(CapitaInfo.bankDebt),
-                
-              },)
+          if (dto.BankoptionII === 'Bank') {
+            if (Number(CapitaInfo.BankCapital) <= Number(dto.payment_Amount))
+              throw new Error(
+                `Money In bank Account is no Enough, you have only ${CapitaInfo.BankCapital}`,
+              );
+          }
+          if (dto.BankoptionII === 'Cash') {
+            if (Number(CapitaInfo.OnhandCapital) <= Number(dto.payment_Amount))
+              throw new Error(
+                `Cash Money Account is no Enough your have only ${CapitaInfo.OnhandCapital}`,
+              );
+          }
 
-          const CreateCashflow = manager.create(CashFlow,{
+          if (dto.Bankoption === 'Return') {
+            const updateCapital = await manager.update(
+              Capital,
+              { id: 1 },
+              {
                 Total_Capital:
+                  Number(CapitaInfo.Total_Capital) - Number(dto.payment_Amount),
+                OnhandCapital:
+                  dto.BankoptionII === 'Bank'
+                    ? Number(CapitaInfo.OnhandCapital)
+                    : Number(CapitaInfo.OnhandCapital) -
+                      Number(dto.payment_Amount),
+                BankCapital:
+                  dto.BankoptionII === 'Cash'
+                    ? Number(CapitaInfo.BankCapital) -
+                      Number(dto.payment_Amount)
+                    : Number(CapitaInfo.BankCapital),
+                Withdraw: Number(CapitaInfo.Withdraw),
+                bankDebt: Number(CapitaInfo.bankDebt),
+              },
+            );
+            const CreateCashflow = manager.create(CashFlow, {
+              Total_Capital:
                 Number(lastCashflowInfo.Total_Capital) -
                 Number(dto.payment_Amount),
-              Bank_Capital: dto.BankoptionII === 'Bank' ? Number(lastCashflowInfo.Bank_Capital) - Number(dto.payment_Amount): Number(lastCashflowInfo.Bank_Capital),
+              Bank_Capital:
+                dto.BankoptionII === 'Bank'
+                  ? Number(lastCashflowInfo.Bank_Capital) -
+                    Number(dto.payment_Amount)
+                  : Number(lastCashflowInfo.Bank_Capital),
               OnHand_Capital:
-                dto.BankoptionII === 'Cash' ?Number(lastCashflowInfo.OnHand_Capital) -
-                Number(dto.payment_Amount): Number(lastCashflowInfo.OnHand_Capital),
-              Withdraw:
-                Number(lastCashflowInfo.Withdraw),
+                dto.BankoptionII === 'Cash'
+                  ? Number(lastCashflowInfo.OnHand_Capital) -
+                    Number(dto.payment_Amount)
+                  : Number(lastCashflowInfo.OnHand_Capital),
+              Withdraw: Number(lastCashflowInfo.Withdraw),
               servicename: CheckservId.service_name,
               bankDebt: Number(lastCashflowInfo.bankDebt),
-          })
-          await manager.save(CreateCashflow)
+            });
+            await manager.save(CreateCashflow);
             const CreateService = manager.create(serviceRecord, {
               price: Number(dto.payment_Amount),
               service: { id: CheckservId.id },
               user: { id: userId },
             });
-            await manager.save(CreateService)
+            await manager.save(CreateService);
           }
+          const updateCapital = await manager.update(
+              Capital,
+              { id: 1 },
+              {
+                Total_Capital:
+                  Number(CapitaInfo.Total_Capital) + Number(dto.payment_Amount),
+                OnhandCapital:
+                  dto.BankoptionII === 'Bank'
+                    ? Number(CapitaInfo.OnhandCapital)
+                    : Number(CapitaInfo.OnhandCapital) +
+                      Number(dto.payment_Amount),
+                BankCapital:
+                  dto.BankoptionII === 'Cash'
+                    ? Number(CapitaInfo.BankCapital) +
+                      Number(dto.payment_Amount)
+                    : Number(CapitaInfo.BankCapital),
+                Withdraw: Number(CapitaInfo.Withdraw),
+                bankDebt: Number(CapitaInfo.bankDebt),
+              },
+            );
+            const CreateCashflow = manager.create(CashFlow, {
+              Total_Capital:
+                Number(lastCashflowInfo.Total_Capital) +
+                Number(dto.payment_Amount),
+              Bank_Capital:
+                dto.BankoptionII === 'Bank'
+                  ? Number(lastCashflowInfo.Bank_Capital) +
+                    Number(dto.payment_Amount)
+                  : Number(lastCashflowInfo.Bank_Capital),
+              OnHand_Capital:
+                dto.BankoptionII === 'Cash'
+                  ? Number(lastCashflowInfo.OnHand_Capital) +
+                    Number(dto.payment_Amount)
+                  : Number(lastCashflowInfo.OnHand_Capital),
+              Withdraw: Number(lastCashflowInfo.Withdraw),
+              servicename: CheckservId.service_name,
+              bankDebt: Number(lastCashflowInfo.bankDebt),
+            });
+            await manager.save(CreateCashflow);
+            const CreateService = manager.create(serviceRecord, {
+              price: Number(dto.payment_Amount),
+              service: { id: CheckservId.id },
+              user: { id: userId },
+            });
+            await manager.save(CreateService);
+
         }
         const checkWithdrawAmount = await manager.findOne(Capital, {
           where: {},
