@@ -357,13 +357,20 @@ export class ManagementService {
                 Number(dto.payment_Amount),
               Bank_Capital: dto.BankoptionII === 'Bank' ? Number(lastCashflowInfo.Bank_Capital) - Number(dto.payment_Amount): Number(lastCashflowInfo.Bank_Capital),
               OnHand_Capital:
-                dto.BankoptionII === 'cash' ?Number(lastCashflowInfo.OnHand_Capital) -
+                dto.BankoptionII === 'Cash' ?Number(lastCashflowInfo.OnHand_Capital) -
                 Number(dto.payment_Amount): Number(lastCashflowInfo.OnHand_Capital),
               Withdraw:
                 Number(lastCashflowInfo.Withdraw),
               servicename: CheckservId.service_name,
               bankDebt: Number(lastCashflowInfo.bankDebt),
           })
+          await manager.save(CreateCashflow)
+            const CreateService = manager.create(serviceRecord, {
+              price: Number(dto.payment_Amount),
+              service: { id: CheckservId.id },
+              user: { id: userId },
+            });
+            await manager.save(CreateService)
           }
         }
         const checkWithdrawAmount = await manager.findOne(Capital, {
