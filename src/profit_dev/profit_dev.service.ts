@@ -45,10 +45,9 @@ export class ProfitDevService {
     @InjectRepository(Stock_transaction)
     private readonly StockTrnasrepo: Repository<Stock_transaction>,
     @InjectRepository(serviceRecord)
-    private readonly ServRecord:Repository<serviceRecord>,
+    private readonly ServRecord: Repository<serviceRecord>,
     private readonly Datasource: DataSource,
     private readonly businesslogic: BusinessGrowthLogic,
-    
   ) {}
 
   async AdminAnalysis(): Promise<ResponseType<any>> {
@@ -436,19 +435,19 @@ export class ProfitDevService {
       },
     };
   }
-  async BusinessServiceReturn():Promise<ResponseType<any>>{
-    const serviceInfo = await this.businessServ.createQueryBuilder('b')
-    .select('b.id', 'id')
-    .addSelect('b.service_name', 'service_name')
-    .addSelect('b.icon_name', 'icon_name')
-    .getRawMany()
+  async BusinessServiceReturn(): Promise<ResponseType<any>> {
+    const serviceInfo = await this.businessServ
+      .createQueryBuilder('b')
+      .select('b.id', 'id')
+      .addSelect('b.service_name', 'service_name')
+      .addSelect('b.icon_name', 'icon_name')
+      .getRawMany();
 
-    return{
-      message:'successfuly returned',
-      success:false,
-      data:serviceInfo
-
-    }
+    return {
+      message: 'successfuly returned',
+      success: false,
+      data: serviceInfo,
+    };
   }
   async Networthcalculate(): Promise<ResponseType<any>> {
     const Stockdata = await this.Stockrepo.createQueryBuilder('cal')
@@ -507,28 +506,41 @@ export class ProfitDevService {
     networth =
       StockWorth + Number(CapitalAmount?.Total_Capital ?? 0) - CustomerDebt;
     const cashStored = { MoneyDistribution, onHandCash };
+
+    const serviceRecord = await this.ServRecord.createQueryBuilder('c')
+      .leftJoin('c.service', 'B')
+      .select('B.service_name', 'serviceName')
+      .addSelect('B.icon_name', 'icon_name')
+      .addSelect('c.price', 'price')
+      .addSelect('c.CreatedAt', 'createdAt')
+      .getRawMany();
+
+    const TodayservRecord = serviceRecord.filter((item) => {
+      const recordDate = new Date(item.createdAt).toISOString().split('T')[0];
+      const today = new Date().toISOString().split('T')[0];
+      return recordDate === today;
+    });
+    const now = new Date();
+    const dateOfWeek = now.getDay();
     
-   const serviceRecord = await this.ServRecord.createQueryBuilder('c')
-   .leftJoin('c.service','B')
-   .select('B.service_name', 'serviceName')
-   .addSelect('B.icon_name', 'icon_name')
-   .addSelect('c.price', 'price')
-   .addSelect('c.CreatedAt', 'createdAt')
-   .getRawMany()
+    const thisweekstart = new Date(now.getDate());
+    thisweekstart.setHours(0, 0, 0, 0);
+    thisweekstart.setDate(now.getDate() - dateOfWeek);
 
-  const TodayservRecord = serviceRecord.filter((item) => {
-  const recordDate = new Date(item.createdAt).toISOString().split('T')[0];
-  const today = new Date().toISOString().split('T')[0];
-  return recordDate === today;
+    const thisWeekEnd = new Date(thisweekstart);
+    thisWeekEnd.setHours(23, 59, 59, 999);
+    thisWeekEnd.setDate(thisweekstart.getDate() + 6);
 
-});
-const now =  new Date().toISOString().split('T')[0]
-const 
-
- const ThisweekServRecord = serviceRecord.filter((item)=>{
-
- })
-    const Withdraw_money = await this.CapitalRepo.findOne({where:{}, order:{id:"DESC"}})
+    const ThisweekServRecord = serviceRecord.filter((item) => {
+      const startdate = thisweekstart;
+      const enddate = thisWeekEnd;
+      const create = new Date(item.createdAt);
+      return create >= startdate && create <= enddate;
+    });
+    const Withdraw_money = await this.CapitalRepo.findOne({
+      where: {},
+      order: { id: 'DESC' },
+    });
     const Capital_Result = await this.CashflowRespo.createQueryBuilder('c')
       .select('SUM(c.Total_Capital)', 'total_revenue')
       .orderBy('c.CreatedAt', 'DESC')
@@ -571,6 +583,7 @@ const
         Withdraw_money,
         serviceRecord,
         TodayservRecord,
+        ThisweekServRecord,
       },
     };
   }
