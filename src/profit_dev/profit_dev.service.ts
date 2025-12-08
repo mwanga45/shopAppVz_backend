@@ -521,21 +521,19 @@ export class ProfitDevService {
       return recordDate === today;
     });
     const now = new Date();
-    const dateOfWeek = now.getDay();
-    
-    const thisweekstart = new Date(now.getDate());
-    thisweekstart.setHours(0, 0, 0, 0);
-    thisweekstart.setDate(now.getDate() - dateOfWeek);
+    const dateOfWeek = now.getDay(); // 0 (Sun) - 6 (Sat)
 
-    const thisWeekEnd = new Date(thisweekstart);
+    const thisWeekStart = new Date(now);
+    thisWeekStart.setHours(0, 0, 0, 0);
+    thisWeekStart.setDate(thisWeekStart.getDate() - dateOfWeek);
+
+    const thisWeekEnd = new Date(thisWeekStart);
     thisWeekEnd.setHours(23, 59, 59, 999);
-    thisWeekEnd.setDate(thisweekstart.getDate() + 6);
+    thisWeekEnd.setDate(thisWeekStart.getDate() + 6);
 
     const ThisweekServRecord = serviceRecord.filter((item) => {
-      const startdate = thisweekstart;
-      const enddate = thisWeekEnd;
       const create = new Date(item.createdAt);
-      return create >= startdate && create <= enddate;
+      return create >= thisWeekStart && create <= thisWeekEnd;
     });
     const Withdraw_money = await this.CapitalRepo.findOne({
       where: {},

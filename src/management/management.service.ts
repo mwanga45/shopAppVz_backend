@@ -180,7 +180,7 @@ export class ManagementService {
     const thisWeekEnd = Timeformat.formatLocal(thisweekend);
     const serviceRecord = await this.serviceRecoRepo
       .createQueryBuilder('s')
-      .leftJoin('s.sr', 'b')
+      .leftJoin('s.service', 'b')
       .select('b.service_name', 'service_name')
       .addSelect('b.icon_name', 'icon_name')
       .addSelect('s.price', 'price')
@@ -277,7 +277,7 @@ export class ManagementService {
 
               const CreateService = manager.create(serviceRecord, {
                 price: Number(dto.payment_Amount),
-                sr: { id: CheckservId.id },
+                service: { id: CheckservId.id },
                 user: { id: userId },
               });
               await manager.save(CreateService);
@@ -320,7 +320,7 @@ export class ManagementService {
 
             const CreateService = manager.create(serviceRecord, {
               price: Number(dto.payment_Amount),
-              sr: { id: CheckservId.id },
+              service: { id: CheckservId.id },
               user: { id: userId },
             });
             await manager.save(CreateService);
@@ -328,6 +328,42 @@ export class ManagementService {
               message: `successfuly withdraw the money from cash(On hand) amount ${Number(dto.payment_Amount).toLocaleString()}`,
               success: true,
             };
+          }
+          if(dto.Bankoption === 'Return'){
+            if(dto.BankoptionII === 'Bank'){
+              if(Number(CapitaInfo.BankCapital) <= Number(dto.payment_Amount))
+                throw new Error(`Money In bank Account is no Enough, you have only ${CapitaInfo.BankCapital}`)
+            }
+              if(dto.BankoptionII === 'Cash'){
+              if(Number(CapitaInfo.OnhandCapital) <= Number(dto.payment_Amount))
+                throw new Error(`Cash Money Account is no Enough your have only ${CapitaInfo.OnhandCapital}`)
+            }
+            const updateCapital  =  await manager.update(Capital,{id:1},{
+                Total_Capital:(
+                  Number(CapitaInfo.Total_Capital)-Number(dto.payment_Amount)),
+                OnhandCapital:
+                  (dto.BankoptionII === 'Bank'?Number(CapitaInfo.OnhandCapital):Number(CapitaInfo.OnhandCapital)-Number(dto.payment_Amount)),
+                BankCapital:
+                (dto.BankoptionII === 'Cash' ? Number(CapitaInfo.BankCapital)- Number(dto.payment_Amount): Number(CapitaInfo.BankCapital)),
+                Withdraw:
+                  Number(CapitaInfo.Withdraw),
+                bankDebt: Number(CapitaInfo.bankDebt),
+                
+              },)
+
+          const CreateCashflow = manager.create(CashFlow,{
+                Total_Capital:
+                Number(lastCashflowInfo.Total_Capital) -
+                Number(dto.payment_Amount),
+              Bank_Capital: dto.BankoptionII === 'Bank' ? Number(lastCashflowInfo.Bank_Capital) - Number(dto.payment_Amount): Number(lastCashflowInfo.Bank_Capital),
+              OnHand_Capital:
+                dto.BankoptionII === 'cash' ?Number(lastCashflowInfo.OnHand_Capital) -
+                Number(dto.payment_Amount): Number(lastCashflowInfo.OnHand_Capital),
+              Withdraw:
+                Number(lastCashflowInfo.Withdraw),
+              servicename: CheckservId.service_name,
+              bankDebt: Number(lastCashflowInfo.bankDebt),
+          })
           }
         }
         const checkWithdrawAmount = await manager.findOne(Capital, {
@@ -339,7 +375,7 @@ export class ManagementService {
           throw new Error('Withdraw first then make request of the service');
         const CreateService = manager.create(serviceRecord, {
           price: dto.payment_Amount,
-          sr: { id: dto.service_id },
+          service: { id: dto.service_id },
           user: { id: userId },
         });
         await manager.save(CreateService);

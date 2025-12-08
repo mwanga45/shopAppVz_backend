@@ -46,7 +46,11 @@ export class ServiceRequestDto{
 
     @IsOptional()
     @IsString()
-    depositTo:string
+    Bankoption:string
+
+    @IsOptional()
+    @IsString()
+    BankoptionII:string
 
 }
 
