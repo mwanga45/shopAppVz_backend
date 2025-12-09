@@ -511,6 +511,7 @@ export class ProfitDevService {
       .leftJoin('c.service', 'B')
       .select('B.service_name', 'serviceName')
       .addSelect('B.icon_name', 'icon_name')
+      .addSelect('c.Servicestatus', 'Servicestatus')
       .addSelect('c.price', 'price')
       .addSelect('c.CreatedAt', 'createdAt')
       .getRawMany();
@@ -539,8 +540,8 @@ export class ProfitDevService {
       where: {},
       order: { id: 'DESC' },
     });
-    
-    const Bank_Debt = Number(Withdraw_money?.bankDebt)
+
+    const Bank_Debt = Number(Withdraw_money?.bankDebt);
 
     const Capital_Result = await this.CashflowRespo.createQueryBuilder('c')
       .select('SUM(c.Total_Capital)', 'total_revenue')
@@ -585,7 +586,7 @@ export class ProfitDevService {
         serviceRecord,
         TodayservRecord,
         ThisweekServRecord,
-        Bank_Debt
+        Bank_Debt,
       },
     };
   }

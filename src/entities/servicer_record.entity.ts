@@ -8,7 +8,8 @@ export class serviceRecord extends baseEntity{
 @Column({type:'decimal', precision:15, scale:2})
 price:number
 
-
+@Column({default:"paid"})
+Servicestatus:string
 
 @ManyToOne(() => BusinessService, (bs) => bs.records)
 @JoinColumn({ name: "bs_id" })

@@ -345,7 +345,7 @@ export class ManagementService {
 
             if(Number(CapitaInfo.bankDebt) < Number(dto.payment_Amount))
               throw new Error(`There the returned loan  is greater than exist debt : Exist Debt ${Number(CapitaInfo.bankDebt)}, Return Debt ${CapitaInfo.bankDebt}`)
-            
+
             const updateCapital = await manager.update(
               Capital,
               { id: 1 },
@@ -363,7 +363,7 @@ export class ManagementService {
                       Number(dto.payment_Amount)
                     : Number(CapitaInfo.BankCapital),
                 Withdraw: Number(CapitaInfo.Withdraw),
-                bankDebt: Number(CapitaInfo.bankDebt),
+                bankDebt: Number(CapitaInfo.bankDebt)- Number(dto.payment_Amount),
               },
             );
 
@@ -383,7 +383,7 @@ export class ManagementService {
                   : Number(lastCashflowInfo.OnHand_Capital),
               Withdraw: Number(lastCashflowInfo.Withdraw),
               servicename: CheckservId.service_name,
-              bankDebt: Number(lastCashflowInfo.bankDebt),
+              bankDebt: Number(lastCashflowInfo.bankDebt)-Number(dto.payment_Amount),
             });
             await manager.save(CreateCashflow);
             const CreateService = manager.create(serviceRecord, {
@@ -415,7 +415,7 @@ export class ManagementService {
                       Number(dto.payment_Amount)
                     : Number(CapitaInfo.BankCapital),
                 Withdraw: Number(CapitaInfo.Withdraw),
-                bankDebt: Number(CapitaInfo.bankDebt),
+                bankDebt: Number(CapitaInfo.bankDebt) + Number(dto.payment_Amount),
               },
             );
             const CreateCashflow = manager.create(CashFlow, {
@@ -434,13 +434,14 @@ export class ManagementService {
                   : Number(lastCashflowInfo.OnHand_Capital),
               Withdraw: Number(lastCashflowInfo.Withdraw),
               servicename: CheckservId.service_name,
-              bankDebt: Number(lastCashflowInfo.bankDebt),
+              bankDebt: Number(lastCashflowInfo.bankDebt) + Number(dto.payment_Amount),
             });
             await manager.save(CreateCashflow);
             const CreateService = manager.create(serviceRecord, {
               price: Number(dto.payment_Amount),
               service: { id: CheckservId.id },
               user: { id: userId },
+              Servicestatus:"Gain"
             });
             await manager.save(CreateService);
             return{
