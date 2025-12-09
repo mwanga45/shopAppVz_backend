@@ -340,8 +340,12 @@ export class ManagementService {
           }
 
           if (dto.Bankoption === 'Return') {
+            if(Number(CapitaInfo.bankDebt) === 0)
+              throw new Error('There no debt exist at all')
+
             if(Number(CapitaInfo.bankDebt) < Number(dto.payment_Amount))
               throw new Error(`There the returned loan  is greater than exist debt : Exist Debt ${Number(CapitaInfo.bankDebt)}, Return Debt ${CapitaInfo.bankDebt}`)
+            
             const updateCapital = await manager.update(
               Capital,
               { id: 1 },
