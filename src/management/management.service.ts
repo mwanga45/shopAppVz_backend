@@ -340,6 +340,8 @@ export class ManagementService {
           }
 
           if (dto.Bankoption === 'Return') {
+            if(Number(CapitaInfo.bankDebt) < Number(dto.payment_Amount))
+              throw new Error(`There the returned loan  is greater than exist debt : Exist Debt ${Number(CapitaInfo.bankDebt)}, Return Debt ${CapitaInfo.bankDebt}`)
             const updateCapital = await manager.update(
               Capital,
               { id: 1 },
@@ -360,6 +362,7 @@ export class ManagementService {
                 bankDebt: Number(CapitaInfo.bankDebt),
               },
             );
+
             const CreateCashflow = manager.create(CashFlow, {
               Total_Capital:
                 Number(lastCashflowInfo.Total_Capital) -
