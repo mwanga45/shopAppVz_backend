@@ -313,7 +313,6 @@ export class ManagementService {
               servicename: CheckservId.service_name,
               bankDebt: Number(lastCashflowInfo.bankDebt),
             });
-            console.log('Create object:', CreateCashflowdata);
             await manager.save(CreateCashflowdata);
 
             const CreateService = manager.create(serviceRecord, {
@@ -386,6 +385,11 @@ export class ManagementService {
               user: { id: userId },
             });
             await manager.save(CreateService);
+
+            return {
+              message:`successfuly  Return an Loan ${Number(dto.payment_Amount).toLocaleString()}`,
+              success:true
+            }
           }
           const updateCapital = await manager.update(
               Capital,
@@ -432,7 +436,10 @@ export class ManagementService {
               user: { id: userId },
             });
             await manager.save(CreateService);
-
+            return{
+              message:`successfuly Add new Loan to capital ${Number(dto.payment_Amount).toLocaleString()},`,
+              success:true
+            }
         }
         const checkWithdrawAmount = await manager.findOne(Capital, {
           where: {},
