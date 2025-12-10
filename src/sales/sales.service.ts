@@ -483,7 +483,7 @@ export class SalesService {
             return {
               message: 'Successfuly  add new sales but  waiting for payment',
               success: true,
-              data:fetchlastRec
+              data: fetchlastRec,
             };
           }
           const Profitrecord = await this.Profitupdatesummary(
@@ -604,8 +604,7 @@ export class SalesService {
       const findCategory = await manager.findOne(Product, {
         where: { id: dto.product_id },
       });
-      if(!findCategory)
-        throw new Error('Product is not Exist')
+      if (!findCategory) throw new Error('Product is not Exist');
       try {
         if (dto.updatetype === updatetype.Updatesales) {
           if (findCategory.product_category === 'wholesales') {
@@ -617,31 +616,48 @@ export class SalesService {
                 payment_via: dto.PaymentVia,
               },
             );
-            const findsalesdetails = await manager.findOne(WholeSales,{where:{id:dto.sales_id}})
-            if(!findsalesdetails)
-              throw new Error('sales record is not found')
-            if(!updatesales)
-              throw new Error('failed to update record')
+            const findsalesdetails = await manager.findOne(WholeSales, {
+              where: { id: dto.sales_id },
+            });
+            if (!findsalesdetails) throw new Error('sales record is not found');
+            if (!updatesales) throw new Error('failed to update record');
 
-            const updateprofit =  await this.Profitupdatesummary(manager,findsalesdetails.Net_profit,findsalesdetails.Revenue)
-            if(!updateprofit.success)
-              throw new Error(String(updateprofit.message))
-            
-            const UpdateCapital =  await this.BusinessGrowthLogic.UpdateCapital(manager,dto.PaymentVia,findsalesdetails.Revenue)
-            if(!UpdateCapital.success)
-              throw new Error(String(UpdateCapital.message))
+            const updateprofit = await this.Profitupdatesummary(
+              manager,
+              findsalesdetails.Net_profit,
+              findsalesdetails.Revenue,
+            );
+            if (!updateprofit.success)
+              throw new Error(String(updateprofit.message));
+
+            const UpdateCapital = await this.BusinessGrowthLogic.UpdateCapital(
+              manager,
+              dto.PaymentVia,
+              findsalesdetails.Revenue,
+            );
+            if (!UpdateCapital.success)
+              throw new Error(String(UpdateCapital.message));
           } else {
-            const findsalesdetails = await manager.findOne(RetailSales,{where:{id:dto.sales_id}})
-            if(!findsalesdetails)
-              throw new Error('sales Record is not found')
+            const findsalesdetails = await manager.findOne(RetailSales, {
+              where: { id: dto.sales_id },
+            });
+            if (!findsalesdetails) throw new Error('sales Record is not found');
 
-            const updateprofit = await this.Profitupdatesummary(manager,findsalesdetails.Net_profit,findsalesdetails.Revenue )
-            if(!updateprofit.success)
-              throw new Error(String(updateprofit.message))
+            const updateprofit = await this.Profitupdatesummary(
+              manager,
+              findsalesdetails.Net_profit,
+              findsalesdetails.Revenue,
+            );
+            if (!updateprofit.success)
+              throw new Error(String(updateprofit.message));
 
-            const UpdateCapital = await this.BusinessGrowthLogic.UpdateCapital(manager,dto.PaymentVia, findsalesdetails.Revenue)
-            if(!UpdateCapital.success)
-              throw new Error(String(UpdateCapital.message))
+            const UpdateCapital = await this.BusinessGrowthLogic.UpdateCapital(
+              manager,
+              dto.PaymentVia,
+              findsalesdetails.Revenue,
+            );
+            if (!UpdateCapital.success)
+              throw new Error(String(UpdateCapital.message));
             const updatesales = await manager.update(
               RetailSales,
               { id: dto.sales_id },
@@ -669,8 +685,8 @@ export class SalesService {
           const Phone_number = this.Dialvalidate.CheckDialformat(
             dto.phone_number,
           );
-          if(!Phone_number.success)
-            throw new Error(String(Phone_number.message))
+          if (!Phone_number.success)
+            throw new Error(String(Phone_number.message));
           const CreateDebt = manager.create(Debt, {
             paidmoney: Number(dto.paidAmount ?? 0),
             Debtor_name: dto.debtorname,
@@ -716,8 +732,8 @@ export class SalesService {
         const Phone_number = this.Dialvalidate.CheckDialformat(
           dto.phone_number,
         );
-        if(!Phone_number.success)
-          throw new Error(String(Phone_number.message))
+        if (!Phone_number.success)
+          throw new Error(String(Phone_number.message));
         const CreateDebt = manager.create(Debt, {
           paidmoney: Number(dto.paidAmount ?? 0),
           Debtor_name: dto.debtorname,
@@ -1006,43 +1022,53 @@ export class SalesService {
     };
   }
 
-  async UpdatePendingsales(dto:updatePendingDto, userId:any):Promise<ResponseType<any>>{
-    return  await this.Datasource.transaction(async(manager)=>{
-      try{
-       const checkProductId = await manager.findOne(Product,{where:{id:dto.Product_id}})
-       
-       if(!checkProductId)
-        throw new Error('This product is not exist')
-        let Tablename = WholeSales
-       if(checkProductId.product_category === 'wholesales'){
-         const verifysalesId = await manager.findOne(WholeSales, {where:{id:dto.Sales_id}})
-         if(!verifysalesId)
-          throw new Error('Sales Is Not Exist')
-         if(verifysalesId.paymentstatus !== 'pending' )
-          throw new Error('This sales is not exist in pending section')
-       }else{
-         const verifysalesId = await manager.findOne(RetailSales, {where:{id:dto.Sales_id}})
-         if(!verifysalesId)
-          throw new Error('Sales Is Not Exist')
-         if(verifysalesId.paymentstatus !== 'pending' )
-          throw new Error('This sales is not exist in pending section')
-        Tablename = RetailSales
-       }
-       if(dto.UpdateType === UpdatePendingType.PaidPending){
-        const updatesales = await manager.update(Tablename,{id:dto.Sales_id},{
-          paymentstatus:paymentstatus.Paid
-        })
-       }
-       return{
-        message:"successfuly ",
-        success:true
-       }
-      }catch(err){
-        return{
-          message:`something went wrong ${err}`,
-          success:false
+  async UpdatePendingsales(
+    dto: updatePendingDto,
+    userId: any,
+  ): Promise<ResponseType<any>> {
+    return await this.Datasource.transaction(async (manager) => {
+      try {
+        const checkProductId = await manager.findOne(Product, {
+          where: { id: dto.Product_id },
+        });
+
+        if (!checkProductId) throw new Error('This product is not exist');
+        let Tablename = WholeSales;
+        if (checkProductId.product_category === 'wholesales') {
+          const verifysalesId = await manager.findOne(WholeSales, {
+            where: { id: dto.Sales_id },
+          });
+          if (!verifysalesId) throw new Error('Sales Is Not Exist');
+          if (verifysalesId.paymentstatus !== 'pending')
+            throw new Error('This sales is not exist in pending section');
+        } else {
+          const verifysalesId = await manager.findOne(RetailSales, {
+            where: { id: dto.Sales_id },
+          });
+          if (!verifysalesId) throw new Error('Sales Is Not Exist');
+          if (verifysalesId.paymentstatus !== 'pending')
+            throw new Error('This sales is not exist in pending section');
+          Tablename = RetailSales;
         }
+        if (dto.UpdateType === UpdatePendingType.PaidPending) {
+          const updatesales = await manager.update(
+            Tablename,
+            { id: dto.Sales_id },
+            {
+              paymentstatus: paymentstatus.Paid,
+            },
+          );
+        }
+        return {
+          message: 'successfuly ',
+          success: true,
+        };
+      } catch (err) {
+        return {
+          message: `something went wrong ${err}`,
+          success: false,
+        };
       }
-    })
+    });
   }
 }
