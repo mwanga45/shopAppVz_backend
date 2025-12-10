@@ -1012,7 +1012,12 @@ export class SalesService {
        
        if(!checkProductId)
         throw new Error('This product is not exist')
-      
+       if(checkProductId.product_category === 'wholesales'){
+         const verifysalesId = await manager.findOne(WholeSales, {where:{id:dto.Sales_id}})
+         if(!verifysalesId)
+          throw new Error('Sales Is Not Exist')
+
+       }
        return{
         message:"successfuly ",
         success:true
