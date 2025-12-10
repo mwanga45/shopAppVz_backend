@@ -452,6 +452,7 @@ export class ManagementService {
         const checkWithdrawAmount = await manager.findOne(Capital, {
           where: {},
         });
+        console.log(checkWithdrawAmount)
         if (!checkWithdrawAmount)
           throw new Error('there is information on capital table');
         if (checkWithdrawAmount.Withdraw < Number(dto.payment_Amount))
@@ -461,6 +462,7 @@ export class ManagementService {
           service: { id: dto.service_id },
           user: { id: userId },
         });
+        console.log(CreateService)
         await manager.save(CreateService);
         const updateCapital = await manager.update(
           Capital,
@@ -470,6 +472,7 @@ export class ManagementService {
               Number(checkWithdrawAmount.Withdraw) - Number(dto.payment_Amount),
           },
         );
+        console.log(updateCapital)
         if (!updateCapital.affected)
           throw new Error('failed to update capital');
         const lastCashflowInfo = await manager
@@ -496,6 +499,7 @@ export class ManagementService {
             Number(checkWithdrawAmount.Withdraw) - Number(dto.payment_Amount),
           servicename: CheckservId.service_name,
         });
+        console.log(CreateCashflow)
         await manager.save(CreateCashflow);
         return {
           message: 'successfuly made the request',

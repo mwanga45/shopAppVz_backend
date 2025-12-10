@@ -76,20 +76,24 @@ export class StockService {
   async findProductInfo(): Promise<any> {
     const getWholesalesquery = this.productRepo
       .createQueryBuilder('p')
+      .leftJoin('p.stock', 'stock')
       .select(['p.id', 'p.product_name', 'p.product_category'])
       .where('p.product_category = :category', {
         category: category.wholesales,
-      });
+      })
+      .andWhere('stock.id is NULL');
     const ForWholesales = await getWholesalesquery
       .orderBy('p.product_name', 'ASC')
       .getMany();
 
     const getRetailsalesquery = this.productRepo
       .createQueryBuilder('p')
+      .leftJoin('p.stock', 'stock')
       .select(['p.id', 'p.product_name', 'p.product_category'])
       .where('p.product_category = :category', {
         category: category.retailsales,
-      });
+      })
+      .andWhere('stock.id is NULL');
     const ForRetailsales = await getRetailsalesquery
       .orderBy('p.product_name', 'ASC')
       .getMany();
