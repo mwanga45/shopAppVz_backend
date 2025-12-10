@@ -1016,7 +1016,14 @@ export class SalesService {
          const verifysalesId = await manager.findOne(WholeSales, {where:{id:dto.Sales_id}})
          if(!verifysalesId)
           throw new Error('Sales Is Not Exist')
-
+         if(verifysalesId.paymentstatus !== 'pending' )
+          throw new Error('This sales is not exist in pending section')
+       }else{
+         const verifysalesId = await manager.findOne(RetailSales, {where:{id:dto.Sales_id}})
+         if(!verifysalesId)
+          throw new Error('Sales Is Not Exist')
+         if(verifysalesId.paymentstatus !== 'pending' )
+          throw new Error('This sales is not exist in pending section')
        }
        return{
         message:"successfuly ",
