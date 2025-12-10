@@ -122,5 +122,8 @@ export class updatePendingDto{
   @IsOptional()
   @IsNumber()
   PaidAmount:string
-  
+
+  @IsString()
+  UpdateType:
+
 }

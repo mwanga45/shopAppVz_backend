@@ -119,7 +119,11 @@ export enum  updatetype {
   Updatesales = 'updatesales',
   addTodebt = 'addTodebt' 
 } 
-
+export enum UpdatePendingType{
+  PaidPending = 'paidpending',
+  partialpaidPending = ' partialpaidpending',
+  unpaidPending = 'unpaidPending '
+}
 export enum Confirmatory{
   REMOVE  = 'Removed',
   ADD    = 'Added'
