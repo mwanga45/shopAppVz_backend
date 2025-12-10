@@ -1058,6 +1058,23 @@ export class SalesService {
               paymentstatus: paymentstatus.Paid,
             },
           );
+          
+        if(!updatesales.affected)
+          throw new Error('No update occured')
+        const updateRawDetails = await manager.findOne(Tablename,{where:{id:dto.Sales_id}})
+        if(!updateRawDetails)
+          throw new Error('Failed to fetch the updated Record')
+        const Profitrecord =  await this.Profitupdatesummary(manager,Number(updateRawDetails.Expected_Profit),Number(updateRawDetails.Revenue), dto.paymentVia )
+        if(!Profitrecord.success)
+          throw new Error(String(Profitrecord.message))
+
+        const CaptalRec =  await this.BusinessGrowthLogic.UpdateCapital(manager, dto.paymentVia, Number(updateRawDetails.Revenue))
+        if(!CaptalRec.success)
+          throw new Error(String(CaptalRec.message))
+        return{
+          message:"Successfuly update sale record",
+          success:true
+        }
         }
         return {
           message: 'successfuly ',

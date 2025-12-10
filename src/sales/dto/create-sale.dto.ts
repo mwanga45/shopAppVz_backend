@@ -113,6 +113,10 @@ export class Updatesales_Dto {
 export class updatePendingDto{
   @IsOptional()
   @IsString()
+  paymentVia:paymentvia
+
+  @IsOptional()
+  @IsString()
   debtorName:string
  
   @IsOptional()
