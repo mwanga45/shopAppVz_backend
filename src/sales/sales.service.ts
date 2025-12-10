@@ -1008,6 +1008,11 @@ export class SalesService {
   async UpdatePendingsales(dto:updatePendingDto, userId:any):Promise<ResponseType<any>>{
     return  await this.Datasource.transaction(async(manager)=>{
       try{
+       const checkProductId = await manager.findOne(Product,{where:{id:dto.Product_id}})
+       
+       if(!checkProductId)
+        throw new Error('This product is not exist')
+      
        return{
         message:"successfuly ",
         success:true

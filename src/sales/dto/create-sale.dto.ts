@@ -126,4 +126,10 @@ export class updatePendingDto{
   @IsString()
   UpdateType:UpdatePendingType
 
+  @IsNumber()
+  Product_id:number
+
+  @IsNumber()
+  Sales_id:number
+
 }
