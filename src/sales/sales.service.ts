@@ -20,6 +20,7 @@ import {
   paymentvia,
   PendingReturnResult,
   ResponseType,
+  UpdatePendingType,
   updatetype,
 } from 'src/type/type.interface';
 import { StockStatus } from 'src/type/type.interface';
@@ -1012,6 +1013,7 @@ export class SalesService {
        
        if(!checkProductId)
         throw new Error('This product is not exist')
+        let Tablename = WholeSales
        if(checkProductId.product_category === 'wholesales'){
          const verifysalesId = await manager.findOne(WholeSales, {where:{id:dto.Sales_id}})
          if(!verifysalesId)
@@ -1024,11 +1026,16 @@ export class SalesService {
           throw new Error('Sales Is Not Exist')
          if(verifysalesId.paymentstatus !== 'pending' )
           throw new Error('This sales is not exist in pending section')
+        Tablename = RetailSales
+       }
+       if(dto.UpdateType === UpdatePendingType.PaidPending){
+        const updatesales = await manager.update(Tablename,{id:dto.Sales_id},{
+          paymentstatus:paymentstatus.Paid
+        })
        }
        return{
         message:"successfuly ",
         success:true
-
        }
       }catch(err){
         return{
