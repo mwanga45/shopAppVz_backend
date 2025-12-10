@@ -602,9 +602,11 @@ export class SalesService {
       const findCategory = await manager.findOne(Product, {
         where: { id: dto.product_id },
       });
+      if(!findCategory)
+        throw new Error('Product is not Exist')
       try {
         if (dto.updatetype === updatetype.Updatesales) {
-          if (findCategory?.product_category === 'wholesales') {
+          if (findCategory.product_category === 'wholesales') {
             const updatesales = await manager.update(
               WholeSales,
               { id: dto.sales_id },
@@ -648,11 +650,11 @@ export class SalesService {
             );
           }
           return {
-            message: 'successfuky to update sales',
+            message: 'successfuly to update sales',
             success: true,
           };
         }
-        if (findCategory?.product_category === 'wholesales') {
+        if (findCategory.product_category === 'wholesales') {
           const findRecordsales = await manager.findOne(WholeSales, {
             where: { id: dto.sales_id },
           });

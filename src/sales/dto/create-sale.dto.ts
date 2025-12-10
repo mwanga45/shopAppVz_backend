@@ -110,3 +110,17 @@ export class Updatesales_Dto {
   @IsOptional()
   location:string
 }
+export class updatePendingDto{
+  @IsOptional()
+  @IsString()
+  debtorName:string
+ 
+  @IsOptional()
+  @IsString()
+  debtorPhone:string
+
+  @IsOptional()
+  @IsNumber()
+  PaidAmount:string
+  
+}

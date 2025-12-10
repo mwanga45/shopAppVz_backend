@@ -26,7 +26,8 @@ async UpdatesalesPending(@Request() req, @Body() dto:Updatesales_Dto){
   return await this.salesService.SaleResponse(Dto)
  }
 
-
+@Post('updatePending')
+async PendingUpdate(@Body())
 @Get('salesAnalysis')
 async SalesAnalys(){
   return await  this.salesService.TodaySaleAnalysis()
