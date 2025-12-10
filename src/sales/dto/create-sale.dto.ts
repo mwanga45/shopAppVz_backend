@@ -7,7 +7,7 @@ import {
   Min,
   IsEnum,
 } from 'class-validator';
-import { paymentstatus, StockStatus, override, paymentvia, updatetype } from 'src/type/type.interface';
+import { paymentstatus, StockStatus, override, paymentvia, updatetype, UpdatePendingType } from 'src/type/type.interface';
 
 export class CreateSaleDto {
   @IsNumber()
@@ -124,6 +124,6 @@ export class updatePendingDto{
   PaidAmount:string
 
   @IsString()
-  UpdateType:
+  UpdateType:UpdatePendingType
 
 }

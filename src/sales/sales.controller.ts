@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Req, HttpCode } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { AuthGuard } from '@nestjs/passport';
-import { CreateSaleDto, SalesResponseDto, Updatesales_Dto } from './dto/create-sale.dto';
+import { CreateSaleDto, SalesResponseDto, updatePendingDto, Updatesales_Dto } from './dto/create-sale.dto';
 
 @Controller('sales')
 export class SalesController {
@@ -26,8 +26,13 @@ async UpdatesalesPending(@Request() req, @Body() dto:Updatesales_Dto){
   return await this.salesService.SaleResponse(Dto)
  }
 
+@UseGuards(AuthGuard('jwt'))
 @Post('updatePending')
-async PendingUpdate(@Body())
+async PendingUpdate(@Request() req , @Body() Dto:updatePendingDto){
+  const userId = req.user.userId
+  return await this.salesService.UpdatePendingsales(Dto,userId)
+}
+
 @Get('salesAnalysis')
 async SalesAnalys(){
   return await  this.salesService.TodaySaleAnalysis()

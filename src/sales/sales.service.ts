@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import {
   CreateSaleDto,
   SalesResponseDto,
+  updatePendingDto,
   Updatesales_Dto,
 } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
@@ -1002,5 +1003,22 @@ export class SalesService {
         PendingcombineResult,
       },
     };
+  }
+
+  async UpdatePendingsales(dto:updatePendingDto, userId:any):Promise<ResponseType<any>>{
+    return  await this.Datasource.transaction(async(manager)=>{
+      try{
+       return{
+        message:"successfuly ",
+        success:true
+
+       }
+      }catch(err){
+        return{
+          message:`something went wrong ${err}`,
+          success:false
+        }
+      }
+    })
   }
 }
