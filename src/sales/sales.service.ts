@@ -1122,8 +1122,16 @@ export class SalesService {
             location: dto.location,
             user: { id: userId },
         })
-        await manager.save(CreateDebt)
-        
+        const savedDebt = await manager.save(CreateDebt)
+        if(!savedDebt || !savedDebt.id)
+          throw new Error('Failed to  add record to Debt')
+
+        const AddDebt_Track  = manager.create(Debt_track,{
+          debt:{id:savedDebt.id},
+          paidmoney:dto.PaidAmount || 0,
+          user:{id:userId}
+        })
+        await manager.save(AddDebt_Track)
         return {
           message: 'successfuly add  sales  to debt list ',
           success: true,
