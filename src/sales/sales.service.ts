@@ -36,7 +36,6 @@ import { Debt_track } from 'src/debt/entities/debt.entity';
 import { Capital } from 'src/entities/capital.entity';
 import { BusinessGrowthLogic } from 'src/common/helper/businessLogic.helper';
 import { dialValidate } from 'src/common/helper/phone.helper';
-import { waitForDebugger } from 'inspector';
 
 @Injectable()
 export class SalesService {
@@ -1084,7 +1083,33 @@ export class SalesService {
             success: true,
           };
         }
-
+        const findProductDetails = await manager.findOne(Tablename,{where:{id:dto.Sales_id}})
+        if(!findProductDetails)
+          throw new Error('Failed to fetch sales record')
+        const isValidPh_number = this.Dialvalidate.CheckDialformat(dto.debtorPhone)
+        if(!isValidPh_number.success)
+          throw new Error('Invalid Phone Number')
+        let partialpaid =false
+        if(Number(dto.PaidAmount)> 0)
+          partialpaid = true
+        const CreateDebt = manager.create(Debt,{
+            product: { id: dto.Product_id },
+            paidmoney:dto.PaidAmount | 0,
+            Debtor_name: dto.debtorName,
+            Net_profit: Number(findProductDetails.Net_profit ?? 0),
+            Expected_profit: Number(findProductDetails.Expected_Profit ?? 0),
+            Phone_number: isValidPh_number.data,
+            Revenue: Number(findProductDetails.Revenue ?? 0),
+            Percentage_deviation:Number(findProductDetails.percentage_deviation ?? 0),
+            profit_deviation: Number(findProductDetails.profit_deviation ?? 0),
+            Total_pc_pkg_litre: Number(findProductDetails.Total_pc_pkg_litre ?? 0),
+            Discount_percentage: findProductDetails.percentage_discount ?? '',
+            paymentstatus: partialpaid === true ? paymentstatus.Parctial:paymentstatus.Dept,
+            PaymentDateAt: dto.PaymentDateAt,
+            location: dto.location,
+            user: { id: userId },
+        })
+        
         return {
           message: 'successfuly ',
           success: true,

@@ -46,7 +46,6 @@ export class DebtService {
           where: { id: dto.ProductId },
         });
         if (!findproduct) throw new Error('Product is not Eixts');
-
         const isValidPh_number = this.dialservecheck.CheckDialformat(
           dto.Phone_number,
         );
@@ -71,7 +70,7 @@ export class DebtService {
             Debtor_name: dto.Debtor_name,
             Net_profit: dto.Net_profit,
             Expected_profit: dto.Expected_profit,
-            Phone_number: dto.Phone_number,
+            Phone_number: isValidPh_number.data,
             Revenue: dto.Revenue,
             Percentage_deviation: dto.Percentage_deviation,
             profit_deviation: dto.profit_deviation,

@@ -87,7 +87,7 @@ export class Updatesales_Dto {
   updatetype:updatetype
   
   @IsOptional()
-  @IsString()
+  @IsEnum(paymentvia)
   PaymentVia:paymentvia
 
   @IsOptional()
@@ -112,7 +112,7 @@ export class Updatesales_Dto {
 }
 export class updatePendingDto{
   @IsOptional()
-  @IsString()
+  @IsEnum(paymentvia)
   paymentVia:paymentvia
 
   @IsOptional()
@@ -125,10 +125,21 @@ export class updatePendingDto{
 
   @IsOptional()
   @IsNumber()
-  PaidAmount:string
+  PaidAmount:number
+
+  @IsOptional()
+  @IsString()
+  PaymentDateAt:string
+ 
+  @IsOptional()
+  @IsString()
+  location:string
 
   @IsString()
+  @IsEnum(UpdatePendingType)
   UpdateType:UpdatePendingType
+
+
 
   @IsNumber()
   Product_id:number
