@@ -33,9 +33,11 @@ import { SaleSummary, MostProfit } from 'src/type/type.interface';
 import { DailyProfitsummary } from './entities/profitsummary.entity';
 import { Debt } from 'src/debt/entities/debt.entity';
 import { Debt_track } from 'src/debt/entities/debt.entity';
+import { Customer } from 'src/entities/customer.entity';
 import { Capital } from 'src/entities/capital.entity';
 import { BusinessGrowthLogic } from 'src/common/helper/businessLogic.helper';
 import { dialValidate } from 'src/common/helper/phone.helper';
+
 
 @Injectable()
 export class SalesService {
@@ -1092,6 +1094,17 @@ export class SalesService {
         let partialpaid =false
         if(Number(dto.PaidAmount)> 0)
           partialpaid = true
+        const checkUserphone_exist = await manager.findOne(Customer, {
+                  where: { phone_number: isValidPh_number.data },
+                });
+        if(!checkUserphone_exist){
+          const addCustomer =   manager.create(Customer,{
+            customer_name: dto.debtorName,
+            phone_number: isValidPh_number.data,
+            Location: dto.location || 'none',
+          })
+          await manager.save(addCustomer)
+        }
         const CreateDebt = manager.create(Debt,{
             product: { id: dto.Product_id },
             paidmoney:dto.PaidAmount | 0,
@@ -1109,9 +1122,10 @@ export class SalesService {
             location: dto.location,
             user: { id: userId },
         })
+        await manager.save(CreateDebt)
         
         return {
-          message: 'successfuly ',
+          message: 'successfuly add  sales  to debt list ',
           success: true,
         };
       } catch (err) {

@@ -14,10 +14,11 @@ import { CashFlow } from 'src/entities/cashFlow.entity';
 import { Debt } from 'src/debt/entities/debt.entity';
 import { Debt_track } from 'src/debt/entities/debt.entity';
 import { dialValidate } from 'src/common/helper/phone.helper';
+import { Customer } from 'src/entities/customer.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([WholeSales, RetailSales,Stock,Stock_transaction, DailyProfitsummary, Capital, CashFlow, Debt, Debt_track]),
+    TypeOrmModule.forFeature([WholeSales, RetailSales,Stock,Stock_transaction, DailyProfitsummary, Capital, CashFlow, Debt, Debt_track,Customer]),
     ProductModule,
     StockModule,
   ],
