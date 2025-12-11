@@ -38,7 +38,6 @@ import { Capital } from 'src/entities/capital.entity';
 import { BusinessGrowthLogic } from 'src/common/helper/businessLogic.helper';
 import { dialValidate } from 'src/common/helper/phone.helper';
 
-
 @Injectable()
 export class SalesService {
   constructor(
@@ -1085,53 +1084,60 @@ export class SalesService {
             success: true,
           };
         }
-        const findProductDetails = await manager.findOne(Tablename,{where:{id:dto.Sales_id}})
-        if(!findProductDetails)
-          throw new Error('Failed to fetch sales record')
-        const isValidPh_number = this.Dialvalidate.CheckDialformat(dto.debtorPhone)
-        if(!isValidPh_number.success)
-          throw new Error('Invalid Phone Number')
-        let partialpaid =false
-        if(Number(dto.PaidAmount)> 0)
-          partialpaid = true
+        const findProductDetails = await manager.findOne(Tablename, {
+          where: { id: dto.Sales_id },
+        });
+        if (!findProductDetails)
+          throw new Error('Failed to fetch sales record');
+        const isValidPh_number = this.Dialvalidate.CheckDialformat(
+          dto.debtorPhone,
+        );
+        if (!isValidPh_number.success) throw new Error('Invalid Phone Number');
+        let partialpaid = false;
+        if (Number(dto.PaidAmount) > 0) partialpaid = true;
         const checkUserphone_exist = await manager.findOne(Customer, {
-                  where: { phone_number: isValidPh_number.data },
-                });
-        if(!checkUserphone_exist){
-          const addCustomer =   manager.create(Customer,{
+          where: { phone_number: isValidPh_number.data },
+        });
+        if (!checkUserphone_exist) {
+          const addCustomer = manager.create(Customer, {
             customer_name: dto.debtorName,
             phone_number: isValidPh_number.data,
             Location: dto.location || 'none',
-          })
-          await manager.save(addCustomer)
+          });
+          await manager.save(addCustomer);
         }
-        const CreateDebt = manager.create(Debt,{
-            product: { id: dto.Product_id },
-            paidmoney:dto.PaidAmount | 0,
-            Debtor_name: dto.debtorName,
-            Net_profit: Number(findProductDetails.Net_profit ?? 0),
-            Expected_profit: Number(findProductDetails.Expected_Profit ?? 0),
-            Phone_number: isValidPh_number.data,
-            Revenue: Number(findProductDetails.Revenue ?? 0),
-            Percentage_deviation:Number(findProductDetails.percentage_deviation ?? 0),
-            profit_deviation: Number(findProductDetails.profit_deviation ?? 0),
-            Total_pc_pkg_litre: Number(findProductDetails.Total_pc_pkg_litre ?? 0),
-            Discount_percentage: findProductDetails.percentage_discount ?? '',
-            paymentstatus: partialpaid === true ? paymentstatus.Parctial:paymentstatus.Dept,
-            PaymentDateAt: dto.PaymentDateAt,
-            location: dto.location,
-            user: { id: userId },
-        })
-        const savedDebt = await manager.save(CreateDebt)
-        if(!savedDebt || !savedDebt.id)
-          throw new Error('Failed to  add record to Debt')
+        const CreateDebt = manager.create(Debt, {
+          product: { id: dto.Product_id },
+          paidmoney: dto.PaidAmount | 0,
+          Debtor_name: dto.debtorName,
+          Net_profit: Number(findProductDetails.Net_profit ?? 0),
+          Expected_profit: Number(findProductDetails.Expected_Profit ?? 0),
+          Phone_number: isValidPh_number.data,
+          Revenue: Number(findProductDetails.Revenue ?? 0),
+          Percentage_deviation: Number(
+            findProductDetails.percentage_deviation ?? 0,
+          ),
+          profit_deviation: Number(findProductDetails.profit_deviation ?? 0),
+          Total_pc_pkg_litre: Number(
+            findProductDetails.Total_pc_pkg_litre ?? 0,
+          ),
+          Discount_percentage: findProductDetails.percentage_discount ?? '',
+          paymentstatus:
+            partialpaid === true ? paymentstatus.Parctial : paymentstatus.Dept,
+          PaymentDateAt: dto.PaymentDateAt,
+          location: dto.location,
+          user: { id: userId },
+        });
+        const savedDebt = await manager.save(CreateDebt);
+        if (!savedDebt || !savedDebt.id)
+          throw new Error('Failed to  add record to Debt');
 
-        const AddDebt_Track  = manager.create(Debt_track,{
-          debt:{id:savedDebt.id},
-          paidmoney:dto.PaidAmount || 0,
-          user:{id:userId}
-        })
-        await manager.save(AddDebt_Track)
+        const AddDebt_Track = manager.create(Debt_track, {
+          debt: { id: savedDebt.id },
+          paidmoney: dto.PaidAmount || 0,
+          user: { id: userId },
+        });
+        await manager.save(AddDebt_Track);
         return {
           message: 'successfuly add  sales  to debt list ',
           success: true,
