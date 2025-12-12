@@ -139,8 +139,6 @@ export class updatePendingDto{
   @IsEnum(UpdatePendingType)
   UpdateType:UpdatePendingType
 
-
-
   @IsNumber()
   Product_id:number
 
