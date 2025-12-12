@@ -571,10 +571,16 @@ export class ProfitDevService {
     .orderBy('s.total_revenue', 'DESC')
     .limit(1)
     .getRawOne()
+
     const findLeastSalesDay =  await this.ProfitsummaryRepo.createQueryBuilder('s')
     .select('s.total_revenue', 'Revenue')
     .addSelect('s.CreatedAt', 'Date')
     .orderBy('s.total_revenue', 'ASC')
+    .getRawOne()
+    const findlargestDebtRec =  await this.DebtRepo.createQueryBuilder('d')
+    .select('d.Revenue', 'Revenue')
+    .addSelect('d.Debtor_name', 'customerName')
+    .orderBy('d.Revenue', 'DESC')
     .getRawOne()
     return {
       message: 'successfuly',
@@ -598,7 +604,8 @@ export class ProfitDevService {
         ThisweekServRecord,
         Bank_Debt,
         findMostSalesDay,
-        findLeastSalesDay
+        findLeastSalesDay,
+        findlargestDebtRec
       },
     };
   }
