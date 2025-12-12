@@ -565,7 +565,15 @@ export class ProfitDevService {
       secondData = Number(Capital_Result[1].total_revenue);
       Revenue_Rate = this.businesslogic.RateCalculation(firstData, secondData);
     }
-
+    const findMostSalesDay = await this.ProfitsummaryRepo.createQueryBuilder('s')
+    .select('s.total_revenue', 'Revenue')
+    .addSelect('s.CreatedAt', 'Date')
+    .orderBy('s.total_revenue', 'DESC')
+    .limit(1)
+    .getRawOne()
+    const findLeastSalesDay =  await this.ProfitsummaryRepo.createQueryBuilder('s')
+    .select('s.total_revenue', 'Revenue')
+    
     return {
       message: 'successfuly',
       success: true,
@@ -587,6 +595,7 @@ export class ProfitDevService {
         TodayservRecord,
         ThisweekServRecord,
         Bank_Debt,
+        findMostSalesDay
       },
     };
   }
