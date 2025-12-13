@@ -14,6 +14,7 @@ import { DataSource } from 'typeorm';
 import { Capital } from 'src/entities/capital.entity';
 import { CashFlow } from 'src/entities/cashFlow.entity';
 import { throwError } from 'rxjs';
+import { Order } from 'src/order/entities/order.entity';
 @Injectable()
 export class StockService {
   constructor(
@@ -126,10 +127,33 @@ export class StockService {
         });
         if (!checkProductId) throw new Error('Product is not exist');
         const  CalculateStockWorth =  checkProductId.product_category === category.retailsales ? Number(checkProductId.rpurchase_price) :Number(updateStockDto.total_stock) *Number(checkProductId.wpurchase_price)
-
+        
         if (updateStockDto.Method === ChangeType.ADD) {
-          const CapitalInfo = await manager.find(Capital,{where:{},order:{id:"DESC"},take:1})
+          const CapitalInfo = await manager.createQueryBuilder(Capital,'c')
+          .select('s.withdraw','Withdraw')
+          .orderBy('s.id','DESC')
+          .getRawOne()
+          const CashflowInfo  = await manager.findOne(CashFlow,{where:{},order:{id:"DESC"}} )
+
+          if(!CashflowInfo) throw new Error('Failed to procced no cashflow Information')
+
           if(!CapitalInfo) throw new Error('Failed to procced no capital Information')
+          if(Number(CapitalInfo.Withdraw) === 0) throw new Error('Please withdraw  first before add new Stock')
+
+          if(Number(CapitalInfo.Withdraw) < CalculateStockWorth)throw new Error('Your current withdrawal amount is insufficient. Please withdraw additional funds')
+          const newWithdraw =  Number(CapitalInfo.Withdraw) - CalculateStockWorth
+          const UpdateWithdraw = await manager.update(Capital,{id:1}, {
+            Withdraw:newWithdraw
+          })
+          const CreateCashflow =  manager.create(CashFlow,{
+           Bank_Capital:CashflowInfo.Bank_Capital,
+           Total_Capital:CashflowInfo.Total_Capital,
+           OnHand_Capital:CashflowInfo.OnHand_Capital,
+           bankDebt:CashflowInfo.bankDebt,
+           Withdraw:newWithdraw,
+           servicename: `bought ${checkProductId.product_name}`
+          })
+          await manager.save(CreateCashflow)
           
           const findTotal = await manager
             .createQueryBuilder(Stock, 's')
