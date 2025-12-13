@@ -11,6 +11,9 @@ import { StockType, ChangeType } from 'src/type/type.interface';
 import { Product } from 'src/product/entities/product.entity';
 import { WholeSales } from 'src/sales/entities/wholesale.entity';
 import { DataSource } from 'typeorm';
+import { Capital } from 'src/entities/capital.entity';
+import { CashFlow } from 'src/entities/cashFlow.entity';
+import { throwError } from 'rxjs';
 @Injectable()
 export class StockService {
   constructor(
@@ -122,8 +125,12 @@ export class StockService {
           where: { id: updateStockDto.product_id },
         });
         if (!checkProductId) throw new Error('Product is not exist');
-        
+        const  CalculateStockWorth =  checkProductId.product_category === category.retailsales ? Number(checkProductId.rpurchase_price) :Number(updateStockDto.total_stock) *Number(checkProductId.wpurchase_price)
+
         if (updateStockDto.Method === ChangeType.ADD) {
+          const CapitalInfo = await manager.find(Capital,{where:{},order:{id:"DESC"},take:1})
+          if(!CapitalInfo) throw new Error('Failed to procced no capital Information')
+          
           const findTotal = await manager
             .createQueryBuilder(Stock, 's')
             .select('s.Total_stock', 'total')
@@ -135,7 +142,7 @@ export class StockService {
             throw new Error('Failed  to find  the targeted product ');
           const FindSum = Number(findTotal.total) + updateStockDto.total_stock;
 
-          const Updatestk = await manager.update(
+          const Updatestock = await manager.update(
             Stock,
             { product: { id: updateStockDto.product_id } },
             {
@@ -143,6 +150,7 @@ export class StockService {
               user: { id: userId },
             },
           );
+          if(!Updatestock.affected) throw new Error('failed to update stock')
 
           const lastStockTransaction = await manager
             .createQueryBuilder(Stock_transaction, 'st')
