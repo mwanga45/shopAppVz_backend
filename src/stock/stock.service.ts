@@ -10,6 +10,7 @@ import { ResponseType } from 'src/type/type.interface';
 import { StockType, ChangeType } from 'src/type/type.interface';
 import { Product } from 'src/product/entities/product.entity';
 import { WholeSales } from 'src/sales/entities/wholesale.entity';
+import { DataSource } from 'typeorm';
 @Injectable()
 export class StockService {
   constructor(
@@ -17,9 +18,9 @@ export class StockService {
     @InjectRepository(Stock) private readonly stockRepo: Repository<Stock>,
     @InjectRepository(Stock_transaction)
     private readonly recstockRepo: Repository<Stock_transaction>,
-    // private readonly stockhelper:StockUpdateHelper,
     @InjectRepository(Product)
     private readonly productRepo: Repository<Product>,
+    private readonly Datasource:DataSource
   ) {}
 
   async createStockRec(
@@ -116,23 +117,21 @@ export class StockService {
     updateStockDto: UpdateStockDto,
     userId: any,
   ): Promise<ResponseType<any>> {
-    if (updateStockDto.Method === ChangeType.ADD) {
-      const findTotal = await this.stockRepo
-        .createQueryBuilder('s')
+    return await this.Datasource.transaction(async(manager)=>{
+      try{
+        if (updateStockDto.Method === ChangeType.ADD) {
+      const findTotal = await manager
+        .createQueryBuilder(Stock,'s')
         .select('s.Total_stock', 'total')
         .where('s.product_id = :product_id', {
           product_id: updateStockDto.product_id,
         })
         .getRawOne<{ total: number }>();
-      if (!findTotal) {
-        return {
-          success: false,
-          message: 'Failed  to find  the targeted product ',
-        };
-      }
+      if (!findTotal)
+        throw new Error('Failed  to find  the targeted product ')
       const FindSum = Number(findTotal.total) + updateStockDto.total_stock;
 
-      const Updatestk = await this.stockRepo.update(
+      const Updatestk = await manager.update(Stock,
         { product: { id: updateStockDto.product_id } },
         {
           Total_stock: FindSum,
@@ -140,8 +139,8 @@ export class StockService {
         },
       );
 
-      const lastStockTransaction = await this.recstockRepo
-        .createQueryBuilder('st')
+      const lastStockTransaction = await manager
+        .createQueryBuilder(Stock_transaction,'st')
         .select('st.new_stock', 'newStock')
         .where('st.product.id = :productId', {
           productId: updateStockDto.product_id,
@@ -178,41 +177,30 @@ export class StockService {
         })
         .getRawOne<{ total: number }>();
 
-      if (!findTotal) {
-        return {
-          message: 'Failed to return total stock',
-          success: false,
-        };
-      }
+      if (!findTotal) 
+        throw new Error('Failed to return total stock')
       const updateTotalstock =
         Number(findTotal.total) - updateStockDto.total_stock;
-      if (updateTotalstock < 0) {
-        return {
-          message: 'can  not remove  stock below 0',
-          success: false,
-        };
-      }
-      const updatestock = await this.stockRepo.update(
+      if (updateTotalstock < 0)
+        throw new Error('You can’t remove this item because there is no stock available')
+      
+      const updatestock = await manager.update(Stock,
         { product: { id: updateStockDto.product_id } },
         {
           Total_stock: updateTotalstock,
           user: { id: userId },
         },
       );
-      const QueryStockTrans = await this.recstockRepo
-        .createQueryBuilder('S') 
+      const QueryStockTrans = await manager
+        .createQueryBuilder(Stock_transaction,'S') 
         .select(['S.new_stock', 'S.prev_stock'])
         .where('S.product_id = :product_id', {
           product_id: updateStockDto.product_id,
         })
         .orderBy('S.CreatedAt', 'DESC')
         .getOne();
-      if (!QueryStockTrans) {
-        return {
-          message: 'No record  of the product in Stock_trans table',
-          success: false,
-        };
-      }
+      if (!QueryStockTrans) 
+        throw new Error('No record  of the product in Stock_transaction ')
       const findNewstock =
         QueryStockTrans.new_stock - updateStockDto.total_stock;
       const newstocktrancrec = this.recstockRepo.create({
@@ -228,12 +216,23 @@ export class StockService {
       });
       this.recstockRepo.save(newstocktrancrec);
       return {
-        message: 'Succesfuly Updatw Stock (reduce number stock)',
+        message: 'Succesfuly Updatw Stock (reduce number stock',
         success: true,
         data: { findNewstock, QueryStockTrans, updateTotalstock, findTotal },
       };
     }
-    return {
+        return{
+          message:"successfuly update product",
+          success:true
+        }
+      }catch(err){
+        return{
+          message:`failed to update product stock`,
+          success:false
+        }
+      }
+    })
+        return {
       message: 'Fail to update Stock please try again',
       success: false,
     };

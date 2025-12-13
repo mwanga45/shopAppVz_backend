@@ -577,11 +577,13 @@ export class ProfitDevService {
     .addSelect('s.CreatedAt', 'Date')
     .orderBy('s.total_revenue', 'ASC')
     .getRawOne()
+
     const findlargestDebtRec =  await this.DebtRepo.createQueryBuilder('d')
     .select('d.Revenue', 'Revenue')
     .addSelect('d.Debtor_name', 'customerName')
     .orderBy('d.Revenue', 'DESC')
     .getRawOne()
+    
     return {
       message: 'successfuly',
       success: true,
