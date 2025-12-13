@@ -216,9 +216,9 @@ export class StockService {
       });
       this.recstockRepo.save(newstocktrancrec);
       return {
-        message: 'Succesfuly Updatw Stock (reduce number stock',
+        message: 'Succesfuly Updatw Stock (reduce number stock)',
         success: true,
-        data: { findNewstock, QueryStockTrans, updateTotalstock, findTotal },
+        data: { findNewstock, QueryStockTrans, updateTotalstock, findTotal},
       };
     }
         return{
