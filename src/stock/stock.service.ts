@@ -118,6 +118,11 @@ export class StockService {
     userId: any,
   ): Promise<ResponseType<any>> {
     return await this.Datasource.transaction(async(manager)=>{
+     const checkProductId = await manager.findOne(Product,{
+      where:{id:updateStockDto.product_id}
+     })
+     if(!checkProductId)
+      throw new Error('Product is not exist')
       try{
         if (updateStockDto.Method === ChangeType.ADD) {
       const findTotal = await manager
