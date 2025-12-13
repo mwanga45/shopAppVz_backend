@@ -14,13 +14,14 @@ import { DataSource } from 'typeorm';
 @Injectable()
 export class StockService {
   constructor(
-    @InjectRepository(WholeSales) private readonly WholesalesRepo: Repository<WholeSales>,
+    @InjectRepository(WholeSales)
+    private readonly WholesalesRepo: Repository<WholeSales>,
     @InjectRepository(Stock) private readonly stockRepo: Repository<Stock>,
     @InjectRepository(Stock_transaction)
     private readonly recstockRepo: Repository<Stock_transaction>,
     @InjectRepository(Product)
     private readonly productRepo: Repository<Product>,
-    private readonly Datasource:DataSource
+    private readonly Datasource: DataSource,
   ) {}
 
   async createStockRec(
@@ -105,8 +106,6 @@ export class StockService {
     };
   }
   async Test(): Promise<any> {
-
-
     return {
       message: 'test',
       success: true,
@@ -117,127 +116,135 @@ export class StockService {
     updateStockDto: UpdateStockDto,
     userId: any,
   ): Promise<ResponseType<any>> {
-    return await this.Datasource.transaction(async(manager)=>{
-     const checkProductId = await manager.findOne(Product,{
-      where:{id:updateStockDto.product_id}
-     })
-     if(!checkProductId)
-      throw new Error('Product is not exist')
-      try{
+    return await this.Datasource.transaction(async (manager) => {
+      try {
+        const checkProductId = await manager.findOne(Product, {
+          where: { id: updateStockDto.product_id },
+        });
+        if (!checkProductId) throw new Error('Product is not exist');
+        
         if (updateStockDto.Method === ChangeType.ADD) {
-      const findTotal = await manager
-        .createQueryBuilder(Stock,'s')
-        .select('s.Total_stock', 'total')
-        .where('s.product_id = :product_id', {
-          product_id: updateStockDto.product_id,
-        })
-        .getRawOne<{ total: number }>();
-      if (!findTotal)
-        throw new Error('Failed  to find  the targeted product ')
-      const FindSum = Number(findTotal.total) + updateStockDto.total_stock;
+          const findTotal = await manager
+            .createQueryBuilder(Stock, 's')
+            .select('s.Total_stock', 'total')
+            .where('s.product_id = :product_id', {
+              product_id: updateStockDto.product_id,
+            })
+            .getRawOne<{ total: number }>();
+          if (!findTotal)
+            throw new Error('Failed  to find  the targeted product ');
+          const FindSum = Number(findTotal.total) + updateStockDto.total_stock;
 
-      const Updatestk = await manager.update(Stock,
-        { product: { id: updateStockDto.product_id } },
-        {
-          Total_stock: FindSum,
-          user: { id: userId },
-        },
-      );
+          const Updatestk = await manager.update(
+            Stock,
+            { product: { id: updateStockDto.product_id } },
+            {
+              Total_stock: FindSum,
+              user: { id: userId },
+            },
+          );
 
-      const lastStockTransaction = await manager
-        .createQueryBuilder(Stock_transaction,'st')
-        .select('st.new_stock', 'newStock')
-        .where('st.product.id = :productId', {
-          productId: updateStockDto.product_id,
-        })
-        .orderBy('st.CreatedAt', 'DESC')
-        .getRawOne<{ newStock: number }>();
+          const lastStockTransaction = await manager
+            .createQueryBuilder(Stock_transaction, 'st')
+            .select('st.new_stock', 'newStock')
+            .where('st.product.id = :productId', {
+              productId: updateStockDto.product_id,
+            })
+            .orderBy('st.CreatedAt', 'DESC')
+            .getRawOne<{ newStock: number }>();
 
-      const prevStockForNewTransaction = lastStockTransaction
-        ? lastStockTransaction.newStock
-        : 0;
+          const prevStockForNewTransaction = lastStockTransaction
+            ? lastStockTransaction.newStock
+            : 0;
 
-      const updatestocktrans = this.recstockRepo.create({
-        product: { id: updateStockDto.product_id },
-        product_category: updateStockDto.product_category,
-        type_Enum: StockType.IN,
-        new_stock: FindSum,
-        prev_stock: prevStockForNewTransaction,
-        Quantity: updateStockDto.total_stock,
-        Change_type: updateStockDto.Method,
-        user: { id: userId },
-        Reasons: updateStockDto.Reasons,
-      });
-      await this.recstockRepo.save(updatestocktrans);
-      return {
-        message: `Succefuly Update Stock ${FindSum}`,
-        success: true,
-      };
-    } else if (updateStockDto.Method === ChangeType.REMOVE) {
-      const findTotal = await this.stockRepo
-        .createQueryBuilder('s')
-        .select('s.Total_stock', 'total')
-        .where('s.product_id = :product_id', {
-          product_id: updateStockDto.product_id,
-        })
-        .getRawOne<{ total: number }>();
+          const updatestocktrans = this.recstockRepo.create({
+            product: { id: updateStockDto.product_id },
+            product_category: updateStockDto.product_category,
+            type_Enum: StockType.IN,
+            new_stock: FindSum,
+            prev_stock: prevStockForNewTransaction,
+            Quantity: updateStockDto.total_stock,
+            Change_type: updateStockDto.Method,
+            user: { id: userId },
+            Reasons: updateStockDto.Reasons,
+          });
+          await this.recstockRepo.save(updatestocktrans);
+          return {
+            message: `Succefuly Update Stock ${FindSum}`,
+            success: true,
+          };
+        } else if (updateStockDto.Method === ChangeType.REMOVE) {
+          const findTotal = await this.stockRepo
+            .createQueryBuilder('s')
+            .select('s.Total_stock', 'total')
+            .where('s.product_id = :product_id', {
+              product_id: updateStockDto.product_id,
+            })
+            .getRawOne<{ total: number }>();
 
-      if (!findTotal) 
-        throw new Error('Failed to return total stock')
-      const updateTotalstock =
-        Number(findTotal.total) - updateStockDto.total_stock;
-      if (updateTotalstock < 0)
-        throw new Error('You can’t remove this item because there is no stock available')
-      
-      const updatestock = await manager.update(Stock,
-        { product: { id: updateStockDto.product_id } },
-        {
-          Total_stock: updateTotalstock,
-          user: { id: userId },
-        },
-      );
-      const QueryStockTrans = await manager
-        .createQueryBuilder(Stock_transaction,'S') 
-        .select(['S.new_stock', 'S.prev_stock'])
-        .where('S.product_id = :product_id', {
-          product_id: updateStockDto.product_id,
-        })
-        .orderBy('S.CreatedAt', 'DESC')
-        .getOne();
-      if (!QueryStockTrans) 
-        throw new Error('No record  of the product in Stock_transaction ')
-      const findNewstock =
-        QueryStockTrans.new_stock - updateStockDto.total_stock;
-      const newstocktrancrec = this.recstockRepo.create({
-        user: { id: userId },
-        Quantity: updateStockDto.total_stock,
-        prev_stock: QueryStockTrans.new_stock,
-        new_stock: findNewstock,
-        product: { id: updateStockDto.product_id },
-        type_Enum: StockType.OUT,
-        product_category: updateStockDto.product_category,
-        Change_type: ChangeType.REMOVE,
-        Reasons: updateStockDto.Reasons,
-      });
-      this.recstockRepo.save(newstocktrancrec);
-      return {
-        message: 'Succesfuly Updatw Stock (reduce number stock)',
-        success: true,
-        data: { findNewstock, QueryStockTrans, updateTotalstock, findTotal},
-      };
-    }
-        return{
-          message:"successfuly update product",
-          success:true
+          if (!findTotal) throw new Error('Failed to return total stock');
+          const updateTotalstock =
+            Number(findTotal.total) - updateStockDto.total_stock;
+          if (updateTotalstock < 0)
+            throw new Error(
+              'You can’t remove this item because there is no stock available',
+            );
+
+          const updatestock = await manager.update(
+            Stock,
+            { product: { id: updateStockDto.product_id } },
+            {
+              Total_stock: updateTotalstock,
+              user: { id: userId },
+            },
+          );
+          const QueryStockTrans = await manager
+            .createQueryBuilder(Stock_transaction, 'S')
+            .select(['S.new_stock', 'S.prev_stock'])
+            .where('S.product_id = :product_id', {
+              product_id: updateStockDto.product_id,
+            })
+            .orderBy('S.CreatedAt', 'DESC')
+            .getOne();
+          if (!QueryStockTrans)
+            throw new Error('No record  of the product in Stock_transaction ');
+          const findNewstock =
+            QueryStockTrans.new_stock - updateStockDto.total_stock;
+          const newstocktrancrec = this.recstockRepo.create({
+            user: { id: userId },
+            Quantity: updateStockDto.total_stock,
+            prev_stock: QueryStockTrans.new_stock,
+            new_stock: findNewstock,
+            product: { id: updateStockDto.product_id },
+            type_Enum: StockType.OUT,
+            product_category: updateStockDto.product_category,
+            Change_type: ChangeType.REMOVE,
+            Reasons: updateStockDto.Reasons,
+          });
+          this.recstockRepo.save(newstocktrancrec);
+          return {
+            message: 'Succesfuly Updatw Stock (reduce number stock)',
+            success: true,
+            data: {
+              findNewstock,
+              QueryStockTrans,
+              updateTotalstock,
+              findTotal,
+            },
+          };
         }
-      }catch(err){
-        return{
-          message:`failed to update product stock`,
-          success:false
-        }
-      }
-    })
         return {
+          message: 'successfuly update product',
+          success: true,
+        };
+      } catch (err) {
+        return {
+          message: `failed to update product stock`,
+          success: false,
+        };
+      }
+    });
+    return {
       message: 'Fail to update Stock please try again',
       success: false,
     };
