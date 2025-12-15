@@ -19,4 +19,7 @@ export class UpdateStockDto {
 
   @IsString()
   product_category: string;
+
+  @IsString()
+  Movement:string
 }

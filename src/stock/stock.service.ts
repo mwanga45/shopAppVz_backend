@@ -126,35 +126,54 @@ export class StockService {
           where: { id: updateStockDto.product_id },
         });
         if (!checkProductId) throw new Error('Product is not exist');
-        const  CalculateStockWorth =  checkProductId.product_category === category.retailsales ? Number(checkProductId.rpurchase_price) :Number(updateStockDto.total_stock) *Number(checkProductId.wpurchase_price)
-        
+        const CapitalInfo = await manager
+          .createQueryBuilder(Capital, 's')
+          .select('s.Withdraw', 'Withdraw')
+          .orderBy('s.id', 'DESC')
+          .getRawOne();
+        const CashflowInfo = await manager.findOne(CashFlow, {
+          where: {},
+          order: { id: 'DESC' },
+        });
+        if (!CashflowInfo)
+          throw new Error('Failed to procced no cashflow Information');
+        if (!CapitalInfo)
+          throw new Error('Failed to procced no capital Information');
+        if (Number(CapitalInfo.Withdraw) === 0)
+          throw new Error('Please withdraw  first before add new Stock');
+
         if (updateStockDto.Method === ChangeType.ADD) {
-          const CapitalInfo = await manager.createQueryBuilder(Capital,'c')
-          .select('s.withdraw','Withdraw')
-          .orderBy('s.id','DESC')
-          .getRawOne()
-          const CashflowInfo  = await manager.findOne(CashFlow,{where:{},order:{id:"DESC"}} )
+          const CalculateStockWorth =
+            checkProductId.product_category === category.retailsales
+              ? Number(checkProductId.rpurchase_price)
+              : Number(updateStockDto.total_stock) *
+                Number(checkProductId.wpurchase_price);
 
-          if(!CashflowInfo) throw new Error('Failed to procced no cashflow Information')
+          if (Number(CapitalInfo.Withdraw) < CalculateStockWorth)
+            throw new Error(
+              'Your current withdrawal amount is insufficient. Please withdraw additional funds',
+            );
+          const newWithdraw =
+            Number(CapitalInfo.Withdraw) - CalculateStockWorth;
+          const UpdateWithdraw = await manager.update(
+            Capital,
+            { id: 1 },
+            {
+              Withdraw: newWithdraw,
+            },
+          );
 
-          if(!CapitalInfo) throw new Error('Failed to procced no capital Information')
-          if(Number(CapitalInfo.Withdraw) === 0) throw new Error('Please withdraw  first before add new Stock')
+          const CreateCashflow = manager.create(CashFlow, {
+            Bank_Capital: CashflowInfo.Bank_Capital,
+            Total_Capital: CashflowInfo.Total_Capital,
+            OnHand_Capital: CashflowInfo.OnHand_Capital,
+            bankDebt: CashflowInfo.bankDebt,
+            Withdraw: newWithdraw,
+            servicename: `bought ${checkProductId.product_name}`,
+          });
 
-          if(Number(CapitalInfo.Withdraw) < CalculateStockWorth)throw new Error('Your current withdrawal amount is insufficient. Please withdraw additional funds')
-          const newWithdraw =  Number(CapitalInfo.Withdraw) - CalculateStockWorth
-          const UpdateWithdraw = await manager.update(Capital,{id:1}, {
-            Withdraw:newWithdraw
-          })
-          const CreateCashflow =  manager.create(CashFlow,{
-           Bank_Capital:CashflowInfo.Bank_Capital,
-           Total_Capital:CashflowInfo.Total_Capital,
-           OnHand_Capital:CashflowInfo.OnHand_Capital,
-           bankDebt:CashflowInfo.bankDebt,
-           Withdraw:newWithdraw,
-           servicename: `bought ${checkProductId.product_name}`
-          })
-          await manager.save(CreateCashflow)
-          
+          await manager.save(CreateCashflow);
+
           const findTotal = await manager
             .createQueryBuilder(Stock, 's')
             .select('s.Total_stock', 'total')
@@ -174,7 +193,7 @@ export class StockService {
               user: { id: userId },
             },
           );
-          if(!Updatestock.affected) throw new Error('failed to update stock')
+          if (!Updatestock.affected) throw new Error('failed to update stock');
 
           const lastStockTransaction = await manager
             .createQueryBuilder(Stock_transaction, 'st')
@@ -189,7 +208,7 @@ export class StockService {
             ? lastStockTransaction.newStock
             : 0;
 
-          const updatestocktrans = this.recstockRepo.create({
+          const updatestocktrans = manager.create(Stock_transaction, {
             product: { id: updateStockDto.product_id },
             product_category: updateStockDto.product_category,
             type_Enum: StockType.IN,
@@ -200,14 +219,14 @@ export class StockService {
             user: { id: userId },
             Reasons: updateStockDto.Reasons,
           });
-          await this.recstockRepo.save(updatestocktrans);
+          await manager.save(updatestocktrans);
           return {
             message: `Succefuly Update Stock ${FindSum}`,
             success: true,
           };
         } else if (updateStockDto.Method === ChangeType.REMOVE) {
-          const findTotal = await this.stockRepo
-            .createQueryBuilder('s')
+          const findTotal = await manager
+            .createQueryBuilder(Stock, 's')
             .select('s.Total_stock', 'total')
             .where('s.product_id = :product_id', {
               product_id: updateStockDto.product_id,
@@ -242,7 +261,7 @@ export class StockService {
             throw new Error('No record  of the product in Stock_transaction ');
           const findNewstock =
             QueryStockTrans.new_stock - updateStockDto.total_stock;
-          const newstocktrancrec = this.recstockRepo.create({
+          const newstocktrancrec = manager.create(Stock_transaction, {
             user: { id: userId },
             Quantity: updateStockDto.total_stock,
             prev_stock: QueryStockTrans.new_stock,
@@ -253,7 +272,24 @@ export class StockService {
             Change_type: ChangeType.REMOVE,
             Reasons: updateStockDto.Reasons,
           });
-          this.recstockRepo.save(newstocktrancrec);
+          await manager.save(newstocktrancrec);
+          if (updateStockDto.Movement === 'IN') {
+            const ReturnPrice =
+              checkProductId.product_category === category.wholesales
+                ? Number(checkProductId.wpurchase_price) *
+                  Number(updateStockDto.total_stock)
+                : Number(checkProductId.rpurchase_price) *
+                  Number(updateStockDto.total_stock);
+            const UpdateWithdraw = await manager.update(
+              Capital,
+              { id: 1 },
+              {
+                Withdraw: Number(CapitalInfo.Withdraw) + Number(ReturnPrice),
+              },
+            );
+            if (!UpdateWithdraw.affected)
+              throw new Error('Failed to update Withdraw');
+          }
           return {
             message: 'Succesfuly Updatw Stock (reduce number stock)',
             success: true,
@@ -271,7 +307,7 @@ export class StockService {
         };
       } catch (err) {
         return {
-          message: `failed to update product stock`,
+          message: `failed to update product stock ${err}`,
           success: false,
         };
       }
