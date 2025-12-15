@@ -162,7 +162,6 @@ export class StockService {
               Withdraw: newWithdraw,
             },
           );
-
           const CreateCashflow = manager.create(CashFlow, {
             Bank_Capital: CashflowInfo.Bank_Capital,
             Total_Capital: CashflowInfo.Total_Capital,
@@ -171,9 +170,7 @@ export class StockService {
             Withdraw: newWithdraw,
             servicename: `bought ${checkProductId.product_name}`,
           });
-
           await manager.save(CreateCashflow);
-
           const findTotal = await manager
             .createQueryBuilder(Stock, 's')
             .select('s.Total_stock', 'total')
@@ -506,7 +503,21 @@ export class StockService {
       .addGroupBy('p.product_name')
       .addGroupBy('p.id')
       .getRawMany();
-
+    const returnStockTransaction =  await this.recstockRepo
+    .createQueryBuilder('t')
+    .leftJoin('t.user', 'u')
+    .leftJoin('t.product', 'p')
+    .select('p.product_name', 'Pname')
+    .addSelect('t.prev_stock', 'prev_stock')
+    .addSelect('t.product_category', 'product_category')
+    .addSelect('t.new_stock', 'new_stock')
+    .addSelect('t.CreatedAt', 'Date')
+    .addSelect('t.Change_type', 'Method')
+    .addSelect('type', 'Movement')
+    .addSelect('t.Quantity', 'total_pc')
+    .addSelect('t.Reasons', 'reasons')
+    .addSelect('u.fullname', 'character')
+    .getRawMany()
     const finalresult = getStockInfo.map((p) => {
       const lastadd = Number(p.last_add_stock) || 0;
       const laststock = Number(p.last_stock) || 0;
@@ -521,7 +532,7 @@ export class StockService {
     return {
       message: 'Successfully obtained data',
       success: true,
-      data: finalresult,
+      data: {finalresult,returnStockTransaction}
     };
   }
 }
