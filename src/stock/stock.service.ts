@@ -517,6 +517,7 @@ export class StockService {
     .addSelect('t.Quantity', 'total_pc')
     .addSelect('t.Reasons', 'reasons')
     .addSelect('u.fullname', 'character')
+    .orderBy('t.id', 'DESC')
     .getRawMany()
     const finalresult = getStockInfo.map((p) => {
       const lastadd = Number(p.last_add_stock) || 0;
