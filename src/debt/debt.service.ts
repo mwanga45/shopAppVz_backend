@@ -419,6 +419,19 @@ export class DebtService {
     });
   }
 
+  async CustomerDetails ():Promise<ResponseType<any>>{
+    const CustomerInfo =  await this.CustomerRepo.createQueryBuilder('c')
+    .select('c.customer_name', 'customerName')
+    .addSelect('c.phone_number', 'Dial')
+    .addSelect('c.Location', 'location')
+    .addSelect('c.CreatedAt', 'RegisteredAt')
+    .getRawMany()
+    return{
+      message:"successfully returned",
+      success:true
+
+    }
+  }
   async Test(id: any): Promise<any> {
     const returnAdded = await this.DebtRepo.findOne({
       where: { id },
