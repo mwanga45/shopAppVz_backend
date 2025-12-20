@@ -425,10 +425,12 @@ export class DebtService {
     .addSelect('c.phone_number', 'Dial')
     .addSelect('c.Location', 'location')
     .addSelect('c.CreatedAt', 'RegisteredAt')
+    .addSelect(`EXISTS(SELECT 1 FROM  Debt d WHERE d."Debtor_name" = c.customer_name)`, 'DebtStatus')
     .getRawMany()
     return{
       message:"successfully returned",
-      success:true
+      success:true,
+      data:CustomerInfo
 
     }
   }

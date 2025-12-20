@@ -33,6 +33,10 @@ export class DebtController {
   ReturnDebtInfo() {
     return this.debtService.ReturnDebtInfo();
   }
+  @Get('CustomerInfo')
+  async GetCustomerInfo(){
+    return this.debtService.CustomerDetails()
+  }
   @Get(':id')
   async UserDebt(@Param('id') id: number) {
     return this.debtService.UserDebt(id);
