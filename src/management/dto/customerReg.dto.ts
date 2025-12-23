@@ -1,12 +1,12 @@
-import { IsOptional, IsString, Length } from "class-validator";
+import { IsNumber, IsOptional, IsString, Length } from "class-validator";
 
-export class CustomerCretor{
+export class CustomerCretorDto{
   @IsString()
   @Length(5, 25)
   CustomerName:string
 
   @IsString()
-  PhoneNumber:number
+  PhoneNumber:string
 
   @IsOptional()
   @IsString()

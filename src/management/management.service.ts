@@ -5,6 +5,7 @@ import {
   ServiceRequestDto,
 } from './dto/create-management.dto';
 import { UpdateManagementDto } from './dto/update-management.dto';
+import { CustomerCretorDto } from './dto/customerReg.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Capital } from 'src/entities/capital.entity';
 import { CashFlow } from 'src/entities/cashFlow.entity';
@@ -15,7 +16,8 @@ import { capitalTimes } from 'src/type/type.interface';
 import { BusinessService } from 'src/entities/businessService.entity';
 import { serviceRecord } from 'src/entities/servicer_record.entity';
 import { Timeformat } from 'src/common/helper/timeformat.helper';
-
+import { Customer } from 'src/entities/customer.entity';
+import { dialValidate } from 'src/common/helper/phone.helper';
 import bcrypt from 'bcrypt';
 
 @Injectable()
@@ -29,7 +31,10 @@ export class ManagementService {
     private readonly BusinessServiceRepo: Repository<BusinessService>,
     @InjectRepository(serviceRecord)
     private readonly serviceRecoRepo: Repository<serviceRecord>,
+    @InjectRepository(Customer)
+    private readonly CustomerRepo:Repository<Customer>,
     private readonly Datasource: DataSource,
+    private readonly Dialvalidaor:dialValidate
   ) {}
   async CapitalRegistration(
     dto: CreateManagementDto,
@@ -514,8 +519,23 @@ export class ManagementService {
     });
   }
 
-  async CreateNewCustomer():Promise<ResponseType<any>>{
-    
+  async CreateNewCustomer(dto:CustomerCretorDto):Promise<ResponseType<any>>{
+  const Dial = this.Dialvalidaor.CheckDialformat(dto.PhoneNumber) 
+  if(!Dial.success){
+    return{
+      message:"Invalid Phone Number",
+      success:false
+    }
+  }
+   const NewCustomer = this.CustomerRepo.create(
+    {
+      customer_name:dto.CustomerName,
+      Location:dto.Location,
+      phone_number:Dial.data
+
+    }
+   )
+   this.CustomerRepo.save(NewCustomer)
     return{
       message:"successfuly registered",
       success:true

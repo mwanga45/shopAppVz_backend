@@ -7,10 +7,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BusinessService } from 'src/entities/businessService.entity';
 import { serviceRecord } from 'src/entities/servicer_record.entity';
 import { ServiceSeeder } from './services.seeder';
+import { Customer } from 'src/entities/customer.entity';
 
 @Module({
   imports:[
-   TypeOrmModule.forFeature([Capital, CashFlow, BusinessService, serviceRecord])
+   TypeOrmModule.forFeature([Capital, CashFlow, BusinessService, serviceRecord, Customer])
   ],
   controllers: [ManagementController],
   providers: [ManagementService, ServiceSeeder],
