@@ -8,12 +8,13 @@ import { BusinessService } from 'src/entities/businessService.entity';
 import { serviceRecord } from 'src/entities/servicer_record.entity';
 import { ServiceSeeder } from './services.seeder';
 import { Customer } from 'src/entities/customer.entity';
+import { dialValidate } from 'src/common/helper/phone.helper';
 
 @Module({
   imports:[
    TypeOrmModule.forFeature([Capital, CashFlow, BusinessService, serviceRecord, Customer])
   ],
   controllers: [ManagementController],
-  providers: [ManagementService, ServiceSeeder],
+  providers: [ManagementService, ServiceSeeder, dialValidate],
 })
 export class ManagementModule {}

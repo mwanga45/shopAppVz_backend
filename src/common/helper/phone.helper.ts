@@ -13,7 +13,21 @@ export class dialValidate{
         success:false
       }
     }
+    if(phone_number.startsWith('255')){
+      if(phone_number.length > 12){
+        return{
+          message:"Phone number is to long",
+          success:false
+        }
+      }
+    }
     if (dial_number.startsWith('0')){
+      if(phone_number.length > 10){
+        return{
+          message:"phone number is to long",
+          success:false
+        }
+      }
        const number =  phone_number.replace(/^0/,"255")
        return {
         message:"valid phone number",
