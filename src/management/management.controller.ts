@@ -17,6 +17,7 @@ import {
 } from './dto/create-management.dto';
 import { UpdateManagementDto } from './dto/update-management.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { CustomerCretorDto } from './dto/customerReg.dto';
 
 @Controller('management')
 export class ManagementController {
@@ -30,6 +31,12 @@ export class ManagementController {
   Createservice(@Body() CreateServiceDto: CreateServiceDto) {
     return this.managementService.CreateService(CreateServiceDto);
   }
+  
+  @Post('CreateCustomer')
+  CreaterCustomer(@Body() Dto:CustomerCretorDto){
+    return this.managementService.CreateNewCustomer(Dto)
+  }
+
   @UseGuards(AuthGuard('jwt'))
   @Post('servieRequest')
   ServiceRequest(@Request() req,  @Body()   ServiceRequestDto:ServiceRequestDto){
