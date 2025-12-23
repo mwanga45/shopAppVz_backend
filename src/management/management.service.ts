@@ -527,9 +527,9 @@ export class ManagementService {
   async CreateNewCustomer(dto: CustomerCretorDto): Promise<ResponseType<any>> {
     const Dial = this.Dialvalidaor.CheckDialformat(dto.PhoneNumber);
     const CheckCustomerName =  await this.CustomerRepo.findOne({where:{customer_name:dto.CustomerName}})
-    if(!CheckCustomerName){
+    if(CheckCustomerName){
       return{
-        message:"Customer is Already exist",
+        message:"Customer name is Already exist",
         success:false
       }
     }
