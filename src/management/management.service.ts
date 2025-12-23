@@ -32,9 +32,9 @@ export class ManagementService {
     @InjectRepository(serviceRecord)
     private readonly serviceRecoRepo: Repository<serviceRecord>,
     @InjectRepository(Customer)
-    private readonly CustomerRepo:Repository<Customer>,
+    private readonly CustomerRepo: Repository<Customer>,
     private readonly Datasource: DataSource,
-    private readonly Dialvalidaor:dialValidate
+    private readonly Dialvalidaor: dialValidate,
   ) {}
   async CapitalRegistration(
     dto: CreateManagementDto,
@@ -345,11 +345,13 @@ export class ManagementService {
           }
 
           if (dto.Bankoption === 'Return') {
-            if(Number(CapitaInfo.bankDebt) === 0)
-              throw new Error('There no debt exist at all')
+            if (Number(CapitaInfo.bankDebt) === 0)
+              throw new Error('There no debt exist at all');
 
-            if(Number(CapitaInfo.bankDebt) < Number(dto.payment_Amount))
-              throw new Error(`There the returned loan  is greater than exist debt : Exist Debt ${Number(CapitaInfo.bankDebt)}, Return Debt ${CapitaInfo.bankDebt}`)
+            if (Number(CapitaInfo.bankDebt) < Number(dto.payment_Amount))
+              throw new Error(
+                `There the returned loan  is greater than exist debt : Exist Debt ${Number(CapitaInfo.bankDebt)}, Return Debt ${CapitaInfo.bankDebt}`,
+              );
 
             const updateCapital = await manager.update(
               Capital,
@@ -368,7 +370,8 @@ export class ManagementService {
                       Number(dto.payment_Amount)
                     : Number(CapitaInfo.BankCapital),
                 Withdraw: Number(CapitaInfo.Withdraw),
-                bankDebt: Number(CapitaInfo.bankDebt)- Number(dto.payment_Amount),
+                bankDebt:
+                  Number(CapitaInfo.bankDebt) - Number(dto.payment_Amount),
               },
             );
 
@@ -388,7 +391,8 @@ export class ManagementService {
                   : Number(lastCashflowInfo.OnHand_Capital),
               Withdraw: Number(lastCashflowInfo.Withdraw),
               servicename: CheckservId.service_name,
-              bankDebt: Number(lastCashflowInfo.bankDebt)-Number(dto.payment_Amount),
+              bankDebt:
+                Number(lastCashflowInfo.bankDebt) - Number(dto.payment_Amount),
             });
             await manager.save(CreateCashflow);
             const CreateService = manager.create(serviceRecord, {
@@ -399,65 +403,66 @@ export class ManagementService {
             await manager.save(CreateService);
 
             return {
-              message:`successfuly  Return an Loan ${Number(dto.payment_Amount).toLocaleString()}`,
-              success:true
-            }
+              message: `successfuly  Return an Loan ${Number(dto.payment_Amount).toLocaleString()}`,
+              success: true,
+            };
           }
           const updateCapital = await manager.update(
-              Capital,
-              { id: 1 },
-              {
-                Total_Capital:
-                  Number(CapitaInfo.Total_Capital) + Number(dto.payment_Amount),
-                OnhandCapital:
-                  dto.BankoptionII === 'Bank'
-                    ? Number(CapitaInfo.OnhandCapital)
-                    : Number(CapitaInfo.OnhandCapital) +
-                      Number(dto.payment_Amount),
-                BankCapital:
-                  dto.BankoptionII === 'Cash'
-                    ? Number(CapitaInfo.BankCapital) +
-                      Number(dto.payment_Amount)
-                    : Number(CapitaInfo.BankCapital),
-                Withdraw: Number(CapitaInfo.Withdraw),
-                bankDebt: Number(CapitaInfo.bankDebt) + Number(dto.payment_Amount),
-              },
-            );
-            const CreateCashflow = manager.create(CashFlow, {
+            Capital,
+            { id: 1 },
+            {
               Total_Capital:
-                Number(lastCashflowInfo.Total_Capital) +
-                Number(dto.payment_Amount),
-              Bank_Capital:
+                Number(CapitaInfo.Total_Capital) + Number(dto.payment_Amount),
+              OnhandCapital:
                 dto.BankoptionII === 'Bank'
-                  ? Number(lastCashflowInfo.Bank_Capital) +
-                    Number(dto.payment_Amount)
-                  : Number(lastCashflowInfo.Bank_Capital),
-              OnHand_Capital:
+                  ? Number(CapitaInfo.OnhandCapital)
+                  : Number(CapitaInfo.OnhandCapital) +
+                    Number(dto.payment_Amount),
+              BankCapital:
                 dto.BankoptionII === 'Cash'
-                  ? Number(lastCashflowInfo.OnHand_Capital) +
-                    Number(dto.payment_Amount)
-                  : Number(lastCashflowInfo.OnHand_Capital),
-              Withdraw: Number(lastCashflowInfo.Withdraw),
-              servicename: CheckservId.service_name,
-              bankDebt: Number(lastCashflowInfo.bankDebt) + Number(dto.payment_Amount),
-            });
-            await manager.save(CreateCashflow);
-            const CreateService = manager.create(serviceRecord, {
-              price: Number(dto.payment_Amount),
-              service: { id: CheckservId.id },
-              user: { id: userId },
-              Servicestatus:"Gain"
-            });
-            await manager.save(CreateService);
-            return{
-              message:`successfuly Add new Loan to capital ${Number(dto.payment_Amount).toLocaleString()},`,
-              success:true
-            }
+                  ? Number(CapitaInfo.BankCapital) + Number(dto.payment_Amount)
+                  : Number(CapitaInfo.BankCapital),
+              Withdraw: Number(CapitaInfo.Withdraw),
+              bankDebt:
+                Number(CapitaInfo.bankDebt) + Number(dto.payment_Amount),
+            },
+          );
+          const CreateCashflow = manager.create(CashFlow, {
+            Total_Capital:
+              Number(lastCashflowInfo.Total_Capital) +
+              Number(dto.payment_Amount),
+            Bank_Capital:
+              dto.BankoptionII === 'Bank'
+                ? Number(lastCashflowInfo.Bank_Capital) +
+                  Number(dto.payment_Amount)
+                : Number(lastCashflowInfo.Bank_Capital),
+            OnHand_Capital:
+              dto.BankoptionII === 'Cash'
+                ? Number(lastCashflowInfo.OnHand_Capital) +
+                  Number(dto.payment_Amount)
+                : Number(lastCashflowInfo.OnHand_Capital),
+            Withdraw: Number(lastCashflowInfo.Withdraw),
+            servicename: CheckservId.service_name,
+            bankDebt:
+              Number(lastCashflowInfo.bankDebt) + Number(dto.payment_Amount),
+          });
+          await manager.save(CreateCashflow);
+          const CreateService = manager.create(serviceRecord, {
+            price: Number(dto.payment_Amount),
+            service: { id: CheckservId.id },
+            user: { id: userId },
+            Servicestatus: 'Gain',
+          });
+          await manager.save(CreateService);
+          return {
+            message: `successfuly Add new Loan to capital ${Number(dto.payment_Amount).toLocaleString()},`,
+            success: true,
+          };
         }
         const checkWithdrawAmount = await manager.findOne(Capital, {
           where: {},
         });
-        console.log(checkWithdrawAmount)
+        console.log(checkWithdrawAmount);
         if (!checkWithdrawAmount)
           throw new Error('there is information on capital table');
         if (checkWithdrawAmount.Withdraw < Number(dto.payment_Amount))
@@ -467,7 +472,7 @@ export class ManagementService {
           service: { id: dto.service_id },
           user: { id: userId },
         });
-        console.log(CreateService)
+        console.log(CreateService);
         await manager.save(CreateService);
         const updateCapital = await manager.update(
           Capital,
@@ -477,7 +482,7 @@ export class ManagementService {
               Number(checkWithdrawAmount.Withdraw) - Number(dto.payment_Amount),
           },
         );
-        console.log(updateCapital)
+        console.log(updateCapital);
         if (!updateCapital.affected)
           throw new Error('failed to update capital');
         const lastCashflowInfo = await manager
@@ -504,7 +509,7 @@ export class ManagementService {
             Number(checkWithdrawAmount.Withdraw) - Number(dto.payment_Amount),
           servicename: CheckservId.service_name,
         });
-        console.log(CreateCashflow)
+        console.log(CreateCashflow);
         await manager.save(CreateCashflow);
         return {
           message: 'successfuly made the request',
@@ -519,27 +524,24 @@ export class ManagementService {
     });
   }
 
-  async CreateNewCustomer(dto:CustomerCretorDto):Promise<ResponseType<any>>{
-  const Dial = this.Dialvalidaor.CheckDialformat(dto.PhoneNumber) 
-  if(!Dial.success){
-    return{
-      message:"Invalid Phone Number",
-      success:false
+  async CreateNewCustomer(dto: CustomerCretorDto): Promise<ResponseType<any>> {
+    const Dial = this.Dialvalidaor.CheckDialformat(dto.PhoneNumber);
+    if (!Dial.success) {
+      return {
+        message: 'Invalid Phone Number',
+        success: false,
+      };
     }
-  }
-   const NewCustomer = this.CustomerRepo.create(
-    {
-      customer_name:dto.CustomerName,
-      Location:dto.Location,
-      phone_number:Dial.data
-
-    }
-   )
-   this.CustomerRepo.save(NewCustomer)
-    return{
-      message:"successfuly registered",
-      success:true
-    }
+    const NewCustomer = this.CustomerRepo.create({
+      customer_name: dto.CustomerName,
+      Location: dto.Location,
+      phone_number: Dial.data,
+    });
+    this.CustomerRepo.save(NewCustomer);
+    return {
+      message: 'successfuly registered',
+      success: true,
+    };
   }
   findOne(id: number) {
     return `This action returns a #${id} management`;
