@@ -513,6 +513,13 @@ export class ManagementService {
       }
     });
   }
+
+  async CreateNewCustomer():Promise<ResponseType<any>>{
+    return{
+      message:"successfuly registered",
+      success:true
+    }
+  }
   findOne(id: number) {
     return `This action returns a #${id} management`;
   }

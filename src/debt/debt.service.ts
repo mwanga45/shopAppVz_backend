@@ -427,11 +427,14 @@ export class DebtService {
     .addSelect('c.CreatedAt', 'RegisteredAt')
     .addSelect(`EXISTS(SELECT 1 FROM  Debt d WHERE d."Debtor_name" = c.customer_name)`, 'DebtStatus')
     .getRawMany()
+    const DebtAmountInfo = await this.DebtRepo.createQueryBuilder('d')
+    .select('SUM(d.Revenue)', 'TotalDebtRec')
+    .addSelect('SUM(d.paidmoney)', 'PaidMoney')
+    .getRawOne()
     return{
       message:"successfully returned",
       success:true,
-      data:CustomerInfo
-
+      data:{CustomerInfo, DebtAmountInfo}
     }
   }
   async Test(id: any): Promise<any> {
