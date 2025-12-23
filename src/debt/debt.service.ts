@@ -89,7 +89,6 @@ export class DebtService {
             debt: { id: saveDebt.id },
             user: { id: userId },
           });
-
           const savedTrack = await manager.save(Addtrack);
           if (!savedTrack || !savedTrack.id)
             throw new Error('failed to add track');

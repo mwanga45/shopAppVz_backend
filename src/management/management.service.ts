@@ -526,20 +526,35 @@ export class ManagementService {
 
   async CreateNewCustomer(dto: CustomerCretorDto): Promise<ResponseType<any>> {
     const Dial = this.Dialvalidaor.CheckDialformat(dto.PhoneNumber);
+    const CheckCustomerName =  await this.CustomerRepo.findOne({where:{customer_name:dto.CustomerName}})
+    if(!CheckCustomerName){
+      return{
+        message:"Customer is Already exist",
+        success:false
+      }
+    }
     if (!Dial.success) {
       return {
-        message: 'Invalid Phone Number',
+        message: Dial.message,
         success: false,
       };
+    }
+    const CheckPhoneNumber = await this.CustomerRepo.exists({where:{phone_number:Dial.data}})
+    if(CheckPhoneNumber){
+      return{
+        message:"Customer Phone number is Already exist",
+        success:false
+      }
     }
     const NewCustomer = this.CustomerRepo.create({
       customer_name: dto.CustomerName,
       Location: dto.Location,
-      phone_number: Dial.data,
+      phone_number:Dial.data
     });
     this.CustomerRepo.save(NewCustomer);
+
     return {
-      message: 'successfuly registered',
+      message: `successfuly registered ${Dial.data}`,
       success: true,
     };
   }
