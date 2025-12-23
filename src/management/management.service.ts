@@ -515,6 +515,7 @@ export class ManagementService {
   }
 
   async CreateNewCustomer():Promise<ResponseType<any>>{
+    
     return{
       message:"successfuly registered",
       success:true
